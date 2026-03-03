@@ -1,0 +1,54 @@
+{% if section.settings.shopify_video != blank %}
+  {{ section.settings.shopify_video | video_tag: autoplay: true, loop: true, muted: true, playsinline: true, class: 'offers-timeline-video' }}
+{% elsif section.settings.video_url != blank %}
+  <video
+    playsinline="playsinline"
+    autoplay="autoplay"
+    loop="loop"
+    muted="muted"
+    class="offers-timeline-video"
+    preload="metadata"
+    {% if section.settings.poster_url != blank %}poster="{{ section.settings.poster_url }}"{% endif %}
+  >
+    <source src="{{ section.settings.video_url }}" type="video/mp4">
+  </video>
+{% endif %}
+
+{% schema %}
+{
+  "name": "Valentine Offers Video",
+  "settings": [
+    {
+      "type": "video",
+      "id": "shopify_video",
+      "label": "Shopify Hosted Video"
+    },
+    {
+      "type": "text",
+      "id": "video_url",
+      "label": "External Video URL (MP4)",
+      "default": "//www.monsterpiercing.com/cdn/shop/videos/c/vp/50197a5203304f8a9e9c33cdcf60a41e/50197a5203304f8a9e9c33cdcf60a41e.SD-480p-0.9Mbps-69548998.mp4?v=0"
+    },
+    {
+      "type": "text",
+      "id": "poster_url",
+      "label": "Poster Image URL",
+      "default": "//www.monsterpiercing.com/cdn/shop/files/preview_images/50197a5203304f8a9e9c33cdcf60a41e.thumbnail.0000000000_1800x.jpg?v=1769946903"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Valentine Offers Video"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+.offers-timeline-video {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+</style>

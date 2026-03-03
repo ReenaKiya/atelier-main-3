@@ -1,0 +1,183 @@
+{% doc %}
+  @prompt
+    Update the collapsible row block to use text-transform: capitalize for the heading instead of uppercase. The heading should display with only the first letter of each word capitalized, not all letters in uppercase. Keep all other functionality the same including the page picker, expand/collapse animation, and Dawn theme styling.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-collapsible-row-{{ ai_gen_id }} {
+    border-top: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .ai-collapsible-row-{{ ai_gen_id }}:last-child {
+    border-bottom: 1px solid rgba(var(--color-foreground), 0.08);
+  }
+
+  .ai-collapsible-row-header-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
+    padding: {{ block.settings.padding_vertical }}px 0;
+    background: none;
+    border: none;
+    cursor: pointer;
+    text-align: left;
+  }
+
+  .ai-collapsible-row-heading-{{ ai_gen_id }} {
+    margin: 0;
+    font-size: {{ block.settings.heading_size }}px;
+    text-transform: capitalize;
+    color: rgb(var(--color-foreground));
+  }
+
+  .ai-collapsible-row-icon-{{ ai_gen_id }} {
+    flex-shrink: 0;
+    margin-left: 16px;
+    transition: transform 0.3s ease;
+  }
+
+  .ai-collapsible-row-icon-{{ ai_gen_id }} svg {
+    width: 20px;
+    height: 20px;
+    stroke: rgb(var(--color-foreground));
+  }
+
+  .ai-collapsible-row-header-{{ ai_gen_id }}[aria-expanded="true"] .ai-collapsible-row-icon-{{ ai_gen_id }} {
+    transform: rotate(180deg);
+  }
+
+  .ai-collapsible-row-content-{{ ai_gen_id }} {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.3s ease;
+  }
+
+  .ai-collapsible-row-content-{{ ai_gen_id }}.active {
+    max-height: 1000px;
+  }
+
+  .ai-collapsible-row-inner-{{ ai_gen_id }} {
+    padding-bottom: {{ block.settings.padding_vertical }}px;
+    color: rgb(var(--color-foreground));
+  }
+
+  .ai-collapsible-row-inner-{{ ai_gen_id }} p {
+    margin: 0 0 1em;
+  }
+
+  .ai-collapsible-row-inner-{{ ai_gen_id }} p:last-child {
+    margin-bottom: 0;
+  }
+{% endstyle %}
+
+<collapsible-row-{{ ai_gen_id }} class="ai-collapsible-row-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <button
+    class="ai-collapsible-row-header-{{ ai_gen_id }}"
+    aria-expanded="{% if block.settings.open_by_default %}true{% else %}false{% endif %}"
+    aria-controls="ai-collapsible-content-{{ ai_gen_id }}"
+  >
+    <h3 class="ai-collapsible-row-heading-{{ ai_gen_id }}">
+      {{ block.settings.heading }}
+    </h3>
+    <span class="ai-collapsible-row-icon-{{ ai_gen_id }}">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke-width="1.5">
+        <polyline points="6 9 12 15 18 9"></polyline>
+      </svg>
+    </span>
+  </button>
+
+  <div
+    id="ai-collapsible-content-{{ ai_gen_id }}"
+    class="ai-collapsible-row-content-{{ ai_gen_id }} {% if block.settings.open_by_default %}active{% endif %}"
+  >
+    <div class="ai-collapsible-row-inner-{{ ai_gen_id }}">
+      {% if block.settings.page != blank %}
+        {{ block.settings.page.content }}
+      {% else %}
+        <p>Select a page to display its content here.</p>
+      {% endif %}
+    </div>
+  </div>
+</collapsible-row-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class CollapsibleRow{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+      }
+
+      connectedCallback() {
+        this.button = this.querySelector('.ai-collapsible-row-header-{{ ai_gen_id }}');
+        this.content = this.querySelector('.ai-collapsible-row-content-{{ ai_gen_id }}');
+        
+        this.button.addEventListener('click', () => this.toggle());
+      }
+
+      toggle() {
+        const isExpanded = this.button.getAttribute('aria-expanded') === 'true';
+        
+        this.button.setAttribute('aria-expanded', !isExpanded);
+        this.content.classList.toggle('active');
+      }
+    }
+
+    customElements.define('collapsible-row-{{ ai_gen_id }}', CollapsibleRow{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Collapsible row",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Collapsible row"
+    },
+    {
+      "type": "page",
+      "id": "page",
+      "label": "Page"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Open by default",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 12,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "padding_vertical",
+      "min": 8,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Vertical padding",
+      "default": 16
+    }
+  ],
+  "presets": [
+    {
+      "name": "Collapsible row"
+    }
+  ]
+}
+{% endschema %}

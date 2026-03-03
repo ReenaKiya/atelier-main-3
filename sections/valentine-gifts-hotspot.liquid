@@ -1,0 +1,436 @@
+<div class="vday-hotspot">
+  <!-- Desktop Image -->
+  {% if section.settings.desktop_image != blank %}
+    <img
+      src="{{ section.settings.desktop_image | image_url: width: 2000 }}"
+      alt="{{ section.settings.heading | escape }}"
+      loading="lazy"
+      width="2000"
+      height="800"
+      class="vday-hotspot__img vday-hotspot__img--desktop"
+    >
+  {% endif %}
+
+  <!-- Mobile Image -->
+  {% if section.settings.mobile_image != blank %}
+    <img
+      src="{{ section.settings.mobile_image | image_url: width: 800 }}"
+      alt="{{ section.settings.heading | escape }}"
+      loading="lazy"
+      width="800"
+      height="1200"
+      class="vday-hotspot__img vday-hotspot__img--mobile"
+    >
+  {% endif %}
+
+  <!-- Promo Banner (top-left) -->
+  {% if section.settings.promo_text != blank %}
+    <div class="vday-hotspot__promo">
+      {{ section.settings.promo_text }}
+    </div>
+  {% endif %}
+
+  <!-- Heading Overlay (bottom-left) -->
+  {% if section.settings.heading != blank %}
+    <div class="vday-hotspot__heading">
+      {{ section.settings.heading }}
+    </div>
+  {% endif %}
+
+  <!-- Hover CTA (bottom-right) -->
+  {% if section.settings.cta_text != blank %}
+    <div class="vday-hotspot__cta">
+      {{ section.settings.cta_text }}
+    </div>
+  {% endif %}
+
+  <!-- Hotspots -->
+  {% for block in section.blocks %}
+    {% assign product = block.settings.product %}
+    <div
+      class="vday-hotspot__spot"
+      style="left: {{ block.settings.pos_x }}%; top: {{ block.settings.pos_y }}%;"
+      {{ block.shopify_attributes }}
+    >
+      <div class="vday-hotspot__dot"></div>
+
+      {% if product != blank %}
+        <a
+          href="{{ product.url }}"
+          class="vday-hotspot__card vday-hotspot__card--{{ block.settings.card_position }}"
+        >
+          {% if product.featured_image != blank %}
+            <img
+              src="{{ product.featured_image | image_url: width: 300 }}"
+              alt="{{ product.title | escape }}"
+              class="vday-hotspot__card-img"
+              loading="lazy"
+            >
+          {% endif %}
+
+          <div class="vday-hotspot__card-content">
+            <h3 class="vday-hotspot__card-title">{{ product.title }}</h3>
+            <div class="vday-hotspot__card-price">
+              {{ product.price | money }}
+            </div>
+            <button
+              type="button"
+              class="vday-hotspot__card-atc"
+              data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+              onclick="event.preventDefault(); event.stopPropagation();"
+            >
+              Add to Cart
+            </button>
+          </div>
+        </a>
+      {% endif %}
+    </div>
+  {% endfor %}
+</div>
+
+{% schema %}
+{
+  "name": "Valentine Gifts Hotspot",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "desktop_image",
+      "label": "Desktop Image"
+    },
+    {
+      "type": "image_picker",
+      "id": "mobile_image",
+      "label": "Mobile Image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Valentine's Day Gifts for HER"
+    },
+    {
+      "type": "text",
+      "id": "promo_text",
+      "label": "Promo Banner Text",
+      "default": "Valentine's Special"
+    },
+    {
+      "type": "text",
+      "id": "cta_text",
+      "label": "CTA Text",
+      "default": "Hover to see the products"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "hotspot",
+      "name": "Product Hotspot",
+      "settings": [
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        },
+        {
+          "type": "range",
+          "id": "pos_x",
+          "label": "Horizontal Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "range",
+          "id": "pos_y",
+          "label": "Vertical Position (%)",
+          "min": 0,
+          "max": 100,
+          "step": 1,
+          "default": 50
+        },
+        {
+          "type": "select",
+          "id": "card_position",
+          "label": "Card Position",
+          "options": [
+            { "value": "left", "label": "Left" },
+            { "value": "right", "label": "Right" }
+          ],
+          "default": "left"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Valentine Gifts Hotspot"
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+/* Container */
+.vday-hotspot {
+  position: relative;
+  width: 100%;
+  overflow: hidden;
+  line-height: 0;
+}
+
+/* Images */
+.vday-hotspot__img {
+  width: 100%;
+  height: auto;
+  display: block;
+  object-fit: cover;
+}
+
+.vday-hotspot__img--mobile {
+  display: none;
+}
+
+/* Promo Banner */
+.vday-hotspot__promo {
+  position: absolute;
+  top: 15px;
+  left: -200px;
+  background: #e31837;
+  color: #fff;
+  font-size: 14px;
+  font-weight: 600;
+  padding: 15px 24px;
+  z-index: 5;
+  border-radius: 0 4px 4px 0;
+  animation: vdayPromoSlide 3s ease infinite;
+}
+
+@keyframes vdayPromoSlide {
+  0% { left: -200px; }
+  15% { left: 0; }
+  50% { left: 0; }
+  65% { left: -200px; }
+  100% { left: -200px; }
+}
+
+/* Heading Overlay */
+.vday-hotspot__heading {
+  position: absolute;
+  bottom: 30px;
+  left: 30px;
+  font-size: 48px;
+  font-weight: 900;
+  color: #fff;
+  line-height: 1.1;
+  max-width: 500px;
+  z-index: 5;
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.6);
+}
+
+/* CTA Button */
+.vday-hotspot__cta {
+  position: absolute;
+  bottom: 15px;
+  right: 15px;
+  background: #e31837;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 600;
+  padding: 18px 20px;
+  z-index: 5;
+  cursor: default;
+  border-radius: 4px;
+}
+
+/* ===== HOTSPOT DOT ===== */
+.vday-hotspot__spot {
+  position: absolute;
+  z-index: 10;
+  transform: translate(-50%, -50%);
+}
+
+.vday-hotspot__dot {
+  width: 9px;
+  height: 9px;
+  background: #e31837;
+  border-radius: 50%;
+  border: 2px solid #fff;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  box-shadow: 0 0 0 0 rgba(227, 24, 55, 0.6);
+  animation: vdayPulse 2s ease infinite;
+}
+
+@keyframes vdayPulse {
+  0% { box-shadow: 0 0 0 0 rgba(227, 24, 55, 0.6); }
+  70% { box-shadow: 0 0 0 10px rgba(227, 24, 55, 0); }
+  100% { box-shadow: 0 0 0 0 rgba(227, 24, 55, 0); }
+}
+
+/* ===== PRODUCT CARD ===== */
+.vday-hotspot__card {
+  display: none;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 130px;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.25);
+  overflow: hidden;
+  text-decoration: none;
+  color: #333;
+  z-index: 20;
+  line-height: 1.4;
+}
+
+.vday-hotspot__card--left {
+  right: 25px;
+}
+
+.vday-hotspot__card--right {
+  left: 25px;
+}
+
+.vday-hotspot__spot:hover .vday-hotspot__card {
+  display: block;
+  animation: vdayCardIn 0.25s ease;
+}
+
+@keyframes vdayCardIn {
+  from { opacity: 0; transform: translateY(-50%) scale(0.9); }
+  to { opacity: 1; transform: translateY(-50%) scale(1); }
+}
+
+/* Card Image */
+.vday-hotspot__card-img {
+  width: 100%;
+  height: 160px;
+  object-fit: contain;
+  display: block;
+  background: #f9f9f9;
+  padding: 10px;
+}
+
+/* Card Content */
+.vday-hotspot__card-content {
+  padding: 12px;
+}
+
+.vday-hotspot__card-title {
+  font-size: 12px;
+  font-weight: 600;
+  margin: 0 0 6px;
+  color: #333;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.vday-hotspot__card-price {
+  font-size: 14px;
+  font-weight: 700;
+  color: #e31837;
+  margin-bottom: 8px;
+}
+
+.vday-hotspot__card-atc {
+  width: 100%;
+  padding: 5px;
+  background: #e31837;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 10px;
+  font-weight: 700;
+  cursor: pointer;
+  text-transform: uppercase;
+  transition: background 0.3s ease;
+}
+
+.vday-hotspot__card-atc:hover {
+  background: #c01430;
+}
+
+/* Responsive */
+@media screen and (max-width: 768px) {
+  .vday-hotspot__img--desktop {
+    display: none;
+  }
+
+  .vday-hotspot__img--mobile {
+    display: block;
+  }
+
+  .vday-hotspot__heading {
+    font-size: 28px;
+    bottom: 20px;
+    left: 15px;
+    max-width: 280px;
+  }
+
+  .vday-hotspot__cta {
+    font-size: 11px;
+    padding: 8px 14px;
+    bottom: 10px;
+    right: 10px;
+  }
+
+  .vday-hotspot__promo {
+    font-size: 12px;
+    padding: 6px 14px;
+  }
+
+  .vday-hotspot__card {
+    width: 190px;
+  }
+
+  .vday-hotspot__card-img {
+    height: 120px;
+  }
+
+  .vday-hotspot__card-title {
+    font-size: 11px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  document.querySelectorAll(".vday-hotspot__card-atc").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      e.stopPropagation();
+      var variantId = this.getAttribute("data-variant-id");
+      if (!variantId) return;
+
+      var originalText = this.textContent;
+      this.textContent = "Adding...";
+      this.disabled = true;
+
+      fetch("/cart/add.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: 1 })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function () {
+          btn.textContent = "Added!";
+          setTimeout(function () {
+            btn.textContent = originalText;
+            btn.disabled = false;
+          }, 1500);
+        })
+        .catch(function () {
+          btn.textContent = originalText;
+          btn.disabled = false;
+        });
+    });
+  });
+});
+</script>

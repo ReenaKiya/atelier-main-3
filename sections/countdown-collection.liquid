@@ -1,0 +1,597 @@
+{%- liquid
+  assign end_date = section.settings.end_date
+  assign heading = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign background_image = section.settings.background_image
+  assign collection = section.settings.collection
+  assign products_to_show = section.settings.products_to_show
+-%}
+
+<section
+  class="countdown-collection"
+  style="
+    --cc-bg-color: {{ section.settings.background_color }};
+    --cc-text-color: {{ section.settings.text_color }};
+    --cc-timer-bg: {{ section.settings.timer_background }};
+    --cc-timer-text: {{ section.settings.timer_text_color }};
+    --cc-card-bg: {{ section.settings.card_background }};
+  "
+>
+  <!-- Banner Section -->
+  <div class="countdown-collection__banner">
+    {%- if background_image != blank -%}
+      <div class="countdown-collection__bg-image">
+        {{ background_image | image_url: width: 2000 | image_tag: loading: 'lazy', class: 'countdown-collection__image' }}
+      </div>
+    {%- endif -%}
+
+    <div class="countdown-collection__banner-inner page-width">
+      <div class="countdown-collection__content">
+        {%- if heading != blank -%}
+          <h2 class="countdown-collection__heading">{{ heading }}</h2>
+        {%- endif -%}
+        {%- if subheading != blank -%}
+          <p class="countdown-collection__subheading">{{ subheading }}</p>
+        {%- endif -%}
+      </div>
+
+      <div class="countdown-collection__timer" data-end-date="{{ end_date }}">
+        <div class="countdown-collection__timer-box">
+          <span class="countdown-collection__number" data-days>0</span>
+          <span class="countdown-collection__label">DAYS</span>
+        </div>
+        <div class="countdown-collection__timer-box">
+          <span class="countdown-collection__number" data-hours>0</span>
+          <span class="countdown-collection__label">HOURS</span>
+        </div>
+        <div class="countdown-collection__timer-box">
+          <span class="countdown-collection__number" data-minutes>0</span>
+          <span class="countdown-collection__label">MINUTES</span>
+        </div>
+        <div class="countdown-collection__timer-box">
+          <span class="countdown-collection__number" data-seconds>0</span>
+          <span class="countdown-collection__label">SECONDS</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Products Grid -->
+  <div class="countdown-collection__products page-width">
+    <div class="countdown-collection__grid">
+      {%- if collection != blank -%}
+        {%- for product in collection.products limit: products_to_show -%}
+          <div class="countdown-collection__card">
+            <a href="{{ product.url }}" class="countdown-collection__card-link">
+              <div
+                class="countdown-collection__card-media"
+                style="
+                  --card-bg-image: url('{{ product.featured_image | image_url: width: 600 }}');
+                  {% if product.images[1] != blank %}--card-bg-image-hover: url('{{ product.images[1] | image_url: width: 600 }}');{% endif %}
+                "
+              >
+                {%- if product.featured_image == blank -%}
+                  <div class="countdown-collection__placeholder">
+                    {{ 'product-1' | placeholder_svg_tag }}
+                  </div>
+                {%- endif -%}
+
+                <span class="countdown-collection__badge countdown-collection__badge--top">Best Seller</span>
+                <span class="countdown-collection__badge countdown-collection__badge--bottom">Valentine's</span>
+
+              </div>
+              <div class="countdown-collection__card-info">
+                <h3 class="countdown-collection__card-title">{{ product.title }}</h3>
+                <div class="countdown-collection__card-price">
+                  {%- if product.compare_at_price > product.price -%}
+                    <span class="countdown-collection__price--sale">{{ product.price | money }}</span>
+                    <span class="countdown-collection__price--compare">{{ product.compare_at_price | money }}</span>
+                  {%- else -%}
+                    <span>{{ product.price | money }}</span>
+                  {%- endif -%}
+                </div>
+                <div class="countdown-collection__card-actions">
+                  <button type="button" class="countdown-collection__action-btn countdown-collection__action-btn--quick" onclick="event.preventDefault(); event.stopPropagation();" data-product-url="{{ product.url }}">Quick Shop</button>
+                  <a href="{{ product.url }}" class="countdown-collection__action-btn countdown-collection__action-btn--options" onclick="event.stopPropagation();">Choose Options</a>
+                </div>
+              </div>
+            </a>
+          </div>
+        {%- endfor -%}
+      {%- else -%}
+        {%- for i in (1..products_to_show) -%}
+          <div class="countdown-collection__card">
+            <div class="countdown-collection__card-link">
+              <div class="countdown-collection__card-media">
+                <div class="countdown-collection__placeholder">
+                  {{ 'product-1' | placeholder_svg_tag }}
+                </div>
+              </div>
+              <div class="countdown-collection__card-info">
+                <h3 class="countdown-collection__card-title">Product Title</h3>
+                <div class="countdown-collection__card-price">
+                  <span>$99.00</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        {%- endfor -%}
+      {%- endif -%}
+    </div>
+
+    {%- if section.settings.show_view_all and collection != blank -%}
+      <div class="countdown-collection__view-all">
+        <a href="{{ collection.url }}" class="countdown-collection__view-all-btn">
+          View All Products
+        </a>
+      </div>
+    {%- endif -%}
+  </div>
+</section>
+
+<script>
+  (function() {
+    const timer = document.querySelector('.countdown-collection__timer');
+    if (!timer) return;
+
+    const endDate = new Date(timer.dataset.endDate).getTime();
+    const daysEl = timer.querySelector('[data-days]');
+    const hoursEl = timer.querySelector('[data-hours]');
+    const minutesEl = timer.querySelector('[data-minutes]');
+    const secondsEl = timer.querySelector('[data-seconds]');
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      if (distance < 0) {
+        daysEl.textContent = '0';
+        hoursEl.textContent = '0';
+        minutesEl.textContent = '0';
+        secondsEl.textContent = '0';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      daysEl.textContent = days;
+      hoursEl.textContent = hours;
+      minutesEl.textContent = minutes;
+      secondsEl.textContent = seconds;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
+
+{% stylesheet %}
+  .countdown-collection {
+    background: #fff;
+  }
+
+  /* Banner Styles */
+  .countdown-collection__banner {
+    position: relative;
+    background: var(--cc-bg-color);
+    padding: 40px 0;
+    overflow: hidden;
+  }
+
+  .countdown-collection__bg-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .countdown-collection__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .countdown-collection__banner-inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 30px;
+  }
+
+  .countdown-collection__content {
+    flex: 1;
+  }
+
+  .countdown-collection__heading {
+    margin: 0 0 8px;
+    font-family: var(--font-heading--family);
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 500;
+    color: var(--cc-text-color);
+    line-height: 1.2;
+  }
+
+  .countdown-collection__subheading {
+    margin: 0;
+    font-size: 16px;
+    color: var(--cc-text-color);
+    opacity: 0.9;
+    line-height: 1.5;
+    max-width: 400px;
+  }
+
+  .countdown-collection__timer {
+    display: flex;
+    gap: 4px;
+    background: var(--cc-timer-bg);
+    padding: 20px 30px;
+    border-radius: 4px;
+  }
+
+  .countdown-collection__timer-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 70px;
+    padding: 0 15px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .countdown-collection__timer-box:last-child {
+    border-right: none;
+  }
+
+  .countdown-collection__number {
+    font-size: 36px;
+    font-weight: 500;
+    color: var(--cc-timer-text);
+    line-height: 1;
+  }
+
+  .countdown-collection__label {
+    font-size: 11px;
+    color: var(--cc-timer-text);
+    opacity: 0.7;
+    margin-top: 8px;
+    letter-spacing: 0.05em;
+  }
+
+  /* Products Grid Styles */
+  .countdown-collection__products {
+    padding: 50px 0;
+  }
+
+  .countdown-collection__grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+  }
+
+  .countdown-collection__card {
+    background: var(--cc-card-bg);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .countdown-collection__card-link {
+    text-decoration: none;
+    color: inherit;
+    display: block;
+  }
+
+  .countdown-collection__card-media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background-image: var(--card-bg-image);
+    background-size: cover;
+    background-position: center;
+    background-color: #f5f5f5;
+    transition: background-image 0.3s ease;
+  }
+
+  .countdown-collection__card:hover .countdown-collection__card-media {
+    background-image: var(--card-bg-image-hover, var(--card-bg-image));
+  }
+
+  /* Badges */
+  .countdown-collection__badge {
+    position: absolute;
+    z-index: 2;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.03em;
+    border-radius: 4px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+  }
+
+  .countdown-collection__badge--top {
+    top: 10px;
+    left: 10px;
+    background: #000;
+    color: #fff;
+  }
+
+  .countdown-collection__badge--bottom {
+    bottom: 50px;
+    right: 10px;
+    background: #000;
+    color: #fff;
+  }
+
+  .countdown-collection__card:hover .countdown-collection__badge {
+    opacity: 1;
+  }
+
+  /* Action Buttons */
+  .countdown-collection__card-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 12px;
+    width: 50%;
+    margin-left: auto;
+    margin-right: auto;
+    opacity: 0;
+    max-height: 0;
+    overflow: hidden;
+    transition: opacity 0.3s ease, max-height 0.3s ease;
+  }
+
+  .countdown-collection__card:hover .countdown-collection__card-actions {
+    opacity: 1;
+    max-height: 120px;
+  }
+
+  .countdown-collection__action-btn {
+    display: block;
+    width: 100%;
+    padding: 10px 8px;
+    font-size: 12px;
+    font-weight: 600;
+    text-align: center;
+    text-decoration: none;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+
+  .countdown-collection__action-btn--quick {
+    background: #fff;
+    color: #c41e3a;
+    border: 2px solid #c41e3a;
+  }
+
+  .countdown-collection__action-btn--quick:hover {
+    background: #c41e3a;
+    color: #fff;
+  }
+
+  .countdown-collection__action-btn--options {
+    background: #000;
+    color: #fff;
+    border: 2px solid #000;
+  }
+
+  .countdown-collection__action-btn--options:hover {
+    background: #333;
+    border-color: #333;
+  }
+
+  .countdown-collection__placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #f0f0f0;
+  }
+
+  .countdown-collection__placeholder svg {
+    width: 60%;
+    height: 60%;
+    fill: #ccc;
+  }
+
+  .countdown-collection__card-info {
+    padding: 15px;
+    text-align: center;
+  }
+
+  .countdown-collection__card-title {
+    margin: 0 0 8px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    line-height: 1.3;
+  }
+
+  .countdown-collection__card-price {
+    font-size: 14px;
+    color: #666;
+  }
+
+  .countdown-collection__price--sale {
+    color: #c41e3a;
+    font-weight: 600;
+    margin-right: 8px;
+  }
+
+  .countdown-collection__price--compare {
+    text-decoration: line-through;
+    opacity: 0.6;
+  }
+
+  .countdown-collection__view-all {
+    text-align: center;
+    margin-top: 30px;
+  }
+
+  .countdown-collection__view-all-btn {
+    display: inline-block;
+    padding: 12px 30px;
+    background: #000;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 30px;
+    font-size: 14px;
+    transition: background 0.3s ease;
+  }
+
+  .countdown-collection__view-all-btn:hover {
+    background: #333;
+  }
+
+  /* Responsive */
+  @media screen and (max-width: 899px) {
+    .countdown-collection__banner-inner {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .countdown-collection__subheading {
+      max-width: 100%;
+    }
+
+    .countdown-collection__timer {
+      padding: 15px 20px;
+    }
+
+    .countdown-collection__timer-box {
+      min-width: 55px;
+      padding: 0 10px;
+    }
+
+    .countdown-collection__number {
+      font-size: 28px;
+    }
+
+    .countdown-collection__grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 15px;
+    }
+  }
+
+  @media screen and (max-width: 599px) {
+    .countdown-collection__timer-box {
+      min-width: 45px;
+      padding: 0 8px;
+    }
+
+    .countdown-collection__number {
+      font-size: 22px;
+    }
+
+    .countdown-collection__label {
+      font-size: 9px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Countdown Collection",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner Settings"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "30% off - Limited Time"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "This Valentine's Day, let us give you a hand in gifting the best gifts that your loved ones deserve."
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date",
+      "info": "Format: YYYY-MM-DD HH:MM (e.g., 2026-02-14 23:59)",
+      "default": "2026-02-14 23:59"
+    },
+    {
+      "type": "header",
+      "content": "Collection Settings"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "range",
+      "id": "products_to_show",
+      "label": "Products to show",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 4
+    },
+    {
+      "type": "checkbox",
+      "id": "show_view_all",
+      "label": "Show 'View All' button",
+      "default": true
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Banner background color",
+      "default": "#6B6B6B"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Banner text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "timer_background",
+      "label": "Timer background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "timer_text_color",
+      "label": "Timer text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Product card background",
+      "default": "#FFFFFF"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown Collection",
+      "category": "Collection"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,163 @@
+{% doc %}
+  @prompt
+    Update the existing size chart block to add a ruler icon before the heading text. The icon should use the class "icon-accordion icon-ruler" and appear inline before the "Size chart" heading text. Style it to align properly with the heading and maintain consistent spacing. The icon and heading should be on the same line with appropriate gap between them.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-size-chart-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+  }
+
+  .ai-size-chart-summary-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    padding: 16px 0;
+    border: none;
+    background: none;
+    width: 100%;
+    text-align: left;
+    list-style: none;
+  }
+
+  .ai-size-chart-summary-{{ ai_gen_id }}::-webkit-details-marker {
+    display: none;
+  }
+
+  .ai-size-chart-heading-wrapper-{{ ai_gen_id }} {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+  }
+
+  .icon-accordion.icon-ruler {
+    width: 20px;
+    height: 20px;
+    flex-shrink: 0;
+  }
+
+  .ai-size-chart-heading-{{ ai_gen_id }} {
+    margin: 0;
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+  }
+
+  .ai-size-chart-icon-{{ ai_gen_id }} {
+    width: 16px;
+    height: 16px;
+    transition: transform 0.3s ease;
+    flex-shrink: 0;
+    margin-left: auto;
+  }
+
+  .ai-size-chart-details-{{ ai_gen_id }}[open] .ai-size-chart-icon-{{ ai_gen_id }} {
+    transform: rotate(180deg);
+  }
+
+  .ai-size-chart-content-{{ ai_gen_id }} {
+    padding: 0 0 16px 0;
+    color: {{ block.settings.text_color }};
+  }
+
+  .ai-size-chart-content-{{ ai_gen_id }} p {
+    margin: 0;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-size-chart-heading-{{ ai_gen_id }} {
+      font-size: calc({{ block.settings.heading_size }}px * 0.9);
+    }
+  }
+{% endstyle %}
+
+<details
+  class="ai-size-chart-details-{{ ai_gen_id }}"
+  {{ block.shopify_attributes }}
+  {% if block.settings.open_by_default %}open{% endif %}
+>
+  <summary class="ai-size-chart-summary-{{ ai_gen_id }}">
+    <div class="ai-size-chart-heading-wrapper-{{ ai_gen_id }}">
+      <svg class="icon-accordion icon-ruler" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M3 3h18v18H3z"/>
+        <path d="M3 9h18"/>
+        <path d="M9 3v6"/>
+        <path d="M15 3v6"/>
+        <path d="M3 15h18"/>
+        <path d="M9 15v6"/>
+        <path d="M15 15v6"/>
+      </svg>
+      <h3 class="ai-size-chart-heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h3>
+    </div>
+    <svg class="ai-size-chart-icon-{{ ai_gen_id }}" viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5">
+      <path d="M4 6l4 4 4-4"/>
+    </svg>
+  </summary>
+  <div class="ai-size-chart-content-{{ ai_gen_id }}">
+    {% if block.settings.size_chart_page != blank %}
+      {{ block.settings.size_chart_page.content }}
+    {% else %}
+      <p>Please select a page with your size chart information.</p>
+    {% endif %}
+  </div>
+</details>
+
+{% schema %}
+{
+  "name": "Size chart",
+  "tag": null,
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Size chart"
+    },
+    {
+      "type": "page",
+      "id": "size_chart_page",
+      "label": "Size chart page"
+    },
+    {
+      "type": "checkbox",
+      "id": "open_by_default",
+      "label": "Open by default",
+      "default": false
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Size chart"
+    }
+  ]
+}
+{% endschema %}

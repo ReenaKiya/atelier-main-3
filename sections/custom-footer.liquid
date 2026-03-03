@@ -1,0 +1,370 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#111111'
+  assign text_color = section.settings.text_color | default: '#cccccc'
+  assign heading_color = section.settings.heading_color | default: '#ffffff'
+  assign bottom_bar_border = section.settings.bottom_bar_border | default: '#333333'
+-%}
+
+<footer class="cf" style="
+  --cf-bg: {{ bg_color }};
+  --cf-text: {{ text_color }};
+  --cf-heading: {{ heading_color }};
+  --cf-border: {{ bottom_bar_border }};
+">
+  <div class="cf__inner">
+    <div class="cf__columns">
+      {% for block in section.blocks %}
+        {% if block.type == 'menu_column' %}
+          <div class="cf__col" {{ block.shopify_attributes }}>
+            {% if block.settings.heading != blank %}
+              <h3 class="cf__heading">{{ block.settings.heading }}</h3>
+            {% endif %}
+            {% if block.settings.menu != blank %}
+              <ul class="cf__links">
+                {% for link in block.settings.menu.links %}
+                  <li><a href="{{ link.url }}" class="cf__link">{{ link.title }}</a></li>
+                {% endfor %}
+              </ul>
+            {% endif %}
+          </div>
+        {% elsif block.type == 'social_column' %}
+          <div class="cf__col cf__col--social" {{ block.shopify_attributes }}>
+            {% if block.settings.heading != blank %}
+              <h3 class="cf__heading">{{ block.settings.heading }}</h3>
+            {% endif %}
+            <div class="cf__socials">
+              {% if block.settings.facebook_url != blank %}
+                <a href="{{ block.settings.facebook_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Facebook">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>
+                </a>
+              {% endif %}
+              {% if block.settings.instagram_url != blank %}
+                <a href="{{ block.settings.instagram_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Instagram">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
+                </a>
+              {% endif %}
+              {% if block.settings.pinterest_url != blank %}
+                <a href="{{ block.settings.pinterest_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Pinterest">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
+                </a>
+              {% endif %}
+              {% if block.settings.tiktok_url != blank %}
+                <a href="{{ block.settings.tiktok_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="TikTok">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.48v-7.1a8.16 8.16 0 005.58 2.2V11.3a4.85 4.85 0 01-3.77-1.85V6.69z"/></svg>
+                </a>
+              {% endif %}
+            </div>
+          </div>
+        {% endif %}
+      {% endfor %}
+    </div>
+  </div>
+
+  <!-- Bottom Bar -->
+  <div class="cf__bottom">
+    <div class="cf__bottom-inner">
+      <p class="cf__copyright">{{ section.settings.copyright_text | default: 'Copyright &copy; 2026 Monster Piercing.' }}</p>
+      {% if section.settings.show_payment_icons %}
+        <div class="cf__payments">
+          {{ '| amazon' | payment_type_svg_tag }}
+          {{ 'american_express' | payment_type_svg_tag }}
+          {{ 'apple_pay' | payment_type_svg_tag }}
+          {{ 'bancontact' | payment_type_svg_tag }}
+          {{ 'diners_club' | payment_type_svg_tag }}
+          {{ 'discover' | payment_type_svg_tag }}
+          {{ 'google_pay' | payment_type_svg_tag }}
+          {{ 'ideal' | payment_type_svg_tag }}
+          {{ 'maestro' | payment_type_svg_tag }}
+          {{ 'master' | payment_type_svg_tag }}
+          {{ 'paypal' | payment_type_svg_tag }}
+          {{ 'shopify_pay' | payment_type_svg_tag }}
+          {{ 'union_pay' | payment_type_svg_tag }}
+          {{ 'visa' | payment_type_svg_tag }}
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</footer>
+
+{% schema %}
+{
+  "name": "Custom Footer",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#111111"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#cccccc"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "bottom_bar_border",
+      "label": "Bottom bar border color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Bottom Bar"
+    },
+    {
+      "type": "text",
+      "id": "copyright_text",
+      "label": "Copyright text",
+      "default": "Copyright © 2026 Monster Piercing."
+    },
+    {
+      "type": "checkbox",
+      "id": "show_payment_icons",
+      "label": "Show payment icons",
+      "default": true
+    }
+  ],
+  "blocks": [
+    {
+      "type": "menu_column",
+      "name": "Menu Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Information"
+        },
+        {
+          "type": "link_list",
+          "id": "menu",
+          "label": "Menu"
+        }
+      ]
+    },
+    {
+      "type": "social_column",
+      "name": "Social Column",
+      "settings": [
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Follow us"
+        },
+        {
+          "type": "url",
+          "id": "facebook_url",
+          "label": "Facebook URL"
+        },
+        {
+          "type": "url",
+          "id": "instagram_url",
+          "label": "Instagram URL"
+        },
+        {
+          "type": "url",
+          "id": "pinterest_url",
+          "label": "Pinterest URL"
+        },
+        {
+          "type": "url",
+          "id": "tiktok_url",
+          "label": "TikTok URL"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Custom Footer",
+      "blocks": [
+        { "type": "menu_column", "settings": { "heading": "Information" } },
+        { "type": "menu_column", "settings": { "heading": "Business Policy" } },
+        { "type": "menu_column", "settings": { "heading": "MP's Guide To" } },
+        { "type": "menu_column", "settings": { "heading": "All Ears" } },
+        { "type": "social_column", "settings": { "heading": "Follow us" } }
+      ]
+    }
+  ]
+}
+{% endschema %}
+
+<style>
+.cf {
+  background: var(--cf-bg);
+  color: var(--cf-text);
+  font-family: 'Nunito Sans', sans-serif;
+  padding: 0;
+  margin: 0;
+}
+
+.cf__inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 60px 40px 40px;
+}
+
+.cf__columns {
+  display: flex;
+  gap: 40px;
+  justify-content: space-between;
+}
+
+.cf__col {
+  flex: 1;
+  min-width: 0;
+}
+
+.cf__heading {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--cf-heading);
+  margin: 0 0 25px;
+  line-height: 1.3;
+}
+
+.cf__links {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.cf__links li {
+  margin-bottom: 12px;
+}
+
+.cf__link {
+  color: var(--cf-text);
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 400;
+  line-height: 1.5;
+  transition: color 0.3s ease;
+}
+
+.cf__link:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+/* Social Column */
+.cf__socials {
+  display: flex;
+  gap: 12px;
+}
+
+.cf__social-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  color: #fff;
+  transition: all 0.3s ease;
+}
+
+.cf__social-link:hover {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+/* Bottom Bar */
+.cf__bottom {
+  border-top: 1px solid var(--cf-border);
+}
+
+.cf__bottom-inner {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 20px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+}
+
+.cf__copyright {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13px;
+  font-style: italic;
+  color: var(--cf-text);
+  margin: 0;
+}
+
+.cf__payments {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.cf__payments svg {
+  width: 38px;
+  height: 24px;
+  border-radius: 3px;
+}
+
+/* Responsive */
+@media screen and (max-width: 999px) {
+  .cf__columns {
+    flex-wrap: wrap;
+    gap: 30px;
+  }
+
+  .cf__col {
+    flex: 0 0 calc(33.333% - 20px);
+  }
+
+  .cf__col--social {
+    flex: 0 0 100%;
+  }
+
+  .cf__inner {
+    padding: 40px 20px 30px;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .cf__columns {
+    flex-direction: column;
+    gap: 30px;
+  }
+
+  .cf__col {
+    flex: none;
+    width: 100%;
+  }
+
+  .cf__bottom-inner {
+    flex-direction: column;
+    text-align: center;
+    padding: 20px;
+  }
+
+  .cf__payments {
+    justify-content: center;
+  }
+
+  .cf__heading {
+    font-size: 16px;
+    margin-bottom: 15px;
+  }
+}
+</style>

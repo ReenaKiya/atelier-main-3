@@ -1,0 +1,435 @@
+{% doc %}
+  @prompt
+    Create a mega menu enhancement that displays two product images from the currently hovered collection on the right side of the header. When hovering over "Clothing" collection, show two images from that collection; when hovering over "Baby Cloths", show two images from that collection; when hovering over "Home Page" collection, show two images from that collection. The images should dynamically update based on which menu item is being hovered. The image display area should be positioned on the right side of the mega menu header and should smoothly transition when switching between collections.
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-mega-menu-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    position: relative;
+  }
+
+  .ai-mega-menu-container-{{ ai_gen_id }} {
+    display: flex;
+    gap: {{ block.settings.gap }}px;
+    padding: {{ block.settings.padding }}px;
+    background-color: {{ block.settings.background_color }};
+    border: {{ block.settings.border_width }}px solid {{ block.settings.border_color }};
+    border-radius: {{ block.settings.border_radius }}px;
+    max-width: 100%;
+  }
+
+  .ai-mega-menu-links-{{ ai_gen_id }} {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: {{ block.settings.link_spacing }}px;
+  }
+
+  .ai-mega-menu-link-{{ ai_gen_id }} {
+    padding: {{ block.settings.link_padding }}px;
+    color: {{ block.settings.text_color }};
+    text-decoration: none;
+    font-size: {{ block.settings.font_size }}px;
+    transition: all 0.3s ease;
+    border-radius: {{ block.settings.link_border_radius }}px;
+    cursor: pointer;
+  }
+
+  .ai-mega-menu-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.hover_background }};
+    color: {{ block.settings.hover_text_color }};
+  }
+
+  .ai-mega-menu-images-{{ ai_gen_id }} {
+    width: {{ block.settings.image_area_width }}px;
+    flex-shrink: 0;
+    display: flex;
+    gap: {{ block.settings.image_gap }}px;
+    opacity: 0;
+    transition: opacity {{ block.settings.transition_speed }}s ease;
+  }
+
+  .ai-mega-menu-images-{{ ai_gen_id }}.active {
+    opacity: 1;
+  }
+
+  .ai-mega-menu-image-wrapper-{{ ai_gen_id }} {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+    border-radius: {{ block.settings.image_border_radius }}px;
+  }
+
+  .ai-mega-menu-image-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .ai-mega-menu-placeholder-{{ ai_gen_id }} {
+    width: 100%;
+    height: 100%;
+    background-color: #f4f4f4;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .ai-mega-menu-placeholder-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    max-width: 150px;
+    max-height: 150px;
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-mega-menu-container-{{ ai_gen_id }} {
+      flex-direction: column;
+    }
+
+    .ai-mega-menu-images-{{ ai_gen_id }} {
+      width: 100%;
+    }
+  }
+{% endstyle %}
+
+<mega-menu-{{ ai_gen_id }} class="ai-mega-menu-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-mega-menu-container-{{ ai_gen_id }}">
+    <div class="ai-mega-menu-links-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign collection_key = 'collection_' | append: i
+          assign collection = block.settings[collection_key]
+        %}
+        
+        {% if collection != blank %}
+          <a
+            href="{{ collection.url }}"
+            class="ai-mega-menu-link-{{ ai_gen_id }}"
+            data-collection-handle="{{ collection.handle }}"
+            data-collection-index="{{ i }}"
+          >
+            {{ collection.title }}
+          </a>
+        {% endif %}
+      {% endfor %}
+    </div>
+
+    <div class="ai-mega-menu-images-{{ ai_gen_id }}" data-images-container>
+      <div class="ai-mega-menu-image-wrapper-{{ ai_gen_id }}">
+        <div class="ai-mega-menu-placeholder-{{ ai_gen_id }}">
+          {{ 'product-1' | placeholder_svg_tag }}
+        </div>
+      </div>
+      <div class="ai-mega-menu-image-wrapper-{{ ai_gen_id }}">
+        <div class="ai-mega-menu-placeholder-{{ ai_gen_id }}">
+          {{ 'product-2' | placeholder_svg_tag }}
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="application/json" data-collection-images>
+    {
+      {% for i in (1..3) %}
+        {% liquid
+          assign collection_key = 'collection_' | append: i
+          assign collection = block.settings[collection_key]
+        %}
+        
+        {% if collection != blank %}
+          "{{ collection.handle }}": [
+            {% assign product_count = 0 %}
+            {% for product in collection.products limit: 2 %}
+              {% if product.featured_image %}
+                {% if product_count > 0 %},{% endif %}
+                {
+                  "url": "{{ product.featured_image | image_url: width: 600 }}",
+                  "alt": "{{ product.featured_image.alt | escape }}",
+                  "width": {{ product.featured_image.width }},
+                  "height": {{ product.featured_image.height }}
+                }
+                {% assign product_count = product_count | plus: 1 %}
+              {% endif %}
+            {% endfor %}
+          ]{% unless forloop.last %},{% endunless %}
+        {% endif %}
+      {% endfor %}
+    }
+  </script>
+</mega-menu-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class MegaMenu{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.links = this.querySelectorAll('.ai-mega-menu-link-{{ ai_gen_id }}');
+        this.imagesContainer = this.querySelector('[data-images-container]');
+        this.imageWrappers = this.querySelectorAll('.ai-mega-menu-image-wrapper-{{ ai_gen_id }}');
+        this.collectionImagesData = JSON.parse(this.querySelector('[data-collection-images]').textContent);
+        this.currentHandle = null;
+      }
+
+      connectedCallback() {
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.links.forEach((link) => {
+          link.addEventListener('mouseenter', (e) => {
+            const handle = e.currentTarget.dataset.collectionHandle;
+            this.showImages(handle);
+          });
+        });
+
+        this.addEventListener('mouseleave', () => {
+          this.hideImages();
+        });
+      }
+
+      showImages(handle) {
+        if (this.currentHandle === handle) return;
+        
+        this.currentHandle = handle;
+        const images = this.collectionImagesData[handle];
+
+        if (!images || images.length === 0) {
+          this.hideImages();
+          return;
+        }
+
+        this.imageWrappers.forEach((wrapper, index) => {
+          wrapper.innerHTML = '';
+          
+          if (images[index]) {
+            const img = document.createElement('img');
+            img.src = images[index].url;
+            img.alt = images[index].alt;
+            img.width = images[index].width;
+            img.height = images[index].height;
+            img.loading = 'lazy';
+            img.className = 'ai-mega-menu-image-{{ ai_gen_id }}';
+            wrapper.appendChild(img);
+          } else {
+            const placeholder = document.createElement('div');
+            placeholder.className = 'ai-mega-menu-placeholder-{{ ai_gen_id }}';
+            placeholder.innerHTML = '{{ 'product-1' | placeholder_svg_tag }}';
+            wrapper.appendChild(placeholder);
+          }
+        });
+
+        this.imagesContainer.classList.add('active');
+      }
+
+      hideImages() {
+        this.imagesContainer.classList.remove('active');
+        this.currentHandle = null;
+      }
+    }
+
+    customElements.define('mega-menu-{{ ai_gen_id }}', MegaMenu{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Mega menu enhancement",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Collections"
+    },
+    {
+      "type": "collection",
+      "id": "collection_1",
+      "label": "Collection 1"
+    },
+    {
+      "type": "collection",
+      "id": "collection_2",
+      "label": "Collection 2"
+    },
+    {
+      "type": "collection",
+      "id": "collection_3",
+      "label": "Collection 3"
+    },
+    {
+      "type": "header",
+      "content": "Layout"
+    },
+    {
+      "type": "range",
+      "id": "padding",
+      "min": 0,
+      "max": 50,
+      "step": 5,
+      "unit": "px",
+      "label": "Container padding",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "min": 10,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between links and images",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "image_area_width",
+      "min": 200,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Image area width",
+      "default": 400
+    },
+    {
+      "type": "range",
+      "id": "image_gap",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Gap between images",
+      "default": 10
+    },
+    {
+      "type": "header",
+      "content": "Links"
+    },
+    {
+      "type": "range",
+      "id": "font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "link_spacing",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Spacing between links",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "link_padding",
+      "min": 5,
+      "max": 30,
+      "step": 5,
+      "unit": "px",
+      "label": "Link padding",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "link_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Link border radius",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "hover_background",
+      "label": "Hover background",
+      "default": "#f5f5f5"
+    },
+    {
+      "type": "color",
+      "id": "hover_text_color",
+      "label": "Hover text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "header",
+      "content": "Style"
+    },
+    {
+      "type": "range",
+      "id": "border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Container border radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "image_border_radius",
+      "min": 0,
+      "max": 20,
+      "step": 2,
+      "unit": "px",
+      "label": "Image border radius",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "transition_speed",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "label": "Transition speed",
+      "default": 0.3
+    }
+  ],
+  "presets": [
+    {
+      "name": "Mega menu enhancement"
+    }
+  ]
+}
+{% endschema %}

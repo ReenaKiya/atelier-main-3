@@ -1,0 +1,901 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#fadddd'
+  assign overlay_color = section.settings.banner_overlay_color | default: '#000000'
+  assign overlay_opacity = section.settings.banner_overlay_opacity | default: 0.0
+  assign text_color = section.settings.text_color | default: '#efefef'
+  assign heading_color = section.settings.heading_color | default: '#ffffff'
+  assign btn_bg = section.settings.btn_bg | default: '#ffffff'
+  assign btn_text = section.settings.btn_text | default: '#000000'
+  assign btn_border = section.settings.btn_border | default: '#5a4444'
+  assign card_bg = section.settings.card_bg | default: '#602124'
+  assign card_border = section.settings.card_border | default: '#fadddd'
+  assign padding_top = section.settings.padding_top | default: 40
+  assign padding_bottom = section.settings.padding_bottom | default: 40
+  assign products_per_view = section.settings.products_per_view | default: 5
+  assign collection = section.settings.collection
+-%}
+
+<section
+  class="fbp-section"
+  data-section-id="{{ section.id }}"
+  style="
+    --fbp-bg-color: {{ bg_color }};
+    --fbp-banner-overlay: {{ overlay_color }};
+    --fbp-banner-overlay-opacity: {{ overlay_opacity }};
+    --fbp-text-color: {{ text_color }};
+    --fbp-heading-color: {{ heading_color }};
+    --fbp-btn-bg: {{ btn_bg }};
+    --fbp-btn-text: {{ btn_text }};
+    --fbp-btn-border: {{ btn_border }};
+    --fbp-card-bg: {{ card_bg }};
+    --fbp-card-border: {{ card_border }};
+    --fbp-padding-top: {{ padding_top }}px;
+    --fbp-padding-bottom: {{ padding_bottom }}px;
+  "
+>
+  <div class="fbp-section__container">
+    <!-- Hero Banner -->
+    <div class="fbp-banner">
+      {% if section.settings.banner_image != blank %}
+        {{ section.settings.banner_image | image_url: width: 2000 | image_tag:
+          loading: 'lazy',
+          class: 'fbp-banner__image fbp-banner__image--desktop',
+          sizes: '100vw'
+        }}
+      {% endif %}
+
+      {% if section.settings.banner_image_mobile != blank %}
+        {{ section.settings.banner_image_mobile | image_url: width: 800 | image_tag:
+          loading: 'lazy',
+          class: 'fbp-banner__image fbp-banner__image--mobile',
+          sizes: '100vw'
+        }}
+      {% endif %}
+
+      <div class="fbp-banner__overlay"></div>
+
+      <div class="fbp-banner__content fbp-banner__content--{{ section.settings.content_position | default: 'left' }}">
+        {% if section.settings.banner_subtitle != blank %}
+          <p class="fbp-banner__subtitle">{{ section.settings.banner_subtitle }}</p>
+        {% endif %}
+
+        {% if section.settings.banner_title != blank %}
+          <h2 class="fbp-banner__title">{{ section.settings.banner_title }}</h2>
+        {% endif %}
+
+        {% if section.settings.banner_description != blank %}
+          <p class="fbp-banner__description">{{ section.settings.banner_description }}</p>
+        {% endif %}
+
+        {% if section.settings.btn_text_label != blank %}
+          <div class="fbp-banner__buttons">
+            <a
+              href="{{ section.settings.btn_link | default: '#' }}"
+              class="fbp-banner__button"
+            >
+              {{ section.settings.btn_text_label }}
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Product Slider -->
+    {% if collection != blank %}
+      <div class="fbp-products">
+        {% if section.settings.products_heading != blank %}
+          <h3 class="fbp-products__heading">{{ section.settings.products_heading }}</h3>
+        {% endif %}
+
+        <div class="fbp-products__slider-wrapper">
+          <button class="fbp-products__nav fbp-products__nav--prev" aria-label="Previous">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+
+          <div class="fbp-products__slider" data-products-per-view="{{ products_per_view }}">
+            <div class="fbp-products__track">
+              {% for product in collection.products limit: section.settings.products_limit %}
+                <div class="fbp-products__slide">
+                  <div class="fbp-products__card">
+                    <a href="{{ product.url }}" class="fbp-products__card-link">
+                      <div class="fbp-products__card-image">
+                        {% if product.featured_image != blank %}
+                          <img
+                            src="{{ product.featured_image | image_url: width: 400 }}"
+                            srcset="{{ product.featured_image | image_url: width: 200 }} 200w,
+                                    {{ product.featured_image | image_url: width: 300 }} 300w,
+                                    {{ product.featured_image | image_url: width: 400 }} 400w"
+                            sizes="(max-width: 600px) 45vw, 200px"
+                            alt="{{ product.title | escape }}"
+                            loading="lazy"
+                          >
+                        {% endif %}
+                      </div>
+                      <div class="fbp-products__card-info">
+                        <h4 class="fbp-products__card-title">{{ product.title }}</h4>
+
+                        <div class="fbp-products__card-rating">
+                          {% assign rating_value = product.metafields.reviews.rating.value | default: 0 %}
+                          {% assign rating_count = product.metafields.reviews.rating_count | default: 0 %}
+                          {% if rating_count > 0 %}
+                            <div class="fbp-products__rating-stars">
+                              {% for i in (1..5) %}
+                                {% assign half_star = i | minus: 0.5 %}
+                                {% if rating_value >= i %}
+                                  <span class="fbp-star fbp-star--filled">&#9733;</span>
+                                {% elsif rating_value >= half_star %}
+                                  <span class="fbp-star fbp-star--half">&#9733;</span>
+                                {% else %}
+                                  <span class="fbp-star fbp-star--empty">&#9733;</span>
+                                {% endif %}
+                              {% endfor %}
+                            </div>
+                            <span class="fbp-products__rating-count">({{ rating_count }})</span>
+                          {% endif %}
+                        </div>
+
+                        <div class="fbp-products__card-price">
+                          <span class="money">{{ product.price | money }}</span>
+                          {% if product.compare_at_price > product.price %}
+                            <span class="fbp-products__card-compare-price">{{ product.compare_at_price | money }}</span>
+                          {% endif %}
+                        </div>
+
+                        {% if product.available %}
+                          <button
+                            class="fbp-products__card-atc"
+                            data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                            data-product-available="true"
+                            type="button"
+                          >
+                            Add to Cart
+                          </button>
+                        {% else %}
+                          <button class="fbp-products__card-atc fbp-products__card-atc--sold-out" disabled type="button">
+                            Sold Out
+                          </button>
+                        {% endif %}
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              {% endfor %}
+            </div>
+          </div>
+
+          <button class="fbp-products__nav fbp-products__nav--next" aria-label="Next">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+
+        <div class="fbp-products__dots"></div>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+/* Section */
+.fbp-section {
+  background-color: var(--fbp-bg-color);
+  padding-top: var(--fbp-padding-top);
+  padding-bottom: var(--fbp-padding-bottom);
+}
+
+.fbp-section__container {
+  max-width: 1400px;
+  margin: 0 auto;
+  padding: 0 20px;
+}
+
+/* Banner */
+.fbp-banner {
+  position: relative;
+  border-radius: 12px;
+  overflow: hidden;
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+}
+
+.fbp-banner__image {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  z-index: 0;
+}
+
+.fbp-banner__image--mobile {
+  display: none;
+}
+
+.fbp-banner__overlay {
+  position: absolute;
+  inset: 0;
+  background-color: var(--fbp-banner-overlay);
+  opacity: var(--fbp-banner-overlay-opacity);
+  z-index: 1;
+}
+
+.fbp-banner__content {
+  position: relative;
+  z-index: 2;
+  padding: 50px 60px;
+  max-width: 550px;
+}
+
+.fbp-banner__content--left {
+  margin-right: auto;
+}
+
+.fbp-banner__content--center {
+  margin: 0 auto;
+  text-align: center;
+}
+
+.fbp-banner__content--right {
+  margin-left: auto;
+}
+
+.fbp-banner__subtitle {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 14px;
+  color: var(--fbp-text-color);
+  margin: 0 0 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+
+.fbp-banner__title {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 20px;
+  font-weight: 400;
+  color: var(--fbp-heading-color);
+  margin: 0 0 12px;
+  line-height: 1.2;
+}
+
+.fbp-banner__description {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 15px;
+  color: var(--fbp-text-color);
+  margin: 0 0 24px;
+  line-height: 1.5;
+  opacity: 0.9;
+}
+
+.fbp-banner__buttons {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.fbp-banner__button {
+  display: inline-block;
+  padding: 9px 35px;
+  background: var(--fbp-btn-bg);
+  color: var(--fbp-btn-text);
+  border: 1px solid var(--fbp-btn-border);
+  border-radius: 3px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 14px;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.fbp-banner__button:hover {
+  opacity: 0.85;
+}
+
+/* Products */
+.fbp-products {
+  margin-top: 30px;
+}
+
+.fbp-products__heading {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 28px;
+  font-weight: 400;
+  color: #602124;
+  text-align: center;
+  margin: 0 0 30px;
+}
+
+/* Slider */
+.fbp-products__slider-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.fbp-products__slider {
+  overflow: hidden;
+  width: 100%;
+}
+
+.fbp-products__track {
+  display: flex;
+  transition: transform 0.4s ease;
+}
+
+.fbp-products__slide {
+  flex: 0 0 20%;
+  max-width: 20%;
+  padding: 0 8px;
+  box-sizing: border-box;
+}
+
+/* Nav Arrows */
+.fbp-products__nav {
+  flex-shrink: 0;
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: 1px solid var(--fbp-card-bg);
+  background: #602124;
+  color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  z-index: 2;
+}
+
+.fbp-products__nav:hover {
+  background: #fff;
+  color: #602124;
+}
+
+.fbp-products__nav svg {
+  pointer-events: none;
+}
+
+/* Product Card */
+.fbp-products__card {
+  background: var(--fbp-card-bg);
+  border: 1px solid var(--fbp-card-border);
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  transition: all 0.3s ease;
+}
+
+.fbp-products__card:hover {
+  box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+  transform: translateY(-4px);
+}
+
+.fbp-products__card-link {
+  display: flex;
+  flex-direction: column;
+  text-decoration: none;
+  flex: 1;
+  padding: 0px;
+}
+
+.fbp-products__card-image {
+  background: #fff;
+  border-radius: 0px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1;
+  margin-bottom: 10px;
+}
+
+.fbp-products__card-image img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.fbp-products__card-info {
+  padding: 10px 15px;
+}
+
+.fbp-products__card-title {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px;
+  font-weight: 600;
+  color: var(--fbp-text-color);
+  margin: 0 0 6px;
+  line-height: 1.3;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.fbp-products__card-rating {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-bottom: 4px;
+  min-height: 18px;
+}
+
+.fbp-products__rating-stars {
+  display: flex;
+  gap: 1px;
+}
+
+.fbp-star {
+  font-size: 13px;
+  line-height: 1;
+}
+
+.fbp-star--filled {
+  color: #f5a623;
+}
+
+.fbp-star--half {
+  color: #f5a623;
+  opacity: 0.6;
+}
+
+.fbp-star--empty {
+  color: #f5a623;
+  opacity: 0.3;
+}
+
+.fbp-products__rating-count {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 11px;
+  color: var(--fbp-text-color);
+  opacity: 0.7;
+}
+
+.fbp-products__card-price {
+  margin-bottom: 10px;
+}
+
+.fbp-products__card-price .money {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 15px;
+  font-weight: 700;
+  color: var(--fbp-text-color);
+}
+
+.fbp-products__card-compare-price {
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 12px;
+  color: var(--fbp-text-color);
+  opacity: 0.5;
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+.fbp-products__card-atc {
+  width: 100%;
+  padding: 10px;
+  background: var(--fbp-btn-bg);
+  color: var(--fbp-btn-text);
+  border: none;
+  border-top: 1px solid var(--fbp-card-border);
+  border-radius: 4px;
+  font-family: 'Nunito Sans', sans-serif;
+  font-size: 13px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  margin-top: auto;
+}
+
+.fbp-products__card-atc:hover {
+  opacity: 0.85;
+}
+
+.fbp-products__card-atc--sold-out {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Dots */
+.fbp-products__dots {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.fbp-products__dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--fbp-card-border);
+  border: none;
+  cursor: pointer;
+  transition: background 0.3s ease;
+  padding: 0;
+}
+
+.fbp-products__dot--active {
+  background: var(--fbp-card-bg);
+}
+
+/* Responsive */
+@media screen and (max-width: 999px) {
+  .fbp-banner {
+    min-height: 280px;
+  }
+
+  .fbp-banner__content {
+    padding: 30px;
+  }
+
+  .fbp-banner__image--desktop {
+    display: none;
+  }
+
+  .fbp-banner__image--mobile {
+    display: block;
+  }
+
+  .fbp-products__slide {
+    flex: 0 0 33.333%;
+    max-width: 33.333%;
+  }
+}
+
+@media screen and (max-width: 600px) {
+  .fbp-banner {
+    min-height: 220px;
+  }
+
+  .fbp-banner__content {
+    padding: 20px;
+    max-width: 100%;
+  }
+
+  .fbp-banner__title {
+    font-size: 24px;
+  }
+
+  .fbp-products__slide {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+
+  .fbp-products__nav {
+    width: 32px;
+    height: 32px;
+  }
+
+  .fbp-products__nav svg {
+    width: 16px;
+    height: 16px;
+  }
+}
+</style>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
+  var section = document.querySelector('.fbp-section[data-section-id="{{ section.id }}"]');
+  if (!section) return;
+
+  var slider = section.querySelector(".fbp-products__slider");
+  if (!slider) return;
+
+  var track = slider.querySelector(".fbp-products__track");
+  var slides = track.querySelectorAll(".fbp-products__slide");
+  var prevBtn = section.querySelector(".fbp-products__nav--prev");
+  var nextBtn = section.querySelector(".fbp-products__nav--next");
+  var dotsContainer = section.querySelector(".fbp-products__dots");
+  var perView = parseInt(slider.dataset.productsPerView) || 5;
+  var currentIndex = 0;
+
+  function getPerView() {
+    if (window.innerWidth <= 600) return 2;
+    if (window.innerWidth <= 999) return 3;
+    return perView;
+  }
+
+  function getMaxIndex() {
+    var pv = getPerView();
+    return Math.max(0, slides.length - pv);
+  }
+
+  function updateSlider() {
+    var pv = getPerView();
+    var slideWidth = 100 / pv;
+    slides.forEach(function (s) {
+      s.style.flex = "0 0 " + slideWidth + "%";
+      s.style.maxWidth = slideWidth + "%";
+    });
+    track.style.transform = "translateX(-" + (currentIndex * slideWidth) + "%)";
+    updateDots();
+  }
+
+  function buildDots() {
+    if (!dotsContainer) return;
+    dotsContainer.innerHTML = "";
+    var total = getMaxIndex() + 1;
+    for (var i = 0; i < total; i++) {
+      var dot = document.createElement("button");
+      dot.className = "fbp-products__dot" + (i === 0 ? " fbp-products__dot--active" : "");
+      dot.setAttribute("aria-label", "Go to slide " + (i + 1));
+      dot.dataset.index = i;
+      dot.addEventListener("click", function () {
+        currentIndex = parseInt(this.dataset.index);
+        updateSlider();
+      });
+      dotsContainer.appendChild(dot);
+    }
+  }
+
+  function updateDots() {
+    if (!dotsContainer) return;
+    var dots = dotsContainer.querySelectorAll(".fbp-products__dot");
+    dots.forEach(function (d, i) {
+      d.classList.toggle("fbp-products__dot--active", i === currentIndex);
+    });
+  }
+
+  if (prevBtn) {
+    prevBtn.addEventListener("click", function () {
+      if (currentIndex > 0) {
+        currentIndex--;
+        updateSlider();
+      }
+    });
+  }
+
+  if (nextBtn) {
+    nextBtn.addEventListener("click", function () {
+      if (currentIndex < getMaxIndex()) {
+        currentIndex++;
+        updateSlider();
+      }
+    });
+  }
+
+  buildDots();
+  updateSlider();
+
+  var resizeTimer;
+  window.addEventListener("resize", function () {
+    clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(function () {
+      if (currentIndex > getMaxIndex()) currentIndex = getMaxIndex();
+      buildDots();
+      updateSlider();
+    }, 150);
+  });
+
+  /* Add to Cart */
+  var atcButtons = section.querySelectorAll(".fbp-products__card-atc[data-variant-id]");
+  atcButtons.forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      var variantId = this.dataset.variantId;
+      var button = this;
+      button.textContent = "Adding...";
+      button.disabled = true;
+
+      fetch("/cart/add.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: parseInt(variantId), quantity: 1 })
+      })
+        .then(function (res) { return res.json(); })
+        .then(function () {
+          button.textContent = "Added!";
+          setTimeout(function () {
+            button.textContent = "Add to Cart";
+            button.disabled = false;
+          }, 1500);
+        })
+        .catch(function () {
+          button.textContent = "Error";
+          setTimeout(function () {
+            button.textContent = "Add to Cart";
+            button.disabled = false;
+          }, 1500);
+        });
+    });
+  });
+});
+</script>
+
+{% schema %}
+{
+  "name": "Featured Banner Products",
+  "tag": "section",
+  "class": "fbp-section-wrapper",
+  "settings": [
+    {
+      "type": "header",
+      "content": "Banner"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image",
+      "label": "Banner image (desktop)"
+    },
+    {
+      "type": "image_picker",
+      "id": "banner_image_mobile",
+      "label": "Banner image (mobile)"
+    },
+    {
+      "type": "text",
+      "id": "banner_subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "text",
+      "id": "banner_title",
+      "label": "Title",
+      "default": "Valentine's Day Gifts for Her"
+    },
+    {
+      "type": "textarea",
+      "id": "banner_description",
+      "label": "Description",
+      "default": "Valentines gifts to honour your love story"
+    },
+    {
+      "type": "text",
+      "id": "btn_text_label",
+      "label": "Button text",
+      "default": "Valentines Day Gifts"
+    },
+    {
+      "type": "url",
+      "id": "btn_link",
+      "label": "Button link"
+    },
+    {
+      "type": "select",
+      "id": "content_position",
+      "label": "Content position",
+      "default": "left",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "center", "label": "Center" },
+        { "value": "right", "label": "Right" }
+      ]
+    },
+    {
+      "type": "header",
+      "content": "Products"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Collection"
+    },
+    {
+      "type": "text",
+      "id": "products_heading",
+      "label": "Products heading",
+      "default": "Best Gifts for Valentine's Day"
+    },
+    {
+      "type": "range",
+      "id": "products_limit",
+      "label": "Products to show",
+      "min": 4,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "products_per_view",
+      "label": "Products per view (desktop)",
+      "min": 3,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Section background",
+      "default": "#fadddd"
+    },
+    {
+      "type": "color",
+      "id": "banner_overlay_color",
+      "label": "Banner overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "banner_overlay_opacity",
+      "label": "Banner overlay opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.0
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#efefef"
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_bg",
+      "label": "Button background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "btn_text",
+      "label": "Button text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "btn_border",
+      "label": "Button border color",
+      "default": "#5a4444"
+    },
+    {
+      "type": "color",
+      "id": "card_bg",
+      "label": "Card background",
+      "default": "#602124"
+    },
+    {
+      "type": "color",
+      "id": "card_border",
+      "label": "Card border",
+      "default": "#fadddd"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (px)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (px)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Featured Banner Products",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

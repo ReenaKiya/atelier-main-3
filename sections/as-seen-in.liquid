@@ -1,0 +1,95 @@
+<section class="shopify-section shopify-section--logo-list">
+  <style>
+    .container.container--xl {
+      max-width: 1168px; /* 👈 Restricts width */
+      margin: 0 auto; /* 👈 Centers the container */
+    }
+
+    .logo-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      justify-items: center;
+      align-items: center;
+      padding: 50px 70px; /* top-bottom 50px, left-right 70px */
+    }
+
+    @media screen and (min-width: 700px) {
+      .logo-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media screen and (min-width: 1000px) {
+      .logo-list {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .logo-list__item img {
+      max-width: 250px;
+      height: auto;
+      display: block;
+    }
+  </style>
+
+  <div class="section-spacing">
+    <div class="container container--xl">
+      <div class="section-stack">
+        <div class="section-header justify-self-center text-center">
+          <div class="prose">
+            <h2 class="h2" style="font-size: 20px; font-weight: 700; letter-spacing: 0.18em; margin-bottom: 20px;">
+              As seen in
+            </h2>
+          </div>
+        </div>
+
+        <div class="logo-list">
+          <div class="logo-list__item">
+            <img
+              src="//bellaforever.co.uk/cdn/shop/files/bella_forever_cosmopolitan_1.png?v=1734791182&width=300"
+              alt="Bella Forever in Cosmopolitan"
+              width="300"
+              height="90"
+              loading="lazy"
+              class="constrained-image"
+            >
+          </div>
+
+          <div class="logo-list__item">
+            <img
+              src="//bellaforever.co.uk/cdn/shop/files/bella_forever_in_plant_based.jpg?v=1701455340&width=300"
+              alt="Bella Forever in Plant Based"
+              width="300"
+              height="90"
+              loading="lazy"
+              class="constrained-image"
+            >
+          </div>
+
+          <div class="logo-list__item">
+            <img
+              src="//bellaforever.co.uk/cdn/shop/files/bella_forever_pick_me_up_7e36a41a-13d3-4d3e-bd06-0e85a45dffb6.png?v=1734791060&width=300"
+              alt="Bella Forever in Pick Me Up"
+              width="300"
+              height="90"
+              loading="lazy"
+              class="constrained-image"
+            >
+          </div>
+
+          <div class="logo-list__item">
+            <img
+              src="//bellaforever.co.uk/cdn/shop/files/bella_forever_in_vegan_life.jpg?v=1701455358&width=300"
+              alt="Bella Forever in Vegan Life"
+              width="300"
+              height="90"
+              loading="lazy"
+              class="constrained-image"
+            >
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

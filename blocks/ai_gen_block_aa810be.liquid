@@ -1,0 +1,844 @@
+{% doc %}
+  @prompt
+    i want to add here three product discount offer card like 10% offer discount , 20 % offer discount , 30% offer discount and add get offer details button inside the product card and and when click the get offer details button then i want to display side drawer pop-uo box  and add drawer background image so that it looks attractive 
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-discount-offers-{{ ai_gen_id }} {
+    display: block;
+    width: 100%;
+    padding: {{ block.settings.section_padding }}px 0;
+  }
+
+  .ai-discount-offers__container-{{ ai_gen_id }} {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .ai-discount-offers__heading-{{ ai_gen_id }} {
+    text-align: center;
+    margin-bottom: 30px;
+    font-size: {{ block.settings.heading_size }}px;
+    color: {{ block.settings.heading_color }};
+  }
+
+  .ai-discount-offers__grid-{{ ai_gen_id }} {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 24px;
+    margin-bottom: 20px;
+  }
+
+  .ai-discount-card-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_background }};
+    border: {{ block.settings.card_border_width }}px solid {{ block.settings.card_border_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    padding: 30px 20px;
+    text-align: center;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .ai-discount-card-{{ ai_gen_id }}:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  }
+
+  .ai-discount-card__badge-{{ ai_gen_id }} {
+    display: inline-block;
+    background-color: {{ block.settings.badge_background }};
+    color: {{ block.settings.badge_text_color }};
+    font-size: {{ block.settings.badge_font_size }}px;
+    font-weight: 700;
+    padding: 8px 16px;
+    border-radius: {{ block.settings.badge_border_radius }}px;
+    margin-bottom: 20px;
+    text-transform: uppercase;
+  }
+
+  .ai-discount-card__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.card_title_size }}px;
+    color: {{ block.settings.card_title_color }};
+    margin-bottom: 12px;
+    font-weight: 600;
+  }
+
+  .ai-discount-card__description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.card_description_size }}px;
+    color: {{ block.settings.card_description_color }};
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+
+  .ai-discount-card__button-{{ ai_gen_id }} {
+    background-color: {{ block.settings.button_background }};
+    color: {{ block.settings.button_text_color }};
+    border: none;
+    padding: 12px 24px;
+    font-size: {{ block.settings.button_font_size }}px;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+    font-weight: 600;
+    text-transform: uppercase;
+  }
+
+  .ai-discount-card__button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_background }};
+  }
+
+  .ai-drawer-overlay-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .ai-drawer-overlay-{{ ai_gen_id }}.active {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .ai-drawer-{{ ai_gen_id }} {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 100%;
+    max-width: {{ block.settings.drawer_width }}px;
+    height: 100%;
+    background-color: {{ block.settings.drawer_background }};
+    z-index: 1000;
+    transition: right 0.3s ease;
+    overflow-y: auto;
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.3);
+  }
+
+  .ai-drawer-{{ ai_gen_id }}.active {
+    right: 0;
+  }
+
+  .ai-drawer__background-{{ ai_gen_id }} {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    opacity: {{ block.settings.drawer_bg_opacity | divided_by: 100.0 }};
+  }
+
+  .ai-drawer__background-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-drawer__content-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 2;
+    padding: 40px 30px;
+    background-color: {{ block.settings.drawer_content_background }};
+    min-height: 100%;
+  }
+
+  .ai-drawer__header-{{ ai_gen_id }} {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 30px;
+  }
+
+  .ai-drawer__title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.drawer_title_size }}px;
+    color: {{ block.settings.drawer_text_color }};
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .ai-drawer__close-{{ ai_gen_id }} {
+    background: none;
+    border: none;
+    cursor: pointer;
+    padding: 8px;
+    color: {{ block.settings.drawer_text_color }};
+    transition: opacity 0.3s ease;
+  }
+
+  .ai-drawer__close-{{ ai_gen_id }}:hover {
+    opacity: 0.7;
+  }
+
+  .ai-drawer__close-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-drawer__body-{{ ai_gen_id }} {
+    color: {{ block.settings.drawer_text_color }};
+  }
+
+  .ai-drawer__discount-{{ ai_gen_id }} {
+    font-size: {{ block.settings.drawer_discount_size }}px;
+    font-weight: 700;
+    color: {{ block.settings.drawer_accent_color }};
+    margin-bottom: 20px;
+  }
+
+  .ai-drawer__description-{{ ai_gen_id }} {
+    font-size: {{ block.settings.drawer_description_size }}px;
+    line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .ai-drawer__terms-{{ ai_gen_id }} {
+    font-size: {{ block.settings.drawer_terms_size }}px;
+    color: {{ block.settings.drawer_text_color }};
+    opacity: 0.8;
+    margin-bottom: 30px;
+  }
+
+  .ai-drawer__cta-{{ ai_gen_id }} {
+    background-color: {{ block.settings.drawer_cta_background }};
+    color: {{ block.settings.drawer_cta_text_color }};
+    border: none;
+    padding: 14px 28px;
+    font-size: {{ block.settings.drawer_cta_font_size }}px;
+    border-radius: {{ block.settings.drawer_cta_border_radius }}px;
+    cursor: pointer;
+    font-weight: 600;
+    text-transform: uppercase;
+    width: 100%;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-drawer__cta-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.drawer_cta_hover_background }};
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-discount-offers__grid-{{ ai_gen_id }} {
+      grid-template-columns: 1fr;
+    }
+
+    .ai-drawer-{{ ai_gen_id }} {
+      max-width: 100%;
+    }
+
+    .ai-drawer__content-{{ ai_gen_id }} {
+      padding: 30px 20px;
+    }
+  }
+{% endstyle %}
+
+<discount-offers-{{ ai_gen_id }} class="ai-discount-offers-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  <div class="ai-discount-offers__container-{{ ai_gen_id }}">
+    {% if block.settings.heading != blank %}
+      <h2 class="ai-discount-offers__heading-{{ ai_gen_id }}">{{ block.settings.heading }}</h2>
+    {% endif %}
+
+    <div class="ai-discount-offers__grid-{{ ai_gen_id }}">
+      {% for i in (1..3) %}
+        {% liquid
+          assign discount_key = 'discount_' | append: i
+          assign title_key = 'title_' | append: i
+          assign description_key = 'description_' | append: i
+          assign details_key = 'details_' | append: i
+          assign terms_key = 'terms_' | append: i
+
+          assign discount = block.settings[discount_key]
+          assign title = block.settings[title_key]
+          assign description = block.settings[description_key]
+          assign details = block.settings[details_key]
+          assign terms = block.settings[terms_key]
+        %}
+
+        <div class="ai-discount-card-{{ ai_gen_id }}">
+          <div class="ai-discount-card__badge-{{ ai_gen_id }}">{{ discount }}</div>
+          <h3 class="ai-discount-card__title-{{ ai_gen_id }}">{{ title }}</h3>
+          <div class="ai-discount-card__description-{{ ai_gen_id }}">{{ description }}</div>
+          <button 
+            class="ai-discount-card__button-{{ ai_gen_id }}" 
+            data-offer-index="{{ i }}"
+            aria-label="Get offer details for {{ discount }}"
+          >
+            {{ block.settings.button_text }}
+          </button>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+
+  <div class="ai-drawer-overlay-{{ ai_gen_id }}"></div>
+
+  <div class="ai-drawer-{{ ai_gen_id }}">
+    {% if block.settings.drawer_background_image %}
+      <div class="ai-drawer__background-{{ ai_gen_id }}">
+        <img 
+          src="{{ block.settings.drawer_background_image | image_url: width: 800 }}" 
+          alt="Drawer background"
+          loading="lazy"
+        >
+      </div>
+    {% endif %}
+
+    <div class="ai-drawer__content-{{ ai_gen_id }}">
+      <div class="ai-drawer__header-{{ ai_gen_id }}">
+        <h3 class="ai-drawer__title-{{ ai_gen_id }}" data-drawer-title></h3>
+        <button class="ai-drawer__close-{{ ai_gen_id }}" aria-label="Close drawer">
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <line x1="18" y1="6" x2="6" y2="18"></line>
+            <line x1="6" y1="6" x2="18" y2="18"></line>
+          </svg>
+        </button>
+      </div>
+
+      <div class="ai-drawer__body-{{ ai_gen_id }}">
+        <div class="ai-drawer__discount-{{ ai_gen_id }}" data-drawer-discount></div>
+        <div class="ai-drawer__description-{{ ai_gen_id }}" data-drawer-description></div>
+        <div class="ai-drawer__terms-{{ ai_gen_id }}" data-drawer-terms></div>
+        <button class="ai-drawer__cta-{{ ai_gen_id }}">{{ block.settings.drawer_cta_text }}</button>
+      </div>
+    </div>
+  </div>
+</discount-offers-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class DiscountOffers{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.offers = [
+          {
+            discount: {{ block.settings.discount_1 | json }},
+            title: {{ block.settings.title_1 | json }},
+            description: {{ block.settings.description_1 | json }},
+            details: {{ block.settings.details_1 | json }},
+            terms: {{ block.settings.terms_1 | json }}
+          },
+          {
+            discount: {{ block.settings.discount_2 | json }},
+            title: {{ block.settings.title_2 | json }},
+            description: {{ block.settings.description_2 | json }},
+            details: {{ block.settings.details_2 | json }},
+            terms: {{ block.settings.terms_2 | json }}
+          },
+          {
+            discount: {{ block.settings.discount_3 | json }},
+            title: {{ block.settings.title_3 | json }},
+            description: {{ block.settings.description_3 | json }},
+            details: {{ block.settings.details_3 | json }},
+            terms: {{ block.settings.terms_3 | json }}
+          }
+        ];
+      }
+
+      connectedCallback() {
+        this.drawer = this.querySelector('.ai-drawer-{{ ai_gen_id }}');
+        this.overlay = this.querySelector('.ai-drawer-overlay-{{ ai_gen_id }}');
+        this.closeButton = this.querySelector('.ai-drawer__close-{{ ai_gen_id }}');
+        this.offerButtons = this.querySelectorAll('.ai-discount-card__button-{{ ai_gen_id }}');
+
+        this.drawerTitle = this.querySelector('[data-drawer-title]');
+        this.drawerDiscount = this.querySelector('[data-drawer-discount]');
+        this.drawerDescription = this.querySelector('[data-drawer-description]');
+        this.drawerTerms = this.querySelector('[data-drawer-terms]');
+
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        this.offerButtons.forEach((button) => {
+          button.addEventListener('click', (e) => {
+            const index = parseInt(e.currentTarget.getAttribute('data-offer-index')) - 1;
+            this.openDrawer(index);
+          });
+        });
+
+        this.closeButton.addEventListener('click', () => {
+          this.closeDrawer();
+        });
+
+        this.overlay.addEventListener('click', () => {
+          this.closeDrawer();
+        });
+
+        document.addEventListener('keydown', (e) => {
+          if (e.key === 'Escape' && this.drawer.classList.contains('active')) {
+            this.closeDrawer();
+          }
+        });
+      }
+
+      openDrawer(index) {
+        const offer = this.offers[index];
+        
+        this.drawerTitle.textContent = offer.title;
+        this.drawerDiscount.textContent = offer.discount;
+        this.drawerDescription.textContent = offer.details;
+        this.drawerTerms.textContent = offer.terms;
+
+        this.drawer.classList.add('active');
+        this.overlay.classList.add('active');
+        document.body.style.overflow = 'hidden';
+      }
+
+      closeDrawer() {
+        this.drawer.classList.remove('active');
+        this.overlay.classList.remove('active');
+        document.body.style.overflow = '';
+      }
+    }
+
+    customElements.define('discount-offers-{{ ai_gen_id }}', DiscountOffers{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Discount offer cards",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Section"
+    },
+    {
+      "type": "inline_richtext",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Special Offers"
+    },
+    {
+      "type": "range",
+      "id": "heading_size",
+      "min": 16,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Heading size",
+      "default": 32
+    },
+    {
+      "type": "color",
+      "id": "heading_color",
+      "label": "Heading color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "section_padding",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Section padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Offer 1"
+    },
+    {
+      "type": "text",
+      "id": "discount_1",
+      "label": "Discount",
+      "default": "10% OFF"
+    },
+    {
+      "type": "text",
+      "id": "title_1",
+      "label": "Title",
+      "default": "First Purchase"
+    },
+    {
+      "type": "text",
+      "id": "description_1",
+      "label": "Short description",
+      "default": "Get 10% off on your first order"
+    },
+    {
+      "type": "textarea",
+      "id": "details_1",
+      "label": "Full details",
+      "default": "Enjoy 10% off your first purchase! This exclusive offer is available for new customers only. Shop now and save on your favorite products."
+    },
+    {
+      "type": "textarea",
+      "id": "terms_1",
+      "label": "Terms",
+      "default": "Valid for new customers only. Cannot be combined with other offers. Expires in 30 days."
+    },
+    {
+      "type": "header",
+      "content": "Offer 2"
+    },
+    {
+      "type": "text",
+      "id": "discount_2",
+      "label": "Discount",
+      "default": "20% OFF"
+    },
+    {
+      "type": "text",
+      "id": "title_2",
+      "label": "Title",
+      "default": "Bulk Order"
+    },
+    {
+      "type": "text",
+      "id": "description_2",
+      "label": "Short description",
+      "default": "Save 20% when you buy 3 or more items"
+    },
+    {
+      "type": "textarea",
+      "id": "details_2",
+      "label": "Full details",
+      "default": "Purchase 3 or more items and receive 20% off your entire order! Perfect for stocking up on your favorites or trying new products."
+    },
+    {
+      "type": "textarea",
+      "id": "terms_2",
+      "label": "Terms",
+      "default": "Minimum 3 items required. Discount applied automatically at checkout. Valid on all products."
+    },
+    {
+      "type": "header",
+      "content": "Offer 3"
+    },
+    {
+      "type": "text",
+      "id": "discount_3",
+      "label": "Discount",
+      "default": "30% OFF"
+    },
+    {
+      "type": "text",
+      "id": "title_3",
+      "label": "Title",
+      "default": "VIP Member"
+    },
+    {
+      "type": "text",
+      "id": "description_3",
+      "label": "Short description",
+      "default": "Exclusive 30% discount for VIP members"
+    },
+    {
+      "type": "textarea",
+      "id": "details_3",
+      "label": "Full details",
+      "default": "Join our VIP membership program and unlock 30% off all purchases! Plus, get early access to new products and exclusive deals."
+    },
+    {
+      "type": "textarea",
+      "id": "terms_3",
+      "label": "Terms",
+      "default": "VIP membership required. Annual fee applies. Discount valid on all products year-round."
+    },
+    {
+      "type": "header",
+      "content": "Card style"
+    },
+    {
+      "type": "color",
+      "id": "card_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_border_color",
+      "label": "Border color",
+      "default": "#e6e6e6"
+    },
+    {
+      "type": "range",
+      "id": "card_border_width",
+      "min": 0,
+      "max": 5,
+      "step": 1,
+      "unit": "px",
+      "label": "Border width",
+      "default": 1
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 8
+    },
+    {
+      "type": "color",
+      "id": "badge_background",
+      "label": "Badge background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "badge_text_color",
+      "label": "Badge text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "badge_font_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Badge font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "badge_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Badge border radius",
+      "default": 4
+    },
+    {
+      "type": "color",
+      "id": "card_title_color",
+      "label": "Title color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "card_title_size",
+      "min": 16,
+      "max": 32,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 24
+    },
+    {
+      "type": "color",
+      "id": "card_description_color",
+      "label": "Description color",
+      "default": "#666666"
+    },
+    {
+      "type": "range",
+      "id": "card_description_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 14
+    },
+    {
+      "type": "header",
+      "content": "Button"
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "Get Offer Details"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_background",
+      "label": "Hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "button_font_size",
+      "min": 12,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Drawer"
+    },
+    {
+      "type": "range",
+      "id": "drawer_width",
+      "min": 300,
+      "max": 600,
+      "step": 20,
+      "unit": "px",
+      "label": "Width",
+      "default": 400
+    },
+    {
+      "type": "color",
+      "id": "drawer_background",
+      "label": "Background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "image_picker",
+      "id": "drawer_background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "range",
+      "id": "drawer_bg_opacity",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "label": "Background image opacity",
+      "default": 20
+    },
+    {
+      "type": "color",
+      "id": "drawer_content_background",
+      "label": "Content background",
+      "default": "rgba(255, 255, 255, 0.95)"
+    },
+    {
+      "type": "color",
+      "id": "drawer_text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "drawer_accent_color",
+      "label": "Accent color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "drawer_title_size",
+      "min": 18,
+      "max": 36,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "drawer_discount_size",
+      "min": 24,
+      "max": 48,
+      "step": 2,
+      "unit": "px",
+      "label": "Discount size",
+      "default": 32
+    },
+    {
+      "type": "range",
+      "id": "drawer_description_size",
+      "min": 14,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Description size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "drawer_terms_size",
+      "min": 12,
+      "max": 16,
+      "step": 1,
+      "unit": "px",
+      "label": "Terms size",
+      "default": 12
+    },
+    {
+      "type": "header",
+      "content": "Drawer CTA button"
+    },
+    {
+      "type": "text",
+      "id": "drawer_cta_text",
+      "label": "Button text",
+      "default": "Apply Offer"
+    },
+    {
+      "type": "color",
+      "id": "drawer_cta_background",
+      "label": "Background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "drawer_cta_text_color",
+      "label": "Text color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "drawer_cta_hover_background",
+      "label": "Hover background",
+      "default": "#333333"
+    },
+    {
+      "type": "range",
+      "id": "drawer_cta_font_size",
+      "min": 14,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Font size",
+      "default": 16
+    },
+    {
+      "type": "range",
+      "id": "drawer_cta_border_radius",
+      "min": 0,
+      "max": 30,
+      "step": 2,
+      "unit": "px",
+      "label": "Border radius",
+      "default": 4
+    }
+  ],
+  "presets": [
+    {
+      "name": "Discount offer cards"
+    }
+  ]
+}
+{% endschema %}

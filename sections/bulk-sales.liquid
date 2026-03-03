@@ -1,0 +1,270 @@
+{%- liquid
+  assign image = section.settings.image
+  assign image_position = section.settings.image_position | default: 'left'
+
+  assign media_width_desktop = '60vw'
+  assign media_width_mobile = '100vw'
+  assign sizes = '(min-width: 900px) ' | append: media_width_desktop | append: ', ' | append: media_width_mobile
+  assign widths = '480, 640, 800, 960, 1200, 1600, 2000'
+-%}
+
+<section
+  class="bulk-sales bulk-sales--media-{{ image_position }}"
+  style="
+    --bulk-sales-bg: {{ section.settings.background_color }};
+    --bulk-sales-btn-bg: {{ section.settings.button_background }};
+    --bulk-sales-btn-text: {{ section.settings.button_text_color }};
+    --bulk-sales-padding-top: {{ section.settings.padding_top }}px;
+    --bulk-sales-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="bulk-sales__inner page-width">
+    <div class="bulk-sales__media">
+      {%- if image != blank -%}
+        {{
+          image
+          | image_url: width: 2000
+          | image_tag:
+            widths: widths,
+            sizes: sizes,
+            loading: 'lazy',
+            alt: image.alt,
+            class: 'bulk-sales__image'
+        }}
+      {%- else -%}
+        <div class="bulk-sales__placeholder" aria-hidden="true"></div>
+      {%- endif -%}
+    </div>
+
+    <div class="bulk-sales__content">
+      {%- if section.settings.heading != blank -%}
+        <h2 class="bulk-sales__heading">{{ section.settings.heading }}</h2>
+      {%- endif -%}
+
+      {%- if section.settings.text != blank -%}
+        <div class="bulk-sales__text rte">
+          {{ section.settings.text }}
+        </div>
+      {%- endif -%}
+
+      {%- if section.settings.button_label != blank and section.settings.button_link != blank -%}
+        <a class="bulk-sales__button" href="{{ section.settings.button_link }}">
+          {{ section.settings.button_label }}
+        </a>
+      {%- endif -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .bulk-sales {
+    background: var(--bulk-sales-bg);
+    padding-block: var(--bulk-sales-padding-top) var(--bulk-sales-padding-bottom);
+  }
+
+  .bulk-sales__inner {
+    display: grid;
+    grid-template-columns: 1.25fr 0.75fr;
+    gap: clamp(24px, 4vw, 64px);
+    align-items: center;
+  }
+
+  .bulk-sales__inner.page-width {
+    padding-inline-start: 30px;
+  }
+
+  .bulk-sales__media {
+    min-width: 0;
+  }
+
+  .bulk-sales__image {
+    width: 100%;
+    height: auto;
+    display: block;
+    object-fit: contain;
+  }
+
+  .bulk-sales__placeholder {
+    width: 100%;
+    aspect-ratio: 4 / 3;
+    background: rgb(var(--color-foreground-rgb) / 6%);
+    border-radius: 12px;
+  }
+
+  .bulk-sales__content {
+    min-width: 0;
+    max-width: 34rem;
+  }
+
+  .bulk-sales__heading {
+    margin: 0 0 12px;
+    font-family: var(--font-heading--family);
+    font-weight: 500;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+    font-size: clamp(40px, 4.8vw, 76px);
+    color: rgb(var(--color-foreground-rgb));
+  }
+
+  .bulk-sales__text {
+    margin: 0 0 22px;
+    font-size: 14px;
+    line-height: 1.6;
+    color: rgb(var(--color-foreground-rgb) / 80%);
+  }
+
+  .bulk-sales__text p {
+    margin: 0;
+  }
+
+  .bulk-sales__button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 18px;
+    border-radius: 9999px;
+    background: var(--bulk-sales-btn-bg);
+    color: var(--bulk-sales-btn-text);
+    text-decoration: none;
+    border: 1px solid rgb(var(--color-foreground-rgb) / 10%);
+    font-size: 14px;
+    line-height: 1;
+    transition: transform 150ms ease, box-shadow 150ms ease, background-color 150ms ease;
+  }
+
+  .bulk-sales__button:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 6px 18px rgb(0 0 0 / 8%);
+    background: yellow;
+    color: #ffffff;
+  }
+
+  .bulk-sales--media-right .bulk-sales__inner {
+    grid-template-columns: 0.75fr 1.25fr;
+  }
+
+  .bulk-sales--media-right .bulk-sales__media {
+    order: 2;
+  }
+
+  .bulk-sales--media-right .bulk-sales__content {
+    order: 1;
+  }
+
+  @media screen and (max-width: 899px) {
+    .bulk-sales__inner {
+      grid-template-columns: 1fr;
+      gap: 24px;
+      text-align: left;
+    }
+
+    .bulk-sales__content {
+      max-width: 100%;
+    }
+
+    .bulk-sales__heading {
+      font-size: clamp(34px, 9vw, 52px);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Bulk Sales",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "image",
+      "label": "Image"
+    },
+    {
+      "type": "select",
+      "id": "image_position",
+      "label": "Image position",
+      "options": [
+        { "value": "left", "label": "Left" },
+        { "value": "right", "label": "Right" }
+      ],
+      "default": "left"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "Bulk Sales"
+    },
+    {
+      "type": "richtext",
+      "id": "text",
+      "label": "Text",
+      "default": "<p>We sell all of our ingredients in bulk, from our Buchu to our Rooibos tea, so you can create your own products with it.</p>"
+    },
+    {
+      "type": "text",
+      "id": "button_label",
+      "label": "Button label",
+      "default": "More Info"
+    },
+    {
+      "type": "url",
+      "id": "button_link",
+      "label": "Button link"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#F6F2EA"
+    },
+    {
+      "type": "color",
+      "id": "button_background",
+      "label": "Button background",
+      "default": "#D9C6B3"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text color",
+      "default": "#2B2B2B"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 120,
+      "step": 4,
+      "unit": "px",
+      "default": 60
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bulk Sales",
+      "category": "Custom"
+    }
+  ]
+}
+{% endschema %}
+

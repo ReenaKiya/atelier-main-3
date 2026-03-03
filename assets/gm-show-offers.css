@@ -1,0 +1,206 @@
+.genius-maker-offer-info-container {
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.offer-display-content {
+  width: 100%;
+  display: flex;
+  gap: 1rem;
+  overflow-x: auto;
+  overflow-y: hidden;
+}
+
+
+.offer-display-content label {
+  flex: 1 1 80%;
+  min-width: 80%;
+}
+
+.offer-display-content label.offer-label {
+  padding-inline: 2rem;
+  padding-block: 1.2rem;
+}
+
+
+.offer-display-content label h4.offer-title {
+  font-size: 2rem;
+  font-weight: bold;
+  margin: 0;
+  margin-top: 0.5rem;
+}
+
+.offer-display-content label.offer-label p {
+  font-size: 1.6rem;
+  line-height: 1.4;
+}
+
+.offer-display-content label span.get-offer-btn {
+  display: block;
+  width: fit-content;
+  padding: 1rem;
+  margin-top: 1rem;
+  font-size: 1.4rem;
+  border-radius: 6px;
+  -webkit-border-radius: 6px;
+  -moz-border-radius: 6px;
+  -ms-border-radius: 6px;
+  -o-border-radius: 6px;
+
+}
+
+.genius-maker-offer-info-container .offer-display-content input {
+  display: none;
+}
+
+.first-offer-info,
+.second-offer-info,
+.third-offer-info,
+.fourth-offer-info{
+  visibility: hidden; /* Hide by default */
+  touch-action: none; /* Disable touch events on the offer details section */
+  overflow-y: auto; /* Enable scrolling inside the offer details section if needed */
+  position: fixed;
+  top: 0;
+  right: 0;
+  width: 100%;
+  max-width: 400px;
+  height: 100vh;
+  background-color: #1e1e1e; 
+  color: #fafafa;
+  padding-inline: 2rem;
+  padding-block: 3rem;
+  flex-direction: column;
+  justify-content: flex-start;
+  align-items: center;
+  gap: 1rem;
+  z-index: 1000;
+  transition: transform 0.5s ease-in-out, visibility 0.5s ease-in-out;
+  transform: translateX(120%);
+   -webkit-transform: translateX(120%);
+  -moz-transform: translateX(120%);
+  -ms-transform: translateX(120%);
+  -o-transform: translateX(120%);
+}
+
+h4.offer-info-title--gm{
+  color: #fafafa;
+}
+
+.first-offer-info img,
+.second-offer-info img,
+.third-offer-info img,
+.fourth-offer-info img{
+  width: 100%;
+  height: auto;
+  aspect-ratio: 1/1;
+}
+
+p.offer-info-slide-content--gm {
+  font-size: 1.6rem;
+}
+
+.close-offer-info-gm {
+  position: absolute;
+  top: 15px;
+  right: 15px;
+  cursor: pointer;
+  background: none;
+  border: none;
+  outline: none;
+}
+
+
+/* Copy Button Styles */
+#discount-code-container--gm {
+  width: 100%;
+  height: auto;
+  background-color: #FFCF50;
+  color: #1e1e1e;
+  border-radius: 6px;
+  position: relative;
+  padding-block: 1rem;
+  margin-top: 1rem; /* Add spacing between content and copy button */
+}
+
+#discount-code-content--gm {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding-block: 5px;
+  padding-inline: 20px;
+}
+
+#discount-code--gm {
+  display: none;
+}
+
+#get-off-text--gm {
+  font-size: 1.5rem; /* Adjusted for better fit */
+  font-weight: bold;
+  color: #1e1e1e1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+}
+
+#copy-button--gm {
+  border: none;
+  display: inline-block;
+  padding-block: 0.7rem;
+  padding-inline: 0.9rem;
+  background-color: #1e1e1e;
+  color: #fafafa;
+  display: flex;
+  align-items: center;
+  gap: 0.3rem;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+#success-msg--gm {
+  visibility: hidden;
+  position: absolute;
+  bottom: -30px;
+  left: 0;
+  margin: 0;
+  width: 100%;
+  background-color: #1e1e1e;
+  color: #fafafa;
+  padding-inline: 1rem;
+  padding-block: 0.5rem;
+  text-align: center;
+  transition: all 500ms ease-in-out;
+}
+
+@media screen and (max-width: 750px) {
+/* Hide scrollbar for Chrome, Safari, and Opera */
+.offer-display-content::-webkit-scrollbar {
+  display: none;
+}
+
+ /* Hide scrollbar for IE, Edge, and Firefox */
+.offer-display-content{
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+}
+
+.offer-display-content label h4.offer-title{
+    font-size: 1.5rem;
+  }
+  
+.offer-display-content label.offer-label p {
+    font-size: 1.2rem;
+  }
+
+  .offer-display-content label span.get-offer-btn{
+    font-size: 1rem;
+    padding: 0.7rem;
+  }
+  p.offer-info-slide-content--gm {
+  font-size: 1.4rem;
+  }
+
+  #discount-code-container--gm {
+    padding-block: 0.2rem;
+  }
+}

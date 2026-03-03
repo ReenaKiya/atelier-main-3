@@ -1,0 +1,344 @@
+{%- liquid
+  assign end_date = section.settings.end_date
+  assign heading = section.settings.heading
+  assign subheading = section.settings.subheading
+  assign background_image = section.settings.background_image
+-%}
+
+<div class="countdown-banner__top-bar" style="background-color: {{ section.settings.top_bar_color }};"></div>
+<section
+  class="countdown-banner"
+  style="
+    --countdown-bg-color: {{ section.settings.background_color }};
+    --countdown-text-color: {{ section.settings.text_color }};
+    --countdown-box-bg: {{ section.settings.timer_background }};
+    --countdown-box-text: {{ section.settings.timer_text_color }};
+  "
+>
+  {%- if background_image != blank -%}
+    <div class="countdown-banner__bg-image">
+      {{ background_image | image_url: width: 2000 | image_tag: loading: 'lazy', class: 'countdown-banner__image' }}
+    </div>
+  {%- endif -%}
+
+  <div class="countdown-timer__overlay" style="--overlay-padding: {{ section.settings.overlay_padding }}px 0; --overlay-background-color: {{ section.settings.overlay_color.red }}, {{ section.settings.overlay_color.green }}, {{ section.settings.overlay_color.blue }}, {{ section.settings.overlay_opacity }};">
+  <div class="countdown-banner__inner page-width">
+    <div class="countdown-banner__content">
+      {%- if heading != blank -%}
+        <h2 class="countdown-banner__heading">{{ heading }}</h2>
+      {%- endif -%}
+      {%- if subheading != blank -%}
+        <p class="countdown-banner__subheading">{{ subheading }}</p>
+      {%- endif -%}
+    </div>
+
+    <div class="countdown-banner__timer" data-end-date="{{ end_date }}">
+      <div class="countdown-banner__timer-box">
+        <span class="countdown-banner__number" data-days>0</span>
+        <span class="countdown-banner__label">DAYS</span>
+      </div>
+      <div class="countdown-banner__timer-box">
+        <span class="countdown-banner__number" data-hours>0</span>
+        <span class="countdown-banner__label">HOURS</span>
+      </div>
+      <div class="countdown-banner__timer-box">
+        <span class="countdown-banner__number" data-minutes>0</span>
+        <span class="countdown-banner__label">MINUTES</span>
+      </div>
+      <div class="countdown-banner__timer-box">
+        <span class="countdown-banner__number" data-seconds>0</span>
+        <span class="countdown-banner__label">SECONDS</span>
+      </div>
+    </div>
+  </div>
+  </div>
+</section>
+
+<script>
+  (function() {
+    const timer = document.querySelector('.countdown-banner__timer');
+    if (!timer) return;
+
+    const endDate = new Date(timer.dataset.endDate).getTime();
+    const daysEl = timer.querySelector('[data-days]');
+    const hoursEl = timer.querySelector('[data-hours]');
+    const minutesEl = timer.querySelector('[data-minutes]');
+    const secondsEl = timer.querySelector('[data-seconds]');
+
+    function updateCountdown() {
+      const now = new Date().getTime();
+      const distance = endDate - now;
+
+      if (distance < 0) {
+        daysEl.textContent = '0';
+        hoursEl.textContent = '0';
+        minutesEl.textContent = '0';
+        secondsEl.textContent = '0';
+        return;
+      }
+
+      const days = Math.floor(distance / (1000 * 60 * 60 * 24));
+      const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+      const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+      const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+      daysEl.textContent = days;
+      hoursEl.textContent = hours;
+      minutesEl.textContent = minutes;
+      secondsEl.textContent = seconds;
+    }
+
+    updateCountdown();
+    setInterval(updateCountdown, 1000);
+  })();
+</script>
+
+{% stylesheet %}
+  .section-wrapper:has(.countdown-banner) {
+    position: relative;
+    padding: 0;
+    margin: 0;
+  }
+
+  .countdown-banner__top-bar {
+    width: 100%;
+    height: 20px;
+  }
+
+  .countdown-timer__overlay {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--overlay-padding, 40px 0);
+    background-color: rgba(var(--overlay-background-color, 0, 0, 0, 0.4));
+  }
+
+  .countdown-banner {
+    position: relative;
+    background: var(--countdown-bg-color);
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+  }
+
+  .countdown-banner__bg-image {
+    position: absolute;
+    inset: 0;
+    z-index: 0;
+  }
+
+  .countdown-banner__image {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .countdown-banner__inner {
+    position: relative;
+    z-index: 1;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 40px;
+  }
+
+  .countdown-banner__content {
+    flex: 1;
+    text-align: left;
+    font-family: 'Nunito Sans', sans-serif;
+  }
+
+  .countdown-banner__heading {
+    margin: 0 0 10px;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: clamp(28px, 4vw, 42px);
+    font-weight: 700;
+    font-style: italic;
+    color: var(--countdown-text-color);
+    line-height: 1.2;
+  }
+
+  .countdown-banner__subheading {
+    margin: 0;
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 15px;
+    font-style: italic;
+    color: var(--countdown-text-color);
+    opacity: 0.9;
+    line-height: 1.5;
+    max-width: 500px;
+  }
+
+  .countdown-banner__timer {
+    display: flex;
+    gap: 0;
+    background: var(--countdown-box-bg);
+    padding: 25px 10px;
+    border-radius: 4px;
+    flex-shrink: 0;
+  }
+
+  .countdown-banner__timer-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-width: 80px;
+    padding: 0 30px;
+    border-right: 1px solid rgba(0, 0, 0, 0.1);
+  }
+
+  .countdown-banner__timer-box:last-child {
+    border-right: none;
+  }
+
+  .countdown-banner__number {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 40px;
+    font-weight: 400;
+    color: var(--countdown-box-text);
+    line-height: 1;
+  }
+
+  .countdown-banner__label {
+    font-family: 'Nunito Sans', sans-serif;
+    font-size: 11px;
+    color: var(--countdown-box-text);
+    opacity: 0.6;
+    margin-top: 8px;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  @media screen and (max-width: 899px) {
+    .countdown-banner__inner {
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .countdown-banner__content {
+      text-align: center;
+    }
+
+    .countdown-banner__subheading {
+      max-width: 100%;
+    }
+
+    .countdown-banner__timer {
+      padding: 15px 5px;
+    }
+
+    .countdown-banner__timer-box {
+      min-width: 55px;
+      padding: 0 15px;
+    }
+
+    .countdown-banner__number {
+      font-size: 28px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Countdown Banner",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Heading",
+      "default": "30% off - Limited Time"
+    },
+    {
+      "type": "textarea",
+      "id": "subheading",
+      "label": "Subheading",
+      "default": "This Valentine's Day, let us give you a hand in gifting the best gifts that your loved ones deserve."
+    },
+    {
+      "type": "text",
+      "id": "end_date",
+      "label": "End date",
+      "info": "Format: YYYY-MM-DD HH:MM (e.g., 2026-02-14 23:59)",
+      "default": "2026-02-14 23:59"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "top_bar_color",
+      "label": "Top bar color",
+      "default": "#f8e0e0"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#6B6B6B"
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "timer_background",
+      "label": "Timer background",
+      "default": "#FFFFFF"
+    },
+    {
+      "type": "color",
+      "id": "timer_text_color",
+      "label": "Timer text color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Overlay"
+    },
+    {
+      "type": "color",
+      "id": "overlay_color",
+      "label": "Overlay color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "overlay_opacity",
+      "label": "Overlay opacity",
+      "min": 0,
+      "max": 1,
+      "step": 0.1,
+      "default": 0.4
+    },
+    {
+      "type": "range",
+      "id": "overlay_padding",
+      "label": "Overlay padding (px)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    }
+  ],
+  "presets": [
+    {
+      "name": "Countdown Banner",
+      "category": "Promotional"
+    }
+  ]
+}
+{% endschema %}

@@ -1,0 +1,308 @@
+{%- assign section_scope = 'trust-icons-bar--' | append: section.id -%}
+
+{% style %}
+  .{{ section_scope }} {
+    --trust-icons-bar-gap: {{ section.settings.gap }}px;
+    --trust-icons-bar-icon-margin: {{ section.settings.icon_margin_bottom }}px;
+    --trust-icons-bar-border-color: {{ section.settings.border_color }};
+  }
+
+  .{{ section_scope }} .trust-icons-bar__wrap {
+    {% if section.settings.show_top_border %}
+      border-top: 1px solid var(--trust-icons-bar-border-color);
+    {% endif %}
+    {% if section.settings.show_bottom_border %}
+      border-bottom: 1px solid var(--trust-icons-bar-border-color);
+    {% endif %}
+  }
+
+  .{{ section_scope }} .trust-icons-bar__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: var(--trust-icons-bar-gap);
+    align-items: center;
+    justify-items: center;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__item {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    transition: transform 0.3s ease;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__item svg {
+    color: #db1e37;
+    fill: currentColor;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__item .trust-icons-bar__text {
+    font-size: 0.8125rem;
+    font-weight: 300;
+    color: #000000;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__item:hover {
+    transform: translateY(-4px);
+  }
+
+  .{{ section_scope }} .trust-icons-bar__link {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 0;
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__icon-wrap {
+    color: #db1e37;
+    line-height: 0;
+    margin-bottom: var(--trust-icons-bar-icon-margin);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__icon {
+    display: block;
+  }
+
+  .{{ section_scope }} .trust-icons-bar__text {
+    font-size: 0.8125rem;
+    line-height: 1.3;
+    letter-spacing: 0;
+    font-weight: 300;
+    color: #000000;
+  }
+
+  @media screen and (max-width: 749px) {
+    .{{ section_scope }} .trust-icons-bar__list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: calc(var(--trust-icons-bar-gap) * 0.75);
+    }
+  }
+{% endstyle %}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<div
+  class="section section--{{ section.settings.section_width }} spacing-style color-{{ section.settings.color_scheme }} {{ section_scope }}"
+  style="{% render 'spacing-padding', settings: section.settings %}"
+>
+  <div class="trust-icons-bar__wrap">
+    <ul class="trust-icons-bar__list" role="list">
+      {%- for block in section.blocks -%}
+        <li class="trust-icons-bar__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a class="trust-icons-bar__link" href="{{ block.settings.link }}">
+          {%- else -%}
+            <div class="trust-icons-bar__link">
+          {%- endif -%}
+
+            <div class="trust-icons-bar__icon-wrap">
+              {%- render 'icon-or-image',
+                icon: block.settings.icon,
+                image_upload: block.settings.image_upload,
+                width: block.settings.icon_size,
+                class_name: 'trust-icons-bar__icon'
+              -%}
+            </div>
+
+            {%- if block.settings.text != blank -%}
+              <div class="trust-icons-bar__text">{{ block.settings.text | escape }}</div>
+            {%- endif -%}
+
+          {%- if block.settings.link != blank -%}
+            </a>
+          {%- else -%}
+            </div>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </div>
+</div>
+
+{% schema %}
+{
+  "name": "Trust icons bar",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "Width",
+      "options": [
+        { "value": "page-width", "label": "Page" },
+        { "value": "full-width", "label": "Full" }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "header",
+      "content": "Appearance"
+    },
+    {
+      "type": "range",
+      "id": "icon_margin_bottom",
+      "label": "Space between icon and text",
+      "min": 0,
+      "max": 30,
+      "step": 1,
+      "unit": "px",
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "gap",
+      "label": "Gap between items",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "checkbox",
+      "id": "show_top_border",
+      "label": "Show top border",
+      "default": false
+    },
+    {
+      "type": "checkbox",
+      "id": "show_bottom_border",
+      "label": "Show bottom border",
+      "default": false
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Border color",
+      "alpha": true,
+      "default": "#00000014"
+    },
+    {
+      "type": "header",
+      "content": "Padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "Top padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "Bottom padding",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 24
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-start",
+      "label": "Left padding",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "range",
+      "id": "padding-inline-end",
+      "label": "Right padding",
+      "min": 0,
+      "max": 80,
+      "step": 1,
+      "unit": "px",
+      "default": 0
+    }
+  ],
+  "blocks": [
+    {
+      "type": "badge",
+      "name": "Badge",
+      "settings": [
+        {
+          "type": "select",
+          "id": "icon",
+          "label": "Icon (used if no image is uploaded)",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "truck", "label": "Truck" },
+            { "value": "return", "label": "Return" },
+            { "value": "box", "label": "Box" },
+            { "value": "bottle", "label": "Bottle" },
+            { "value": "star", "label": "Star" },
+            { "value": "check_box", "label": "Check box" },
+            { "value": "heart", "label": "Heart" },
+            { "value": "eye", "label": "Eye" },
+            { "value": "stopwatch", "label": "Stopwatch" }
+          ],
+          "default": "truck"
+        },
+        {
+          "type": "image_picker",
+          "id": "image_upload",
+          "label": "Icon image (optional)"
+        },
+        {
+          "type": "range",
+          "id": "icon_size",
+          "label": "Icon size",
+          "min": 16,
+          "max": 80,
+          "step": 1,
+          "unit": "px",
+          "default": 44
+        },
+        {
+          "type": "text",
+          "id": "text",
+          "label": "Label",
+          "default": "Free shipping"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link (optional)"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "Trust icons bar",
+      "category": "Layout",
+      "blocks": [
+        { "type": "badge", "settings": { "icon": "truck", "text": "Free shipping" } },
+        { "type": "badge", "settings": { "icon": "bottle", "text": "Piercing Aftercare" } },
+        { "type": "badge", "settings": { "icon": "return", "text": "30-days returns" } },
+        { "type": "badge", "settings": { "icon": "star", "text": "4.8/5 Reviews" } },
+        { "type": "badge", "settings": { "icon": "check_box", "text": "Premium Quality" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

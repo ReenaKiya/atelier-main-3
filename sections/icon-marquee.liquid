@@ -1,0 +1,296 @@
+{%- liquid
+  assign speed = section.settings.speed
+  assign icon_size = section.settings.icon_size
+  assign border_color = section.settings.border_color
+  assign bg_color = section.settings.background_color
+-%}
+
+<section
+  class="icon-marquee"
+  style="
+    --im-speed: {{ speed }}s;
+    --im-icon-size: {{ icon_size }}px;
+    --im-border-color: {{ border_color }};
+    --im-bg: {{ bg_color }};
+    --im-padding-top: {{ section.settings.padding_top }}px;
+    --im-padding-bottom: {{ section.settings.padding_bottom }}px;
+  "
+>
+  <div class="icon-marquee__wrapper">
+    <div class="icon-marquee__track">
+      {%- for block in section.blocks -%}
+        <div class="icon-marquee__item" {{ block.shopify_attributes }}>
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="icon-marquee__link">
+          {%- endif -%}
+            <div class="icon-marquee__circle">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 200 | image_tag: class: 'icon-marquee__img', loading: 'lazy', alt: block.settings.label }}
+              {%- else -%}
+                <span class="icon-marquee__placeholder"></span>
+              {%- endif -%}
+              {%- if block.settings.label != blank -%}
+                <div class="icon-marquee__overlay">
+                  <span class="icon-marquee__overlay-text">{{ block.settings.label }}</span>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- if block.settings.link != blank -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+
+      {%- for block in section.blocks -%}
+        <div class="icon-marquee__item" aria-hidden="true">
+          {%- if block.settings.link != blank -%}
+            <a href="{{ block.settings.link }}" class="icon-marquee__link" tabindex="-1">
+          {%- endif -%}
+            <div class="icon-marquee__circle">
+              {%- if block.settings.image != blank -%}
+                {{ block.settings.image | image_url: width: 200 | image_tag: class: 'icon-marquee__img', loading: 'lazy', alt: block.settings.label }}
+              {%- else -%}
+                <span class="icon-marquee__placeholder"></span>
+              {%- endif -%}
+              {%- if block.settings.label != blank -%}
+                <div class="icon-marquee__overlay">
+                  <span class="icon-marquee__overlay-text">{{ block.settings.label }}</span>
+                </div>
+              {%- endif -%}
+            </div>
+          {%- if block.settings.link != blank -%}
+            </a>
+          {%- endif -%}
+        </div>
+      {%- endfor -%}
+    </div>
+  </div>
+</section>
+
+{% stylesheet %}
+  .icon-marquee {
+    background: var(--im-bg);
+    padding-top: var(--im-padding-top);
+    padding-bottom: var(--im-padding-bottom);
+    overflow: hidden;
+  }
+
+  .icon-marquee__wrapper {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .icon-marquee__track {
+    display: flex;
+    align-items: center;
+    gap: 30px;
+    animation: icon-marquee-scroll var(--im-speed, 20s) linear infinite;
+    width: max-content;
+  }
+
+  .icon-marquee__wrapper:hover .icon-marquee__track {
+    animation-play-state: paused;
+  }
+
+  .icon-marquee__item {
+    flex-shrink: 0;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-marquee__link {
+    text-decoration: none;
+    color: inherit;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .icon-marquee__circle {
+    position: relative;
+    width: var(--im-icon-size);
+    height: var(--im-icon-size);
+    border-radius: 50%;
+    border: 1px solid var(--im-border-color);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    background: #fff;
+    transition: transform 0.3s ease, border-color 0.3s ease;
+  }
+
+  .icon-marquee__item:hover .icon-marquee__circle {
+    transform: scale(1.05);
+  }
+
+  .icon-marquee__overlay {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    border-radius: 0 0 50% 50%;
+    background: linear-gradient(0deg, #000000 0%, transparent 100%);
+    padding: 20px 5px 10px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  .icon-marquee__item:hover .icon-marquee__overlay {
+    opacity: 1;
+    visibility: visible;
+  }
+
+  .icon-marquee__overlay-text {
+    color: #fff;
+    font-size: 11px;
+    font-weight: 600;
+    text-align: center;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .icon-marquee__img {
+    width: 60%;
+    height: 60%;
+    object-fit: contain;
+  }
+
+  .icon-marquee__placeholder {
+    width: 40%;
+    height: 40%;
+    background: #ddd;
+    border-radius: 50%;
+  }
+
+  @keyframes icon-marquee-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .icon-marquee__track {
+      gap: 20px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Icon Marquee",
+  "tag": "section",
+  "class": "section-wrapper",
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "Scroll speed",
+      "min": 5,
+      "max": 60,
+      "step": 5,
+      "default": 20,
+      "unit": "sec"
+    },
+    {
+      "type": "range",
+      "id": "icon_size",
+      "label": "Icon size",
+      "min": 60,
+      "max": 150,
+      "step": 10,
+      "default": 90,
+      "unit": "px"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#F5F5F5"
+    },
+    {
+      "type": "color",
+      "id": "border_color",
+      "label": "Circle border color",
+      "default": "#c41e3a"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 20,
+      "unit": "px"
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 80,
+      "step": 4,
+      "default": 20,
+      "unit": "px"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "icon",
+      "name": "Icon",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Icon image"
+        },
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Icon Marquee",
+      "category": "Custom",
+      "blocks": [
+        { "type": "icon", "settings": { "label": "Belly" } },
+        { "type": "icon", "settings": { "label": "Eye" } },
+        { "type": "icon", "settings": { "label": "Ear" } },
+        { "type": "icon", "settings": { "label": "Tongue" } },
+        { "type": "icon", "settings": { "label": "Nose" } },
+        { "type": "icon", "settings": { "label": "Surface" } },
+        { "type": "icon", "settings": { "label": "Stretch" } },
+        { "type": "icon", "settings": { "label": "Lips" } }
+      ]
+    }
+  ]
+}
+{% endschema %}

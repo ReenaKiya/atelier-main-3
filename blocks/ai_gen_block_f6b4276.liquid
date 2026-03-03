@@ -1,0 +1,778 @@
+{% doc %}
+  @prompt
+    i want to create a section like set the background image and keep the carousel with previouse and next button of the section rigth side i think this carousel will take position absolute of the section right side 55% space and leave the space of the section left side empty and put the title of this carousel like "style "  above this background image with carousel section i want to put two things like left will come title and paragraph like the title Find Your Style and paragraph like Discover the pieces that define your look and the right side  would be navigation for collection make navigation attractive like when user hover navigation tab then tab backgroun change in the defferent color and tab has radious border that's it and remember that carousel should in right side of this section and left side should empty  
+{% enddoc %}
+{% assign ai_gen_id = block.id | replace: '_', '' | downcase %}
+
+{% style %}
+  .ai-style-carousel-section-{{ ai_gen_id }} {
+    display: block;
+    position: relative;
+    width: 100%;
+    min-height: 500px;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    {% if block.settings.background_image %}
+      background-image: url('{{ block.settings.background_image | image_url: width: 2000 }}');
+    {% else %}
+      background-color: #f4f4f4;
+    {% endif %}
+  }
+
+  .ai-style-carousel-header-{{ ai_gen_id }} {
+    position: relative;
+    z-index: 2;
+    padding: {{ block.settings.header_padding_top }}px 40px {{ block.settings.header_padding_bottom }}px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 40px;
+  }
+
+  .ai-style-carousel-header-content-{{ ai_gen_id }} {
+    flex: 1;
+  }
+
+  .ai-style-carousel-header-title-{{ ai_gen_id }} {
+    font-size: {{ block.settings.title_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0 0 12px;
+  }
+
+  .ai-style-carousel-header-text-{{ ai_gen_id }} {
+    font-size: {{ block.settings.paragraph_size }}px;
+    color: {{ block.settings.text_color }};
+    margin: 0;
+    max-width: 500px;
+  }
+
+  .ai-style-carousel-nav-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .ai-style-carousel-nav-item-{{ ai_gen_id }} {
+    padding: 10px 20px;
+    background-color: {{ block.settings.nav_bg_color }};
+    color: {{ block.settings.nav_text_color }};
+    border: {{ block.settings.nav_border_width }}px solid {{ block.settings.nav_border_color }};
+    border-radius: {{ block.settings.nav_border_radius }}px;
+    text-decoration: none;
+    font-size: {{ block.settings.nav_font_size }}px;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    text-transform: uppercase;
+    font-weight: 500;
+  }
+
+  .ai-style-carousel-nav-item-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.nav_hover_bg_color }};
+    color: {{ block.settings.nav_hover_text_color }};
+    border-color: {{ block.settings.nav_hover_border_color }};
+  }
+
+  .ai-style-carousel-container-{{ ai_gen_id }} {
+    position: absolute;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: {{ block.settings.carousel_width }}%;
+    display: flex;
+    align-items: center;
+    padding: 40px;
+  }
+
+  .ai-style-carousel-wrapper-{{ ai_gen_id }} {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+  }
+
+  .ai-style-carousel-track-{{ ai_gen_id }} {
+    display: flex;
+    transition: transform 0.5s ease;
+  }
+
+  .ai-style-carousel-slide-{{ ai_gen_id }} {
+    min-width: 100%;
+    flex-shrink: 0;
+  }
+
+  .ai-style-carousel-product-{{ ai_gen_id }} {
+    background-color: {{ block.settings.card_bg_color }};
+    border-radius: {{ block.settings.card_border_radius }}px;
+    overflow: hidden;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .ai-style-carousel-product-image-{{ ai_gen_id }} {
+    width: 100%;
+    aspect-ratio: {{ block.settings.image_aspect_ratio }};
+    overflow: hidden;
+    background-color: #f4f4f4;
+  }
+
+  .ai-style-carousel-product-image-{{ ai_gen_id }} img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-style-carousel-product-image-{{ ai_gen_id }} svg {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .ai-style-carousel-product-info-{{ ai_gen_id }} {
+    padding: 20px;
+  }
+
+  .ai-style-carousel-product-title-{{ ai_gen_id }} {
+    font-size: 18px;
+    color: {{ block.settings.card_text_color }};
+    margin: 0 0 8px;
+    font-weight: 600;
+  }
+
+  .ai-style-carousel-product-price-{{ ai_gen_id }} {
+    font-size: 16px;
+    color: {{ block.settings.card_text_color }};
+    margin: 0 0 12px;
+  }
+
+  .ai-style-carousel-product-link-{{ ai_gen_id }} {
+    display: inline-block;
+    padding: 10px 20px;
+    background-color: {{ block.settings.button_bg_color }};
+    color: {{ block.settings.button_text_color }};
+    text-decoration: none;
+    border-radius: {{ block.settings.button_border_radius }}px;
+    font-size: 14px;
+    transition: background-color 0.3s ease;
+  }
+
+  .ai-style-carousel-product-link-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.button_hover_bg_color }};
+  }
+
+  .ai-style-carousel-controls-{{ ai_gen_id }} {
+    display: flex;
+    gap: 12px;
+    margin-top: 20px;
+    justify-content: center;
+  }
+
+  .ai-style-carousel-button-{{ ai_gen_id }} {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    background-color: {{ block.settings.control_bg_color }};
+    color: {{ block.settings.control_icon_color }};
+    border: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+  }
+
+  .ai-style-carousel-button-{{ ai_gen_id }}:hover {
+    background-color: {{ block.settings.control_hover_bg_color }};
+    color: {{ block.settings.control_hover_icon_color }};
+  }
+
+  .ai-style-carousel-button-{{ ai_gen_id }} svg {
+    width: 24px;
+    height: 24px;
+  }
+
+  .ai-style-carousel-label-{{ ai_gen_id }} {
+    position: absolute;
+    top: 20px;
+    right: 40px;
+    font-size: {{ block.settings.label_size }}px;
+    color: {{ block.settings.label_color }};
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    z-index: 3;
+  }
+
+  .ai-style-carousel-empty-state-{{ ai_gen_id }} {
+    text-align: center;
+    padding: 40px;
+    color: #666;
+    font-size: 14px;
+  }
+
+  @media screen and (max-width: 989px) {
+    .ai-style-carousel-section-{{ ai_gen_id }} {
+      min-height: 400px;
+    }
+
+    .ai-style-carousel-header-{{ ai_gen_id }} {
+      flex-direction: column;
+      align-items: flex-start;
+      padding: 30px 20px;
+    }
+
+    .ai-style-carousel-container-{{ ai_gen_id }} {
+      position: relative;
+      width: 100%;
+      padding: 20px;
+    }
+
+    .ai-style-carousel-label-{{ ai_gen_id }} {
+      right: 20px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .ai-style-carousel-section-{{ ai_gen_id }} {
+      min-height: 350px;
+    }
+
+    .ai-style-carousel-header-title-{{ ai_gen_id }} {
+      font-size: {{ block.settings.title_size | times: 0.7 }}px;
+    }
+
+    .ai-style-carousel-header-text-{{ ai_gen_id }} {
+      font-size: {{ block.settings.paragraph_size | times: 0.9 }}px;
+    }
+
+    .ai-style-carousel-nav-item-{{ ai_gen_id }} {
+      font-size: {{ block.settings.nav_font_size | times: 0.9 }}px;
+      padding: 8px 16px;
+    }
+  }
+{% endstyle %}
+
+<style-carousel-{{ ai_gen_id }} class="ai-style-carousel-section-{{ ai_gen_id }}" {{ block.shopify_attributes }}>
+  {% if block.settings.show_label %}
+    <div class="ai-style-carousel-label-{{ ai_gen_id }}">{{ block.settings.label_text }}</div>
+  {% endif %}
+
+  <div class="ai-style-carousel-header-{{ ai_gen_id }}">
+    <div class="ai-style-carousel-header-content-{{ ai_gen_id }}">
+      {% if block.settings.title != blank %}
+        <h2 class="ai-style-carousel-header-title-{{ ai_gen_id }}">{{ block.settings.title }}</h2>
+      {% endif %}
+      {% if block.settings.paragraph != blank %}
+        <p class="ai-style-carousel-header-text-{{ ai_gen_id }}">{{ block.settings.paragraph }}</p>
+      {% endif %}
+    </div>
+
+    {% if block.settings.show_navigation %}
+      <nav class="ai-style-carousel-nav-{{ ai_gen_id }}">
+        {% for i in (1..4) %}
+          {% liquid
+            assign collection_key = 'nav_collection_' | append: i
+            assign collection = block.settings[collection_key]
+          %}
+          {% if collection != blank %}
+            <a href="{{ collection.url }}" class="ai-style-carousel-nav-item-{{ ai_gen_id }}">
+              {{ collection.title }}
+            </a>
+          {% endif %}
+        {% endfor %}
+      </nav>
+    {% endif %}
+  </div>
+
+  <div class="ai-style-carousel-container-{{ ai_gen_id }}">
+    <div class="ai-style-carousel-wrapper-{{ ai_gen_id }}">
+      {% assign has_products = false %}
+      {% for i in (1..5) %}
+        {% liquid
+          assign product_key = 'product_' | append: i
+          assign product = block.settings[product_key]
+          if product != blank
+            assign has_products = true
+          endif
+        %}
+      {% endfor %}
+
+      {% if has_products %}
+        <div class="ai-style-carousel-track-{{ ai_gen_id }}">
+          {% for i in (1..5) %}
+            {% liquid
+              assign product_key = 'product_' | append: i
+              assign product = block.settings[product_key]
+            %}
+            {% if product != blank %}
+              <div class="ai-style-carousel-slide-{{ ai_gen_id }}">
+                <div class="ai-style-carousel-product-{{ ai_gen_id }}">
+                  <div class="ai-style-carousel-product-image-{{ ai_gen_id }}">
+                    {% if product.featured_image %}
+                      <img
+                        src="{{ product.featured_image | image_url: width: 800 }}"
+                        alt="{{ product.featured_image.alt | escape }}"
+                        loading="lazy"
+                        width="800"
+                        height="800"
+                      >
+                    {% else %}
+                      {{ 'product-1' | placeholder_svg_tag }}
+                    {% endif %}
+                  </div>
+                  <div class="ai-style-carousel-product-info-{{ ai_gen_id }}">
+                    <h3 class="ai-style-carousel-product-title-{{ ai_gen_id }}">{{ product.title }}</h3>
+                    <div class="ai-style-carousel-product-price-{{ ai_gen_id }}">{{ product.price | money }}</div>
+                    <a href="{{ product.url }}" class="ai-style-carousel-product-link-{{ ai_gen_id }}">
+                      {{ block.settings.button_text }}
+                    </a>
+                  </div>
+                </div>
+              </div>
+            {% endif %}
+          {% endfor %}
+        </div>
+
+        <div class="ai-style-carousel-controls-{{ ai_gen_id }}">
+          <button class="ai-style-carousel-button-{{ ai_gen_id }} ai-style-carousel-prev-{{ ai_gen_id }}" aria-label="Previous">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="15 18 9 12 15 6"></polyline>
+            </svg>
+          </button>
+          <button class="ai-style-carousel-button-{{ ai_gen_id }} ai-style-carousel-next-{{ ai_gen_id }}" aria-label="Next">
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </button>
+        </div>
+      {% else %}
+        <div class="ai-style-carousel-empty-state-{{ ai_gen_id }}">
+          Next, add products to the carousel
+        </div>
+      {% endif %}
+    </div>
+  </div>
+</style-carousel-{{ ai_gen_id }}>
+
+<script>
+  (function() {
+    class StyleCarousel{{ ai_gen_id }} extends HTMLElement {
+      constructor() {
+        super();
+        this.currentIndex = 0;
+        this.totalSlides = 0;
+      }
+
+      connectedCallback() {
+        this.track = this.querySelector('.ai-style-carousel-track-{{ ai_gen_id }}');
+        this.slides = this.querySelectorAll('.ai-style-carousel-slide-{{ ai_gen_id }}');
+        this.prevButton = this.querySelector('.ai-style-carousel-prev-{{ ai_gen_id }}');
+        this.nextButton = this.querySelector('.ai-style-carousel-next-{{ ai_gen_id }}');
+
+        if (!this.track || this.slides.length === 0) return;
+
+        this.totalSlides = this.slides.length;
+        this.setupEventListeners();
+      }
+
+      setupEventListeners() {
+        if (this.prevButton) {
+          this.prevButton.addEventListener('click', () => this.prev());
+        }
+
+        if (this.nextButton) {
+          this.nextButton.addEventListener('click', () => this.next());
+        }
+      }
+
+      prev() {
+        this.currentIndex = (this.currentIndex - 1 + this.totalSlides) % this.totalSlides;
+        this.updateCarousel();
+      }
+
+      next() {
+        this.currentIndex = (this.currentIndex + 1) % this.totalSlides;
+        this.updateCarousel();
+      }
+
+      updateCarousel() {
+        const offset = -this.currentIndex * 100;
+        this.track.style.transform = `translateX(${offset}%)`;
+      }
+    }
+
+    customElements.define('style-carousel-{{ ai_gen_id }}', StyleCarousel{{ ai_gen_id }});
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Style carousel",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Background"
+    },
+    {
+      "type": "image_picker",
+      "id": "background_image",
+      "label": "Background image"
+    },
+    {
+      "type": "header",
+      "content": "Label"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_label",
+      "label": "Show label",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "label_text",
+      "label": "Label text",
+      "default": "STYLE"
+    },
+    {
+      "type": "range",
+      "id": "label_size",
+      "min": 10,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Label size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "label_color",
+      "label": "Label color",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Header content"
+    },
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Find Your Style"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "min": 20,
+      "max": 80,
+      "step": 2,
+      "unit": "px",
+      "label": "Title size",
+      "default": 48
+    },
+    {
+      "type": "textarea",
+      "id": "paragraph",
+      "label": "Paragraph",
+      "default": "Discover the pieces that define your look"
+    },
+    {
+      "type": "range",
+      "id": "paragraph_size",
+      "min": 12,
+      "max": 24,
+      "step": 1,
+      "unit": "px",
+      "label": "Paragraph size",
+      "default": 16
+    },
+    {
+      "type": "color",
+      "id": "text_color",
+      "label": "Text color",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "header_padding_top",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Header top padding",
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "header_padding_bottom",
+      "min": 20,
+      "max": 100,
+      "step": 5,
+      "unit": "px",
+      "label": "Header bottom padding",
+      "default": 40
+    },
+    {
+      "type": "header",
+      "content": "Collection navigation"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_navigation",
+      "label": "Show navigation",
+      "default": true
+    },
+    {
+      "type": "collection",
+      "id": "nav_collection_1",
+      "label": "Collection 1"
+    },
+    {
+      "type": "collection",
+      "id": "nav_collection_2",
+      "label": "Collection 2"
+    },
+    {
+      "type": "collection",
+      "id": "nav_collection_3",
+      "label": "Collection 3"
+    },
+    {
+      "type": "collection",
+      "id": "nav_collection_4",
+      "label": "Collection 4"
+    },
+    {
+      "type": "range",
+      "id": "nav_font_size",
+      "min": 10,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "label": "Navigation font size",
+      "default": 12
+    },
+    {
+      "type": "range",
+      "id": "nav_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Navigation border radius",
+      "default": 20
+    },
+    {
+      "type": "range",
+      "id": "nav_border_width",
+      "min": 0,
+      "max": 4,
+      "step": 1,
+      "unit": "px",
+      "label": "Navigation border width",
+      "default": 1
+    },
+    {
+      "type": "color",
+      "id": "nav_bg_color",
+      "label": "Navigation background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_text_color",
+      "label": "Navigation text",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "nav_border_color",
+      "label": "Navigation border",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "nav_hover_bg_color",
+      "label": "Navigation hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "nav_hover_text_color",
+      "label": "Navigation hover text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "nav_hover_border_color",
+      "label": "Navigation hover border",
+      "default": "#000000"
+    },
+    {
+      "type": "header",
+      "content": "Carousel"
+    },
+    {
+      "type": "range",
+      "id": "carousel_width",
+      "min": 30,
+      "max": 70,
+      "step": 5,
+      "unit": "%",
+      "label": "Carousel width",
+      "default": 55
+    },
+    {
+      "type": "product",
+      "id": "product_1",
+      "label": "Product 1"
+    },
+    {
+      "type": "product",
+      "id": "product_2",
+      "label": "Product 2"
+    },
+    {
+      "type": "product",
+      "id": "product_3",
+      "label": "Product 3"
+    },
+    {
+      "type": "product",
+      "id": "product_4",
+      "label": "Product 4"
+    },
+    {
+      "type": "product",
+      "id": "product_5",
+      "label": "Product 5"
+    },
+    {
+      "type": "select",
+      "id": "image_aspect_ratio",
+      "label": "Image aspect ratio",
+      "options": [
+        {
+          "value": "1 / 1",
+          "label": "Square (1:1)"
+        },
+        {
+          "value": "3 / 4",
+          "label": "Portrait (3:4)"
+        },
+        {
+          "value": "4 / 5",
+          "label": "Portrait (4:5)"
+        },
+        {
+          "value": "16 / 9",
+          "label": "Landscape (16:9)"
+        }
+      ],
+      "default": "3 / 4"
+    },
+    {
+      "type": "header",
+      "content": "Product card style"
+    },
+    {
+      "type": "color",
+      "id": "card_bg_color",
+      "label": "Card background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "card_text_color",
+      "label": "Card text",
+      "default": "#000000"
+    },
+    {
+      "type": "range",
+      "id": "card_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Card border radius",
+      "default": 8
+    },
+    {
+      "type": "text",
+      "id": "button_text",
+      "label": "Button text",
+      "default": "View Product"
+    },
+    {
+      "type": "color",
+      "id": "button_bg_color",
+      "label": "Button background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "button_text_color",
+      "label": "Button text",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "button_hover_bg_color",
+      "label": "Button hover background",
+      "default": "#383838"
+    },
+    {
+      "type": "range",
+      "id": "button_border_radius",
+      "min": 0,
+      "max": 40,
+      "step": 2,
+      "unit": "px",
+      "label": "Button border radius",
+      "default": 4
+    },
+    {
+      "type": "header",
+      "content": "Carousel controls"
+    },
+    {
+      "type": "color",
+      "id": "control_bg_color",
+      "label": "Control background",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "control_icon_color",
+      "label": "Control icon",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "control_hover_bg_color",
+      "label": "Control hover background",
+      "default": "#000000"
+    },
+    {
+      "type": "color",
+      "id": "control_hover_icon_color",
+      "label": "Control hover icon",
+      "default": "#ffffff"
+    },
+    {
+      "type": "range",
+      "id": "desktop_width_percent",
+      "label": "Desktop width",
+      "min": 50,
+      "max": 100,
+      "step": 5,
+      "unit": "%",
+      "default": 100
+    }
+  ],
+  "presets": [
+    {
+      "name": "Style carousel"
+    }
+  ]
+}
+{% endschema %}

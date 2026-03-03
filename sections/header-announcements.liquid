@@ -1,0 +1,193 @@
+
+
+{% if section.blocks.size > 1 %}
+  <script
+    src="{{ 'announcement-bar.js' | asset_url }}"
+    type="module"
+    fetchpriority="low"
+  ></script>
+{% endif %}
+
+<div class="section-background color-{{ section.settings.color_scheme }}"></div>
+<aside
+  class="announcement-bar spacing-style section section--{{ section.settings.section_width }} color-{{ section.settings.color_scheme }}"
+  style="{% render 'spacing-padding', settings: section.settings %}; --border-bottom-width: {{ section.settings.divider_width }}px; --marquee-speed: {{ section.settings.marquee_speed }}s;"
+>
+  <div class="announcement-bar__marquee">
+    <div class="announcement-bar__marquee-track">
+      {% for block in section.blocks %}
+        <span class="announcement-bar__marquee-item" {{ block.shopify_attributes }}>
+          {% if block.settings.link != blank %}
+            <a href="{{ block.settings.link }}" class="announcement-bar__marquee-link">{{ block.settings.text }}</a>
+          {% else %}
+            {{ block.settings.text }}
+          {% endif %}
+        </span>
+      {% endfor %}
+      {% for block in section.blocks %}
+        <span class="announcement-bar__marquee-item" aria-hidden="true">
+          {% if block.settings.link != blank %}
+            <a href="{{ block.settings.link }}" class="announcement-bar__marquee-link">{{ block.settings.text }}</a>
+          {% else %}
+            {{ block.settings.text }}
+          {% endif %}
+        </span>
+      {% endfor %}
+    </div>
+  </div>
+</aside>
+
+{% stylesheet %}
+  .announcement-bar {
+    border-block-end: var(--border-bottom-width) solid var(--color-border);
+    overflow: hidden;
+  }
+
+  .announcement-bar__marquee {
+    overflow: hidden;
+    width: 100%;
+  }
+
+  .announcement-bar__marquee-track {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: marquee-scroll var(--marquee-speed, 20s) linear infinite;
+  }
+
+  .announcement-bar__marquee:hover .announcement-bar__marquee-track {
+    animation-play-state: paused;
+  }
+
+  .announcement-bar__marquee-item {
+    display: inline-flex;
+    align-items: center;
+    padding: 0 40px;
+    flex-shrink: 0;
+  }
+
+  .announcement-bar__marquee-link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .announcement-bar__marquee-link:hover {
+    text-decoration: underline;
+  }
+
+  @keyframes marquee-scroll {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "t:names.announcement_bar",
+  "blocks": [
+    {
+      "type": "_announcement"
+    }
+  ],
+  "enabled_on": {
+    "groups": ["header"]
+  },
+  "settings": [
+    {
+      "type": "range",
+      "id": "speed",
+      "label": "t:settings.speed",
+      "min": 2,
+      "max": 10,
+      "step": 1,
+      "default": 5,
+      "unit": "sec"
+    },
+    {
+      "type": "range",
+      "id": "marquee_speed",
+      "label": "Marquee speed",
+      "min": 5,
+      "max": 60,
+      "step": 5,
+      "default": 20,
+      "unit": "sec"
+    },
+    {
+      "type": "header",
+      "content": "t:content.appearance"
+    },
+    {
+      "type": "select",
+      "id": "section_width",
+      "label": "t:settings.section_width",
+      "options": [
+        {
+          "value": "page-width",
+          "label": "t:options.page"
+        },
+        {
+          "value": "full-width",
+          "label": "t:options.full"
+        }
+      ],
+      "default": "page-width"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "default": "scheme-4",
+      "label": "t:settings.color_scheme"
+    },
+    {
+      "type": "range",
+      "id": "divider_width",
+      "label": "t:settings.divider_thickness",
+      "min": 0,
+      "max": 5,
+      "step": 0.5,
+      "unit": "px",
+      "default": 0
+    },
+    {
+      "type": "header",
+      "content": "t:content.padding"
+    },
+    {
+      "type": "range",
+      "id": "padding-block-start",
+      "label": "t:settings.top",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    },
+    {
+      "type": "range",
+      "id": "padding-block-end",
+      "label": "t:settings.bottom",
+      "min": 0,
+      "max": 100,
+      "step": 1,
+      "unit": "px",
+      "default": 15
+    }
+  ],
+  "presets": [
+    {
+      "name": "t:names.announcement_bar",
+      "blocks": {
+        "announcement_1": {
+          "type": "_announcement"
+        }
+      },
+      "block_order": ["announcement_1"]
+    }
+  ]
+}
+{% endschema %}

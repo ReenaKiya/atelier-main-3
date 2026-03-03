@@ -1,0 +1,294 @@
+{% layout false %}
+<div class="metafields-demo">
+    <div class="section">
+      <h2 class="heading">
+        Text
+      </h2>
+      <div class="section-inner">
+        <div class="label">Simple text</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.simple_text.type  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.simple_text.type  }}
+          </div>
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.simple_text.value {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.simple_text.value }}
+          </div>
+        </div>
+      </div>
+      <div class="section-inner">
+        <div class="label">Text (List)</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.simple_text_list{% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.simple_text_list }}
+          </div>
+          <div class="metafield input">
+            {% raw %} 
+             {% for text in page.metafields.custom.simple_text_list.value %} {{ text }} {%- unless forloop.last -%}, {%- endunless -%} {% endfor %}
+            {% endraw %}
+          </div>
+          <div class="metafield">
+               {% for text in page.metafields.custom.simple_text_list.value %} {{ text }} {%- unless forloop.last -%}, {%- endunless -%} {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="section">
+      <h2 class="heading">
+        Image
+      </h2>
+      <div class="section-inner">
+        <div class="label">Single Image</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %}  page.metafields.custom.media {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.media }}
+          </div>
+          <div class="metafield input">
+            {% raw %}  page.metafields.custom.media.value {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.media.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %}  page.metafields.custom.media.value | img_tag {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.media.value | img_tag }}
+          </div>
+        </div>
+      </div>
+      <div class="section-inner">
+        <div class="label">List of Images</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.list_of_media  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.list_of_media }}
+          </div>
+          <div class="metafield input">
+            {% raw %}  page.metafields.custom.list_of_media.value {% endraw %}
+          </div>
+          <div class="metafield">
+            {{  page.metafields.custom.list_of_media.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %}
+             {% for image in page.metafields.custom.list_of_media.value %}
+             {{ image | img_tag }}
+               {% endfor %}
+            {% endraw %}
+          </div>
+          <div class="metafield">
+            {% for image in page.metafields.custom.list_of_media.value %}
+               {{ image | img_tag }} 
+              {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="section">
+      <h2 class="heading">
+        Products
+      </h2>
+      <div class="section-inner">
+        <div class="label">Single Product</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.single_product  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.single_product  }}
+          </div>
+          <div class="metafield input">
+            {% raw %}  page.metafields.custom.single_product.value  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.single_product.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %}  {% assign product = page.metafields.custom.single_product.value %} {{ product.title }} {% endraw %}
+          </div>
+          <div class="metafield">
+           {% assign product = page.metafields.custom.single_product.value %} {{ product.title }}
+          </div>
+        </div>
+      </div>
+      <div class="section-inner">
+        <div class="label">Multiple Products</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %}page.metafields.custom.list_of_products  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.list_of_products  }}
+          </div>
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.list_of_products.value  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.list_of_products.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %} 
+             {% assign product_list = page.metafields.custom.list_of_products.value %}
+              {% for product in product_list  %}
+               {{ product}}
+                {% endfor %}
+            {% endraw %}
+          </div>
+          <div class="metafield">
+            {% assign product_list = page.metafields.custom.list_of_products.value %}
+              {% for product in product_list  %}
+               {{ product }}
+                {% endfor %}
+          </div>
+          <div class="metafield input">
+            {% raw %} 
+               {% assign product_list = page.metafields.custom.list_of_products.value %}
+              {% for product in product_list  %}
+               {{ product.title }}
+                {% endfor %}
+            {% endraw %}
+          </div>
+          <div class="metafield">
+            {% assign product_list = page.metafields.custom.list_of_products.value %}
+              {% for product in product_list  %}
+               {{ product.title }}
+                {% endfor %}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="section">
+      <h2 class="heading">
+        JSON
+      </h2>
+      <div class="section-inner">
+        <div class="label">JSON Object</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.json  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.json }}
+          </div>
+          <div class="metafield input">
+            {% raw %}page.metafields.custom.json.value  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.json.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %}page.metafields.custom.json.value.name  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.json.value.name }}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+    <div class="section">
+      <h2 class="heading">
+        Metaobject
+      </h2>
+      <div class="section-inner">
+        <div class="label">Single Metaobject</div>
+        <div class="section-right">
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.metaobject {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.metaobject }}
+          </div>
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.metaobject.value {% endraw %}
+          </div>
+          <div class="metafield">
+            {{page.metafields.custom.metaobject.value }}
+          </div>
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.metaobject.value.gender  {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.metaobject.value.gender  }}
+          </div>
+          <div class="metafield input">
+            {% raw %} page.metafields.custom.metaobject.type {% endraw %}
+          </div>
+          <div class="metafield">
+            {{ page.metafields.custom.metaobject.type }}
+          </div>
+        </div>
+      </div>
+    </div>
+  
+  </div>
+  
+  <style>
+  .metafields-demo {
+      display: flex;
+      gap: 15px;
+      flex-wrap: wrap;
+  }
+  .section {
+    background: #94a3b8;
+    border: 1px solid #64748b;
+    border-radius: 5px;
+    padding: 10px;
+    width: 100%;
+    max-width: 1120px;
+    margin: auto;
+  }
+  .heading {
+      margin-top: 0;
+  }
+  .label {
+    min-width: 100px;
+  }
+  .section-inner {
+      display: flex;
+      border-radius: 5px;
+      column-gap: 20px;
+      background-color: #475569;
+      padding: 20px;
+      color: white;
+      align-items: center;
+  }
+  .section-inner + .section-inner {
+      margin-top: 15px;
+  }
+  .section-right {
+      display: grid;
+      gap: 10px;
+      grid-template-columns: 1fr 1fr;
+      width: 100%;
+  }
+  .metafield {
+      color: #1e293b;
+      padding: 5px 15px;
+      border-radius: 5px;
+      background-color: white;
+      overflow-wrap: anywhere;
+  }
+  .metafield.input {
+    font-family: monospace;
+    background-color: black;
+    color: white;
+  }
+</style>

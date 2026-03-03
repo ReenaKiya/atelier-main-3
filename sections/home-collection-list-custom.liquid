@@ -1,0 +1,259 @@
+<section class="shopify-section shopify-section--logo-list">
+  <style>
+    /* ✅ Overlay base setup */
+    .content-over-media {
+      position: relative;
+      overflow: hidden;
+    }
+
+    .content-over-media::before {
+      content: "";
+      background: var(--content-over-media-gradient-overlay, rgb(var(--content-over-media-overlay, 0 0 0 / 0.3)));
+      border-radius: inherit;
+      z-index: 1;
+      pointer-events: none;
+      position: absolute;
+      top: 0;
+      right: 0;
+      bottom: 0;
+      left: 0;
+    }
+
+    .image-overlay {
+      position: relative;
+      display: inline-block;
+      overflow: hidden;
+    }
+
+    .image-overlay img {
+      display: block;
+    width: 100%;
+    height: auto;
+    
+    }
+
+    .zoom-image{
+      
+      transform-origin: center;
+          transition: scale 8s 
+      cubic-bezier(.25, .46, .45, .94);
+    }
+    .zoom-image:hover{
+    scale: 1.2;
+    }
+
+    /* ✅ Center text over image */
+    .image-overlay .collection-card__content {
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 2;
+      max-width: 173px;
+      display: flex;
+      justify-content: center;
+      flex-direction: column;
+      text-align: center;
+    }
+
+    .collection-card__content .h3 {
+      color: white;
+      text-transform: uppercase;
+      letter-spacing: 0.23em;
+      font-size: 18px;
+      font-weight: 600;
+      font-family: Poppins, sans-serif;
+      line-height: 1.5;
+    }
+
+    .image-overlay .button {
+      background-color: rgb(161 240 210);
+    color: black;
+    border: none;
+    padding: 8px 26px;
+    cursor: pointer;
+    font-weight: 600;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+    letter-spacing: 0.23em;
+
+    }
+
+    .image-overlay .button:hover {
+      background-color: black;
+      color: white;
+    }
+
+    /* ✅ Layout styling */
+    .logo-list {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      justify-items: center;
+      align-items: center;
+      padding: 50px 70px;
+    }
+
+    @media screen and (min-width: 700px) {
+      .logo-list {
+        grid-template-columns: repeat(3, 1fr);
+      }
+    }
+
+    @media screen and (min-width: 1000px) {
+      .logo-list {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .container {
+      max-width: 1184px;
+      margin: 0 auto;
+    }
+
+    .section-stack {
+      display: grid;
+      gap: 40px;
+    }
+
+    .collection-list.wrap {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    .collection-card {
+      flex: 1 1 calc(25% - 20px);
+      min-width: 250px;
+      box-sizing: border-box;
+    }
+
+    @media screen and (max-width: 1000px) {
+      .collection-card {
+        flex: 1 1 calc(33.33% - 20px);
+      }
+    }
+
+    @media screen and (max-width: 700px) {
+      .collection-card {
+        flex: 1 1 calc(50% - 20px);
+      }
+    }
+
+    @media screen and (max-width: 500px) {
+      .collection-card {
+        flex: 1 1 100%;
+      }
+    }
+  </style>
+
+  <div class="section-spacing">
+    <div class="container container--xl">
+      <div class="section-stack">
+        <div class="section-header justify-self-center text-center">
+          <div class="prose">
+            <h2 class="h2"
+              style="font-size: 20px; font-weight: 700; letter-spacing: 0.18em; margin-bottom: 20px;">
+              {{ section.settings.heading }}
+            </h2>
+          </div>
+        </div>
+
+        <!-- ✅ Dynamic Collection List -->
+        <div class="collection-list wrap">
+          {% for block in section.blocks %}
+            <a href="{{ block.settings.link }}" class="collection-card is-selected group">
+              <div
+                class="content-over-media image-overlay"
+                style="--content-over-media-overlay: 0 0 0 / 0.4;"
+              >
+                {% if block.settings.image != blank %}
+                  <img
+                    src="{{ block.settings.image | image_url: width: 800 }}"
+                    alt="{{ block.settings.title | escape }}"
+                    width="800"
+                    height="800"
+                    loading="lazy"
+                    class="zoom-image group-hover:zoom"
+                    draggable="false"
+                  />
+                {% endif %}
+                <div class="collection-card__content prose prose--tight text-center">
+                  {% if block.settings.title != blank %}
+                    <p class="h3">{{ block.settings.title }}</p>
+                  {% endif %}
+                  {% if block.settings.button_text != blank %}
+                    <button type="button" class="button">{{ block.settings.button_text }}</button>
+                  {% endif %}
+                </div>
+              </div>
+            </a>
+          {% endfor %}
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+{% schema %}
+{
+  "name": "As Seen In Section",
+  "settings": [
+    {
+      "type": "text",
+      "id": "heading",
+      "label": "Section Heading",
+      "default": "As seen in"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "image_block",
+      "name": "Image Card",
+      "settings": [
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Image"
+        },
+        {
+          "type": "text",
+          "id": "title",
+          "label": "Title",
+          "default": "ESSENTIAL OILS BATH BOMBS"
+        },
+        {
+          "type": "text",
+          "id": "button_text",
+          "label": "Button Text",
+          "default": "SHOP NOW"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "max_blocks": 8,
+  "presets": [
+    {
+      "name": "As Seen In Section",
+      "blocks": [
+        {
+          "type": "image_block"
+        },
+        {
+          "type": "image_block"
+        },
+        {
+          "type": "image_block"
+        }
+      ]
+    }
+  ]
+}
+{% endschema %}
