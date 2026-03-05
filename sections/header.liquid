@@ -51,7 +51,8 @@
                   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                   position: absolute !important;
                   top: 100% !important;
-                  left: 20% !important;
+                  left: 50% !important;
+                  transform: translateX(-50%);
                   width: 60% !important;
                   z-index: 9999;
                 }
@@ -465,7 +466,8 @@
                   box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
                   position: absolute !important;
                   top: 100% !important;
-                  left: 20% !important;
+                  left: 50% !important;
+                  transform: translateX(-50%);
                   width: 60% !important;
                   z-index: 9999;
                 }
@@ -961,6 +963,10 @@
 
   .navmenu-item {
     position: relative;
+  }
+
+  .navmenu-item-parent {
+    position: static;
   }
 
   .navmenu-link {
