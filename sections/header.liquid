@@ -13,915 +13,210 @@
 <header class="site-header site-header-nav--open" role="banner" data-site-header="" data-nav-header-sticky="">
   <div class="site-navigation-wrapper site-navigation--has-actions site-header--full-width" data-site-navigation="" id="site-header-nav">
     <nav class="site-navigation" aria-label="Main">
-      <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Heirarchy" style="display:flex;align-items:center;height:auto;margin:0;">
+      <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Hierarchy" style="display:flex;align-items:center;height:auto;margin:0;">
 
-        <!-- 1. New -->
-        <li class="navmenu-item navmenu-basic__item navmenu-id-new" style="display:flex;align-items:center;padding-top:0;height:auto;">
-          <a class="navmenu-link navmenu-link-depth-1" href="/collections/new-arrivals">New</a>
-        </li>
+        {% for link in linklists[section.settings.menu].links %}
+          {% assign link_handle = link.title | handleize %}
 
-        <!-- 2. Best Sellers -->
-        <li class="navmenu-item navmenu-basic__item navmenu-id-best-sellers" style="display:flex;align-items:center;padding-top:0;height:auto;">
-          <a class="navmenu-link navmenu-link-depth-1" href="/collections/best-sellers">Best Sellers</a>
-        </li>
+          {% if link.links.size > 0 %}
+            {% comment %} ========== MEGA MENU ITEM ========== {% endcomment %}
+            {% assign meganav_id = 'meganav_' | append: section.id | append: '_' | append: forloop.index %}
 
-        <!-- 3. MP LUXE -->
-        <li class="navmenu-item navmenu-basic__item navmenu-id-mp-luxe" style="display:flex;align-items:center;padding-top:0;height:auto;">
-          <a class="navmenu-link navmenu-link-depth-1" href="/collections/luxury-piercing-jewellery">MP LUXE</a>
-        </li>
+            <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-{{ link_handle }}"
+                data-navmenu-meganav-trigger=""
+                data-navmenu-meganav-type="multi-column-menu"
+                data-navmenu-parent=""
+                style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
+              <details data-navmenu-details="">
+                <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent"
+                         aria-haspopup="true"
+                         aria-expanded="false"
+                         data-href="{{ link.url }}">
+                  {{ link.title }}
+                  <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                    <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
+                      <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                      <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                    </svg>
+                  </span>
+                </summary>
 
-        <!-- 4. Solid Gold (Mega Menu) -->
-        <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-solid-gold" data-navmenu-meganav-trigger="" data-navmenu-meganav-type="multi-column-menu" data-navmenu-parent="" style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
-          <details data-navmenu-details="">
-            <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent" aria-haspopup="true" aria-expanded="false" data-href="/collections/gold-body-jewellery">
-              Solid Gold
-              <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
-                <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
-                  <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
-                  <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
-                </svg>
-              </span>
-            </summary>
+                <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column"
+                     data-navmenu-submenu=""
+                     data-meganav-menu=""
+                     data-meganav-id="{{ meganav_id }}"
+                     data-meganav-multi-column=""
+                     style="display:none;opacity:0;visibility:hidden;">
+                  <div class="multi-col-wrapper">
 
-            <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column" data-navmenu-submenu="" data-meganav-menu="" data-meganav-id="multi_column_menu_NnA9Qk" data-meganav-multi-column="" style="display:none;opacity:0;visibility:hidden;">
-              <style>
-                [data-meganav-id="multi_column_menu_NnA9Qk"] {
-                  background: #fff;
-                  padding: 0;
-                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                  position: absolute !important;
-                  top: 100% !important;
-                  left: 50% !important;
-                  transform: translateX(-50%);
-                  width: 60% !important;
-                  z-index: 9999;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-wrapper {
-                  display: grid;
-                  grid-template-columns: 200px 1fr 240px;
-                  min-height: 350px;
-                  width: 100%;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-categories {
-                  background: #f8f8f8;
-                  border-right: 1px solid #eee;
-                  padding: 20px 0;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-categories-title {
-                  font-size: 12px;
-                  font-weight: 500;
-                  color: #999;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  padding: 0 20px 12px;
-                  margin: 0;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-list {
-                  list-style: none;
-                  margin: 0;
-                  padding: 0;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-item {
-                  position: relative;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link {
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  padding: 10px 20px;
-                  color: #333;
-                  text-decoration: none;
-                  font-size: 14px;
-                  font-weight: 500;
-                  transition: all 0.2s ease;
-                  cursor: pointer;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link:hover,
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active {
-                  background: #fff;
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active {
-                  border-right: 2px solid #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-icon {
-                  width: 24px;
-                  height: 24px;
-                  margin-right: 10px;
-                  object-fit: contain;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-text {
-                  flex: 1;
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-arrow {
-                  width: 16px;
-                  height: 16px;
-                  color: #999;
-                  transition: color 0.2s ease;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link:hover .multi-col-category-arrow,
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active .multi-col-category-arrow {
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenus {
-                  padding: 20px 30px;
-                  background: #fff;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-panel {
-                  display: none;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-panel.active {
-                  display: block;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-grid {
-                  display: grid;
-                  grid-template-columns: repeat(2, 1fr);
-                  gap: 8px 30px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link {
-                  color: #555;
-                  text-decoration: none;
-                  font-size: 13px;
-                  padding: 6px 0;
-                  display: block;
-                  transition: color 0.2s ease;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link:hover {
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link--view-all {
-                  font-weight: 600;
-                  color: #da1e37;
-                  margin-top: 15px;
-                  grid-column: 1 / -1;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured {
-                  background: #fafafa;
-                  border-left: 1px solid #eee;
-                  padding: 20px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-title {
-                  font-size: 12px;
-                  font-weight: 500;
-                  color: #999;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin: 0 0 15px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item {
-                  display: block;
-                  text-decoration: none;
-                  margin-bottom: 20px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item:last-child {
-                  margin-bottom: 0;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-image-wrapper {
-                  display: flex;
-                  gap: 12px;
-                  align-items: flex-start;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-image {
-                  width: 100px;
-                  height: 120px;
-                  object-fit: cover;
-                  border-radius: 6px;
-                  flex-shrink: 0;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-content {
-                  flex: 1;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item-title {
-                  font-size: 14px;
-                  font-weight: 600;
-                  color: #333;
-                  margin: 0 0 5px;
-                  line-height: 1.3;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-price {
-                  font-size: 14px;
-                  font-weight: 600;
-                  color: #da1e37;
-                  display: block;
-                  margin-bottom: 5px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-cta {
-                  font-size: 13px;
-                  color: #da1e37;
-                  display: inline-flex;
-                  align-items: center;
-                  gap: 4px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-cta svg {
-                  width: 14px;
-                  height: 14px;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-placeholder {
-                  background: #f5f5f5;
-                  display: flex;
-                  align-items: center;
-                  justify-content: center;
-                  overflow: hidden;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-placeholder .placeholder-svg {
-                  width: 60%;
-                  height: 60%;
-                  opacity: 0.5;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-panel {
-                  display: none;
-                }
-                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-panel.active {
-                  display: block;
-                }
-                @media screen and (max-width: 1024px) {
-                  [data-meganav-id="multi_column_menu_NnA9Qk"] {
-                    display: none !important;
-                  }
-                }
-              </style>
-
-              <div class="multi-col-wrapper">
-                <!-- Left Column: Categories -->
-                <div class="multi-col-categories">
-                  <p class="multi-col-categories-title">Browse by category</p>
-                  <ul class="multi-col-category-list">
-                    <li class="multi-col-category-item">
-                      <a href="/collections/gold-body-jewellery" class="multi-col-category-link active" data-category-index="1">
-                        <span class="multi-col-category-text">By Jewellery</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/gold-body-jewellery" class="multi-col-category-link" data-category-index="2">
-                        <span class="multi-col-category-text">By Material/Stone</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
-                          <polyline points="9 18 15 12 9 6"></polyline>
-                        </svg>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Middle Column: Submenus -->
-                <div class="multi-col-submenus">
-                  <div class="multi-col-submenu-panel active" data-submenu-panel="1">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/gold-flat-backs" class="multi-col-submenu-link">Flatback Studs</a>
-                      <a href="/collections/gold-belly-rings" class="multi-col-submenu-link">Belly Rings</a>
-                      <a href="/collections/gold-nose-hoops" class="multi-col-submenu-link">Nose Hoops</a>
-                      <a href="/collections/gold-nose-studs-1" class="multi-col-submenu-link">Nose Studs</a>
-                      <a href="/collections/gold-barbells" class="multi-col-submenu-link">Barbells</a>
-                      <a href="/collections/gold-segment-clickers" class="multi-col-submenu-link">Clicker Rings</a>
-                      <a href="/collections/gold-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All By Jewellery &rarr;</a>
+                    {% comment %} Left Column: Categories (Level 2 links) {% endcomment %}
+                    <div class="multi-col-categories">
+                      <p class="multi-col-categories-title">Browse by category</p>
+                      <ul class="multi-col-category-list">
+                        {% for child_link in link.links %}
+                          <li class="multi-col-category-item">
+                            <a href="{{ child_link.url }}"
+                               class="multi-col-category-link{% if forloop.first %} active{% endif %}"
+                               data-category-index="{{ forloop.index }}">
+                              <span class="multi-col-category-text">{{ child_link.title }}</span>
+                              <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                              </svg>
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
                     </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="2">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/9k-gold" class="multi-col-submenu-link">9K</a>
-                      <a href="/collections/14k-gold" class="multi-col-submenu-link">14K</a>
-                      <a href="/collections/18k-gold" class="multi-col-submenu-link">18K</a>
-                      <a href="/collections/diamond" class="multi-col-submenu-link">Natural Diamond</a>
-                      <a href="/collections/natural-stones" class="multi-col-submenu-link">Natural Stone</a>
-                      <a href="https://www.monsterpiercing.com/collections/gold-body-jewellery/stone_lab-grown-diamond" class="multi-col-submenu-link">Lab Grown Diamond</a>
-                      <a href="https://www.monsterpiercing.com/collections/gold-body-jewellery/stone_moissanite" class="multi-col-submenu-link">Moissanite</a>
-                      <a href="/collections/gold-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All By Material/Stone &rarr;</a>
-                    </div>
-                  </div>
-                </div>
 
-                <!-- Right Column: Featured Products -->
-                <div class="multi-col-featured">
-                  <p class="multi-col-featured-title">Featured</p>
-                  <div class="multi-col-featured-panel active" data-featured-panel="1">
-                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
-                      <div class="multi-col-featured-image-wrapper">
-                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
-                        <div class="multi-col-featured-content">
-                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
-                          <span class="multi-col-featured-price">$87.48</span>
-                          <span class="multi-col-featured-cta">
-                            Shop Now
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
-                              <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                          </span>
+                    {% comment %} Middle Column: Submenus (Level 3 links) {% endcomment %}
+                    <div class="multi-col-submenus">
+                      {% for child_link in link.links %}
+                        <div class="multi-col-submenu-panel{% if forloop.first %} active{% endif %}" data-submenu-panel="{{ forloop.index }}">
+                          <div class="multi-col-submenu-grid">
+                            {% for grandchild_link in child_link.links %}
+                              <a href="{{ grandchild_link.url }}" class="multi-col-submenu-link">{{ grandchild_link.title }}</a>
+                            {% endfor %}
+                            <a href="{{ child_link.url }}" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All {{ child_link.title }} &rarr;</a>
+                          </div>
                         </div>
-                      </div>
-                    </a>
-                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
-                      <div class="multi-col-featured-image-wrapper">
-                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
-                        <div class="multi-col-featured-content">
-                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
-                          <span class="multi-col-featured-price">$59.02</span>
-                          <span class="multi-col-featured-cta">
-                            Shop Now
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
-                              <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                  <div class="multi-col-featured-panel" data-featured-panel="2">
-                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
-                      <div class="multi-col-featured-image-wrapper">
-                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
-                        <div class="multi-col-featured-content">
-                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
-                          <span class="multi-col-featured-price">$87.48</span>
-                          <span class="multi-col-featured-cta">
-                            Shop Now
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
-                              <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
-                      <div class="multi-col-featured-image-wrapper">
-                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
-                        <div class="multi-col-featured-content">
-                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
-                          <span class="multi-col-featured-price">$59.02</span>
-                          <span class="multi-col-featured-cta">
-                            Shop Now
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
-                              <polyline points="9 18 15 12 9 6"></polyline>
-                            </svg>
-                          </span>
-                        </div>
-                      </div>
-                    </a>
+                      {% endfor %}
+                    </div>
+
+                    {% comment %} Right Column: Featured Products (from blocks) {% endcomment %}
+                    <div class="multi-col-featured">
+                      <p class="multi-col-featured-title">Featured</p>
+                      {% for block in section.blocks %}
+                        {% if block.type == 'featured_product' %}
+                          {% assign block_menu_handle = block.settings.menu_item_title | handleize %}
+                          {% if block_menu_handle == link_handle and block.settings.product != blank %}
+                            {% assign feat_product = block.settings.product %}
+                            <a href="{{ feat_product.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                              <div class="multi-col-featured-image-wrapper">
+                                {% if feat_product.featured_image %}
+                                  <img src="{{ feat_product.featured_image | image_url: width: 200 }}"
+                                       alt="{{ feat_product.featured_image.alt | escape }}"
+                                       class="multi-col-featured-image"
+                                       loading="lazy">
+                                {% endif %}
+                                <div class="multi-col-featured-content">
+                                  <p class="multi-col-featured-item-title">{{ feat_product.title | truncate: 45 }}</p>
+                                  <span class="multi-col-featured-price">{{ feat_product.price | money }}</span>
+                                  <span class="multi-col-featured-cta">
+                                    Shop Now
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                      <polyline points="9 18 15 12 9 6"></polyline>
+                                    </svg>
+                                  </span>
+                                </div>
+                              </div>
+                            </a>
+                          {% endif %}
+                        {% endif %}
+                      {% endfor %}
+                    </div>
+
                   </div>
                 </div>
-              </div>
-            </div>
+              </details>
+            </li>
 
-            <script>
-              (function() {
-                var meganav = document.querySelector('[data-meganav-id="multi_column_menu_NnA9Qk"]');
-                if (!meganav) return;
-                var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
-                if (!parentItem) return;
-                var categoryLinks = meganav.querySelectorAll('[data-category-index]');
-                var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
-                var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
-                categoryLinks.forEach(function(link) {
-                  link.addEventListener('mouseenter', function() {
-                    var index = this.dataset.categoryIndex;
-                    categoryLinks.forEach(function(l) { l.classList.remove('active'); });
-                    this.classList.add('active');
-                    submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
-                    var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
-                    if (activePanel) activePanel.classList.add('active');
-                    featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
-                    var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
-                    if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
-                  });
-                  link.addEventListener('click', function(e) {
-                    var href = this.getAttribute('href');
-                    if (href && href !== '#' && href !== '') {
-                      e.preventDefault();
-                      window.location.href = href;
-                    }
-                  });
-                });
-                var isOpen = false;
-                var closeTimeout = null;
-                function openMenu() {
-                  if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
-                  if (!isOpen) {
-                    isOpen = true;
-                    document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
-                      if (otherMenu !== meganav) {
-                        otherMenu.style.display = 'none';
-                        otherMenu.style.opacity = '0';
-                        otherMenu.style.visibility = 'hidden';
-                      }
-                    });
-                    meganav.style.display = 'block';
-                    meganav.style.opacity = '1';
-                    meganav.style.visibility = 'visible';
-                    var details = parentItem.querySelector('[data-navmenu-details]');
-                    if (details) details.setAttribute('open', 'open');
-                  }
-                }
-                function closeMenu() {
-                  closeTimeout = setTimeout(function() {
-                    isOpen = false;
-                    meganav.style.display = 'none';
-                    meganav.style.opacity = '0';
-                    meganav.style.visibility = 'hidden';
-                    var details = parentItem.querySelector('[data-navmenu-details]');
-                    if (details) details.removeAttribute('open');
-                    closeTimeout = null;
-                  }, 50);
-                }
-                parentItem.addEventListener('mouseenter', openMenu);
-                parentItem.addEventListener('mouseleave', closeMenu);
-                meganav.addEventListener('mouseenter', openMenu);
-                meganav.addEventListener('mouseleave', closeMenu);
-                var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
-                if (parentLink) {
-                  parentLink.addEventListener('click', function(e) {
-                    var href = this.getAttribute('href') || this.dataset.href;
-                    if (href && href !== '#' && href !== '') {
-                      e.preventDefault();
-                      window.location.href = href;
-                    }
-                  });
-                }
-              })();
-            </script>
-          </details>
-        </li>
-
-        <!-- 5. By Jewellery Type (Mega Menu) -->
-        <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-by-jewellery-type" data-navmenu-meganav-trigger="" data-navmenu-meganav-type="multi-column-menu" data-navmenu-parent="" style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
-          <details data-navmenu-details="">
-            <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent" aria-haspopup="true" aria-expanded="false" data-href="https://www.monsterpiercing.com/pages/all-body-jewellery">
-              By Jewellery Type
-              <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
-                <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
-                  <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
-                  <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
-                </svg>
-              </span>
-            </summary>
-
-            <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column" data-navmenu-submenu="" data-meganav-menu="" data-meganav-id="multi_column_menu_aWQkBk" data-meganav-multi-column="" style="display:none;opacity:0;visibility:hidden;">
-              <style>
-                [data-meganav-id="multi_column_menu_aWQkBk"] {
-                  background: #fff;
-                  padding: 0;
-                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
-                  position: absolute !important;
-                  top: 100% !important;
-                  left: 50% !important;
-                  transform: translateX(-50%);
-                  width: 60% !important;
-                  z-index: 9999;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-wrapper {
-                  display: grid;
-                  grid-template-columns: 200px 1fr 240px;
-                  min-height: 350px;
-                  width: 100%;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-categories {
-                  background: #f8f8f8;
-                  border-right: 1px solid #eee;
-                  padding: 20px 0;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-categories-title {
-                  font-size: 12px;
-                  font-weight: 500;
-                  color: #999;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  padding: 0 20px 12px;
-                  margin: 0;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-list {
-                  list-style: none;
-                  margin: 0;
-                  padding: 0;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-item {
-                  position: relative;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link {
-                  display: flex;
-                  align-items: center;
-                  justify-content: space-between;
-                  padding: 10px 20px;
-                  color: #333;
-                  text-decoration: none;
-                  font-size: 14px;
-                  font-weight: 500;
-                  transition: all 0.2s ease;
-                  cursor: pointer;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link:hover,
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active {
-                  background: #fff;
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active {
-                  border-right: 2px solid #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-icon {
-                  width: 24px;
-                  height: 24px;
-                  margin-right: 10px;
-                  object-fit: contain;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-text {
-                  flex: 1;
-                  display: flex;
-                  align-items: center;
-                  gap: 10px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-arrow {
-                  width: 16px;
-                  height: 16px;
-                  color: #999;
-                  transition: color 0.2s ease;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link:hover .multi-col-category-arrow,
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active .multi-col-category-arrow {
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenus {
-                  padding: 20px 30px;
-                  background: #fff;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-panel {
-                  display: none;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-panel.active {
-                  display: block;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-grid {
-                  display: grid;
-                  grid-template-columns: repeat(2, 1fr);
-                  gap: 8px 30px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link {
-                  color: #555;
-                  text-decoration: none;
-                  font-size: 13px;
-                  padding: 6px 0;
-                  display: block;
-                  transition: color 0.2s ease;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link:hover {
-                  color: #da1e37;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link--view-all {
-                  font-weight: 600;
-                  color: #da1e37;
-                  margin-top: 15px;
-                  grid-column: 1 / -1;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured {
-                  background: #fafafa;
-                  border-left: 1px solid #eee;
-                  padding: 20px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-title {
-                  font-size: 12px;
-                  font-weight: 500;
-                  color: #999;
-                  text-transform: uppercase;
-                  letter-spacing: 0.5px;
-                  margin: 0 0 15px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item {
-                  display: block;
-                  text-decoration: none;
-                  margin-bottom: 20px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item:last-child {
-                  margin-bottom: 0;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-image-wrapper {
-                  display: flex;
-                  gap: 12px;
-                  align-items: flex-start;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-image {
-                  width: 100px;
-                  height: 120px;
-                  object-fit: cover;
-                  border-radius: 6px;
-                  flex-shrink: 0;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-content {
-                  flex: 1;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item-title {
-                  font-size: 14px;
-                  font-weight: 600;
-                  color: #333;
-                  margin: 0 0 5px;
-                  line-height: 1.3;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-price {
-                  font-size: 14px;
-                  font-weight: 600;
-                  color: #da1e37;
-                  display: block;
-                  margin-bottom: 5px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-cta {
-                  font-size: 13px;
-                  color: #da1e37;
-                  display: inline-flex;
-                  align-items: center;
-                  gap: 4px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-cta svg {
-                  width: 14px;
-                  height: 14px;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-panel {
-                  display: none;
-                }
-                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-panel.active {
-                  display: block;
-                }
-                @media screen and (max-width: 1024px) {
-                  [data-meganav-id="multi_column_menu_aWQkBk"] {
-                    display: none !important;
-                  }
-                }
-              </style>
-
-              <div class="multi-col-wrapper">
-                <!-- Left Column: Categories -->
-                <div class="multi-col-categories">
-                  <p class="multi-col-categories-title">Browse by category</p>
-                  <ul class="multi-col-category-list">
-                    <li class="multi-col-category-item">
-                      <a href="/collections/flat-backs" class="multi-col-category-link active" data-category-index="1">
-                        <span class="multi-col-category-text">Labrets</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery" class="multi-col-category-link" data-category-index="2">
-                        <span class="multi-col-category-text">Hoops &amp; Rings</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/pages/nose-jewellery" class="multi-col-category-link" data-category-index="3">
-                        <span class="multi-col-category-text">Nose Studs</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/earrings" class="multi-col-category-link" data-category-index="4">
-                        <span class="multi-col-category-text">Earrings</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/barbells" class="multi-col-category-link" data-category-index="5">
-                        <span class="multi-col-category-text">Barbells</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/belly-bars" class="multi-col-category-link" data-category-index="6">
-                        <span class="multi-col-category-text">Belly Rings</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/plugs-tunnels-expanders" class="multi-col-category-link" data-category-index="7">
-                        <span class="multi-col-category-text">Plugs &amp; Tunnels</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/nipple-piercing" class="multi-col-category-link" data-category-index="8">
-                        <span class="multi-col-category-text">Nipple Rings</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/dermal-anchors" class="multi-col-category-link" data-category-index="9">
-                        <span class="multi-col-category-text">Dermal Anchors</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/sterilised-gas-items" class="multi-col-category-link" data-category-index="10">
-                        <span class="multi-col-category-text">Sterilised Jewellery</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/jewellery-piercing-aftercare" class="multi-col-category-link" data-category-index="11">
-                        <span class="multi-col-category-text">Aftercare</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                    <li class="multi-col-category-item">
-                      <a href="/collections/accessories-1" class="multi-col-category-link" data-category-index="12">
-                        <span class="multi-col-category-text">Accessories</span>
-                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                      </a>
-                    </li>
-                  </ul>
-                </div>
-
-                <!-- Middle Column: Submenus -->
-                <div class="multi-col-submenus">
-                  <div class="multi-col-submenu-panel active" data-submenu-panel="1">
-                    <div class="multi-col-submenu-grid">
-                      <a href="https://www.monsterpiercing.com/collections/flat-backs/thread-type_internal" class="multi-col-submenu-link">Threaded Labrets</a>
-                      <a href="https://www.monsterpiercing.com/collections/flat-backs/thread-type_push-fit" class="multi-col-submenu-link">Threadless Labrets</a>
-                      <a href="https://www.monsterpiercing.com/collections/accessories-1/thread-type_push-fit" class="multi-col-submenu-link">Threadless Tops</a>
-                      <a href="https://www.monsterpiercing.com/collections/accessories-1/thread-type_internal" class="multi-col-submenu-link">Threaded Tops</a>
-                      <a href="/collections/labret-backs" class="multi-col-submenu-link">Labret backs</a>
-                      <a href="/collections/flat-backs" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Labrets &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="2">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/segment-clickers" class="multi-col-submenu-link">Hinged Clickers</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_hoop?page=3&amp;grid_list=grid-view" class="multi-col-submenu-link">Bendable Hoops</a>
-                      <a href="/collections/septum-piercing" class="multi-col-submenu-link">Septum Clickers</a>
-                      <a href="/collections/bcr-rings" class="multi-col-submenu-link">Captive Bead Rings/BCR's</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_open-hoop" class="multi-col-submenu-link">Open Hoops</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Hoops &amp; Rings &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="3">
-                    <div class="multi-col-submenu-grid">
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_l-bend" class="multi-col-submenu-link">L-Bend</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_screw-stud" class="multi-col-submenu-link">Nose Screws</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_nose-bone" class="multi-col-submenu-link">Nose Bone</a>
-                      <a href="https://www.monsterpiercing.com/collections/nose-jewellery/type_straight-stud" class="multi-col-submenu-link">Straight Studs</a>
-                      <a href="/collections/threadless-nose-screws" class="multi-col-submenu-link">Threadless Nose Studs</a>
-                      <a href="https://www.monsterpiercing.com/collections/accessories-1/thread-type_push-fit" class="multi-col-submenu-link">Threadless Nose Tops</a>
-                      <a href="/pages/nose-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Nose Studs &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="4">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/earrings" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Earrings &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="5">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/ball-end-studs" class="multi-col-submenu-link">Barbell Studs</a>
-                      <a href="/collections/circular-barbells" class="multi-col-submenu-link">Circular Barbells</a>
-                      <a href="/collections/curved-barbells" class="multi-col-submenu-link">Curved Barbells</a>
-                      <a href="/collections/tongue-bars" class="multi-col-submenu-link">Straight Barbells</a>
-                      <a href="/collections/twisted-barbells" class="multi-col-submenu-link">Twisted Barbells</a>
-                      <a href="/collections/industrial-barbell" class="multi-col-submenu-link">Industrial Barbells</a>
-                      <a href="/collections/bcr-rings" class="multi-col-submenu-link">Captive Bead Rings/BCR's</a>
-                      <a href="/collections/barbells" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Barbells &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="6">
-                    <div class="multi-col-submenu-grid">
-                      <a href="https://www.monsterpiercing.com/collections/belly-bars/type_dangling" class="multi-col-submenu-link">Dangle Belly Rings</a>
-                      <a href="https://www.monsterpiercing.com/collections/belly-bars/type_non-dangling" class="multi-col-submenu-link">Non-Dangle Belly Rings</a>
-                      <a href="https://www.monsterpiercing.com/collections/belly-bars/type_floating" class="multi-col-submenu-link">Floating Belly Rings</a>
-                      <a href="https://www.monsterpiercing.com/collections/belly-bars/type_reverse" class="multi-col-submenu-link">Reverse Belly Rings</a>
-                      <a href="https://www.monsterpiercing.com/collections/belly-bars/type_spinal" class="multi-col-submenu-link">Spinal Belly Rings</a>
-                      <a href="/collections/belly-bars" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Belly Rings &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="7">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/plugs-tunnels-expanders" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Plugs &amp; Tunnels &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="8">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/nipple-piercing" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Nipple Rings &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="9">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/dermal-anchors" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Dermal Anchors &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="10">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/sterilised-gas-items" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Sterilised Jewellery &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="11">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/jewellery-piercing-aftercare" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Aftercare &rarr;</a>
-                    </div>
-                  </div>
-                  <div class="multi-col-submenu-panel" data-submenu-panel="12">
-                    <div class="multi-col-submenu-grid">
-                      <a href="/collections/accessories-1" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Accessories &rarr;</a>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Right Column: Featured Products -->
-                <div class="multi-col-featured">
-                  <p class="multi-col-featured-title">Featured</p>
-                  <div class="multi-col-featured-panel active" data-featured-panel="1">
-                    <a href="/products/316l-surgical-steel-internal-threaded-piercing-stud" class="multi-col-featured-item">
-                      <div class="multi-col-featured-image-wrapper">
-                        <div class="multi-col-featured-content">
-                          <p class="multi-col-featured-item-title">316L Surgical Steel Internal Threaded Piercing Stud</p>
-                          <span class="multi-col-featured-cta">
-                            Shop Now
-                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;"><polyline points="9 18 15 12 9 6"></polyline></svg>
-                          </span>
-                        </div>
-                      </div>
-                    </a>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <script>
-              (function() {
-                var meganav = document.querySelector('[data-meganav-id="multi_column_menu_aWQkBk"]');
-                if (!meganav) return;
-                var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
-                if (!parentItem) return;
-                var categoryLinks = meganav.querySelectorAll('[data-category-index]');
-                var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
-                var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
-                categoryLinks.forEach(function(link) {
-                  link.addEventListener('mouseenter', function() {
-                    var index = this.dataset.categoryIndex;
-                    categoryLinks.forEach(function(l) { l.classList.remove('active'); });
-                    this.classList.add('active');
-                    submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
-                    var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
-                    if (activePanel) activePanel.classList.add('active');
-                    featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
-                    var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
-                    if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
-                  });
-                  link.addEventListener('click', function(e) {
-                    var href = this.getAttribute('href');
-                    if (href && href !== '#' && href !== '') {
-                      e.preventDefault();
-                      window.location.href = href;
-                    }
-                  });
-                });
-                var isOpen = false;
-                var closeTimeout = null;
-                function openMenu() {
-                  if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
-                  if (!isOpen) {
-                    isOpen = true;
-                    document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
-                      if (otherMenu !== meganav) {
-                        otherMenu.style.display = 'none';
-                        otherMenu.style.opacity = '0';
-                        otherMenu.style.visibility = 'hidden';
-                      }
-                    });
-                    meganav.style.display = 'block';
-                    meganav.style.opacity = '1';
-                    meganav.style.visibility = 'visible';
-                    var details = parentItem.querySelector('[data-navmenu-details]');
-                    if (details) details.setAttribute('open', 'open');
-                  }
-                }
-                function closeMenu() {
-                  closeTimeout = setTimeout(function() {
-                    isOpen = false;
-                    meganav.style.display = 'none';
-                    meganav.style.opacity = '0';
-                    meganav.style.visibility = 'hidden';
-                    var details = parentItem.querySelector('[data-navmenu-details]');
-                    if (details) details.removeAttribute('open');
-                    closeTimeout = null;
-                  }, 50);
-                }
-                parentItem.addEventListener('mouseenter', openMenu);
-                parentItem.addEventListener('mouseleave', closeMenu);
-                meganav.addEventListener('mouseenter', openMenu);
-                meganav.addEventListener('mouseleave', closeMenu);
-                var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
-                if (parentLink) {
-                  parentLink.addEventListener('click', function(e) {
-                    var href = this.getAttribute('href') || this.dataset.href;
-                    if (href && href !== '#' && href !== '') {
-                      e.preventDefault();
-                      window.location.href = href;
-                    }
-                  });
-                }
-              })();
-            </script>
-          </details>
-        </li>
+          {% else %}
+            {% comment %} ========== SIMPLE LINK ========== {% endcomment %}
+            <li class="navmenu-item navmenu-basic__item navmenu-id-{{ link_handle }}" style="display:flex;align-items:center;padding-top:0;height:auto;">
+              <a class="navmenu-link navmenu-link-depth-1" href="{{ link.url }}">{{ link.title }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
 
       </ul>
     </nav>
   </div>
 </header>
+
+<script>
+  (function() {
+    var meganavs = document.querySelectorAll('[data-meganav-multi-column]');
+    meganavs.forEach(function(meganav) {
+      var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
+      if (!parentItem) return;
+
+      var categoryLinks = meganav.querySelectorAll('[data-category-index]');
+      var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
+      var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
+
+      categoryLinks.forEach(function(link) {
+        link.addEventListener('mouseenter', function() {
+          var index = this.dataset.categoryIndex;
+          categoryLinks.forEach(function(l) { l.classList.remove('active'); });
+          this.classList.add('active');
+          submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
+          var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
+          if (activePanel) activePanel.classList.add('active');
+          featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
+          var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
+          if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
+        });
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href !== '#' && href !== '') {
+            e.preventDefault();
+            window.location.href = href;
+          }
+        });
+      });
+
+      var isOpen = false;
+      var closeTimeout = null;
+
+      function openMenu() {
+        if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+        if (!isOpen) {
+          isOpen = true;
+          document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
+            if (otherMenu !== meganav) {
+              otherMenu.style.display = 'none';
+              otherMenu.style.opacity = '0';
+              otherMenu.style.visibility = 'hidden';
+            }
+          });
+          meganav.style.display = 'block';
+          meganav.style.opacity = '1';
+          meganav.style.visibility = 'visible';
+          var details = parentItem.querySelector('[data-navmenu-details]');
+          if (details) details.setAttribute('open', 'open');
+        }
+      }
+
+      function closeMenu() {
+        closeTimeout = setTimeout(function() {
+          isOpen = false;
+          meganav.style.display = 'none';
+          meganav.style.opacity = '0';
+          meganav.style.visibility = 'hidden';
+          var details = parentItem.querySelector('[data-navmenu-details]');
+          if (details) details.removeAttribute('open');
+          closeTimeout = null;
+        }, 50);
+      }
+
+      parentItem.addEventListener('mouseenter', openMenu);
+      parentItem.addEventListener('mouseleave', closeMenu);
+      meganav.addEventListener('mouseenter', openMenu);
+      meganav.addEventListener('mouseleave', closeMenu);
+
+      var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
+      if (parentLink) {
+        parentLink.addEventListener('click', function(e) {
+          var href = this.getAttribute('href') || this.dataset.href;
+          if (href && href !== '#' && href !== '') {
+            e.preventDefault();
+            window.location.href = href;
+          }
+        });
+      }
+    });
+  })();
+</script>
 
 {% stylesheet %}
   /* Base header styles */
@@ -1036,6 +331,208 @@
     z-index: 9999;
   }
 
+  /* ===== Multi-column Mega Menu Styles ===== */
+  .navmenu-meganav-multi-column {
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: 60% !important;
+    z-index: 9999;
+  }
+
+  .multi-col-wrapper {
+    display: grid;
+    grid-template-columns: 200px 1fr 240px;
+    min-height: 350px;
+    width: 100%;
+  }
+
+  /* Left column: Categories */
+  .multi-col-categories {
+    background: #f8f8f8;
+    border-right: 1px solid #eee;
+    padding: 20px 0;
+  }
+
+  .multi-col-categories-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 20px 12px;
+    margin: 0;
+  }
+
+  .multi-col-category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .multi-col-category-item {
+    position: relative;
+  }
+
+  .multi-col-category-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .multi-col-category-link:hover,
+  .multi-col-category-link.active {
+    background: #fff;
+    color: #da1e37;
+  }
+
+  .multi-col-category-link.active {
+    border-right: 2px solid #da1e37;
+  }
+
+  .multi-col-category-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .multi-col-category-arrow {
+    width: 16px;
+    height: 16px;
+    color: #999;
+    transition: color 0.2s ease;
+  }
+
+  .multi-col-category-link:hover .multi-col-category-arrow,
+  .multi-col-category-link.active .multi-col-category-arrow {
+    color: #da1e37;
+  }
+
+  /* Middle column: Submenus */
+  .multi-col-submenus {
+    padding: 20px 30px;
+    background: #fff;
+  }
+
+  .multi-col-submenu-panel {
+    display: none;
+  }
+
+  .multi-col-submenu-panel.active {
+    display: block;
+  }
+
+  .multi-col-submenu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 30px;
+  }
+
+  .multi-col-submenu-link {
+    color: #555;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 0;
+    display: block;
+    transition: color 0.2s ease;
+  }
+
+  .multi-col-submenu-link:hover {
+    color: #da1e37;
+  }
+
+  .multi-col-submenu-link--view-all {
+    font-weight: 600;
+    color: #da1e37;
+    margin-top: 15px;
+    grid-column: 1 / -1;
+  }
+
+  /* Right column: Featured products */
+  .multi-col-featured {
+    background: #fafafa;
+    border-left: 1px solid #eee;
+    padding: 20px;
+  }
+
+  .multi-col-featured-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 15px;
+  }
+
+  .multi-col-featured-item {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+
+  .multi-col-featured-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .multi-col-featured-image-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .multi-col-featured-image {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .multi-col-featured-content {
+    flex: 1;
+  }
+
+  .multi-col-featured-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 5px;
+    line-height: 1.3;
+  }
+
+  .multi-col-featured-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #da1e37;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .multi-col-featured-cta {
+    font-size: 13px;
+    color: #da1e37;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .multi-col-featured-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
   /* Mobile: hide mega menus and show simple layout */
   @media screen and (max-width: 1024px) {
     .navmenu-meganav--desktop {
@@ -1085,7 +582,38 @@
   "name": "Header Navigation",
   "tag": "section",
   "class": "header-section",
-  "settings": [],
-  "presets": []
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main Menu",
+      "default": "main-menu",
+      "info": "Select the navigation menu. Manage links in Admin > Navigation."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured_product",
+      "name": "Featured Product",
+      "settings": [
+        {
+          "type": "text",
+          "id": "menu_item_title",
+          "label": "Menu Item Title",
+          "info": "Enter the exact title of the top-level menu item this product belongs to (e.g. 'Solid Gold', 'By Jewellery Type')."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header Navigation"
+    }
+  ]
 }
 {% endschema %}
