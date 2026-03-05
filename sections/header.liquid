@@ -1,161 +1,3 @@
-
-
-{% liquid
-  assign order = 'logo,menu,localization,search,mobile_search,actions'
-
-  if shop.customer_accounts_enabled
-    assign order = 'mobile_search,logo,menu,localization,search,actions'
-  endif
-
-  assign rows = 'top,bottom' | split: ','
-  assign search_style = 'none'
-
-  if section.settings.show_search
-    assign search_style = 'modal'
-  endif
-
-  if section.settings.enable_transparent_header_home and template.name == 'index'
-    assign transparent = 'always'
-    assign transparent_color_scheme = section.settings.home_color_scheme
-  elsif section.settings.enable_transparent_header_product and template.name == 'product'
-    assign transparent = 'always'
-    assign transparent_color_scheme = section.settings.product_color_scheme
-  elsif section.settings.enable_transparent_header_collection and template.name == 'collection'
-    assign transparent = 'always'
-    assign transparent_color_scheme = section.settings.collection_color_scheme
-  endif
-
-  if section.settings.enable_sticky_header == 'always'
-    assign sticky = 'always'
-  elsif section.settings.enable_sticky_header == 'scroll-up'
-    assign sticky = 'scroll-up'
-  endif
-
-  if transparent and sticky
-    assign transparent = 'not-sticky'
-  endif
-
-  if transparent
-    if transparent_color_scheme == 'inverse'
-      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_transparent
-    else
-      assign transparent_color_scheme = 'color-' | append: section.settings.color_scheme_top
-    endif
-  endif
-
-  capture logo
-    content_for 'block', type: '_header-logo', id: 'header-logo'
-  endcapture
-
-  capture menu
-    content_for 'block', type: '_header-menu', id: 'header-menu'
-  endcapture
-
-  capture mobile_menu
-    content_for 'block', type: '_header-menu', id: 'header-menu', variant: 'mobile'
-  endcapture
-
-  capture navigation_bar
-    content_for 'block', type: '_header-menu', id: 'header-menu', variant: 'navigation_bar', transparent: transparent
-  endcapture
-
-  capture actions
-    render 'header-actions'
-  endcapture
-
-  if shop.customer_accounts_enabled
-    assign search_class = 'mobile:hidden'
-  endif
-
-  if section.settings.search_position == 'left'
-    if shop.customer_accounts_enabled
-      assign order = 'mobile_search,logo,search,menu,localization,actions'
-    else
-      assign order = 'logo,search,menu,localization,mobile_search,actions'
-    endif
-  endif
-  capture search
-    render 'search', style: search_style, class: search_class
-  endcapture
-
-  # Skip mobile search under specific conditions:
-  # Always render if search_row is bottom
-  # Don't render when shop.customer_accounts_enabled is false and search_position is left and search_style is not none
-  assign skip_mobile_search = false
-  if shop.customer_accounts_enabled == false and section.settings.search_position == 'left' and search_style != 'none'
-    assign skip_mobile_search = true
-  endif
-
-  if section.settings.search_row == 'bottom' or search_style != 'none' and skip_mobile_search == false
-    # Mobile search duplicate for when search is not in the right order for mobile layout
-    capture mobile_search
-      render 'search', class: 'desktop:hidden', style: search_style
-    endcapture
-  endif
-
-  assign show_language = section.settings.show_language
-  if localization.available_languages.size <= 1
-    assign show_language = false
-  endif
-
-  assign show_country = section.settings.show_country
-  if localization.available_countries.size <= 1
-    assign show_country = false
-  endif
-
-  if show_country or show_language
-    capture localization_markup
-      render 'dropdown-localization', show_country: show_country, show_language: show_language, country_style: section.settings.country_selector_style, localization_position: section.settings.localization_position
-    endcapture
-  endif
-
-  assign bottom_row_blocks = ''
-
-  if section.settings.menu_row == 'bottom'
-    assign bottom_row_blocks = bottom_row_blocks | append: 'menu,'
-  endif
-
-  if section.settings.search_style != 'none'
-    if section.settings.search_row == 'bottom'
-      assign bottom_row_blocks = bottom_row_blocks | append: 'search,'
-    endif
-  endif
-
-  if section.settings.show_country or section.settings.show_language
-    if section.settings.localization_row == 'bottom'
-      assign bottom_row_blocks = bottom_row_blocks | append: 'localization,'
-    endif
-  endif
-
-  assign bottom_row_blocks = bottom_row_blocks | split: ',' | compact
-
-  if section.settings.section_height == 'compact'
-    assign header_height_class = ' header--compact'
-  endif
-
-  if bottom_row_blocks.size > 0 and section.settings.color_scheme_top.settings.background.rgb == section.settings.color_scheme_bottom.settings.background.rgb and section.settings.divider_width == 0
-    assign collapse_header_paddings_class = 'header--collapse-row-paddings'
-  endif
-
-  assign class = 'header'
-
-  if transparent_color_scheme
-    assign class = class | append: ' ' | append: transparent_color_scheme
-  endif
-
-  if section.settings.color_scheme_top.settings.background.alpha != 1
-    assign class = class | append: ' ' | append: 'header--inherit-color-scheme-on-menu-open'
-  endif
-
-  if header_height_class
-    assign class = class | append: ' ' | append: header_height_class
-  endif
-
-  if collapse_header_paddings_class
-    assign class = class | append: ' ' | append: collapse_header_paddings_class
-  endif
-%}
-
 <script type="application/ld+json">
   {
     "@context": "http://schema.org",
@@ -168,864 +10,1047 @@
   }
 </script>
 
-<header-component
-  id="header-component"
-  class="{{ class }}"
-  {% if transparent %}
-    transparent="{{ transparent }}"
-  {% endif %}
-  {% if sticky %}
-    sticky="{{ sticky }}"
-  {% endif %}
-  data-skip-node-update
-  data-scroll-direction="none"
->
-  {% for row in rows %}
-    {% liquid
-      assign scheme = 'color_scheme_' | append: row
-      assign class = 'header__row header__row--[row] color-[row_scheme] section section--full-width-margin section--[section-width]' | replace: '[row]', row | replace: '[row_scheme]', section.settings[scheme] | replace: '[section-width]', section.settings.section_width
+<header class="site-header site-header-nav--open" role="banner" data-site-header="" data-nav-header-sticky="">
+  <div class="site-navigation-wrapper site-navigation--has-actions site-header--full-width" data-site-navigation="" id="site-header-nav">
+    <nav class="site-navigation" aria-label="Main">
+      <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Heirarchy" style="display:flex;align-items:center;height:auto;margin:0;">
 
-      case row
-        when 'top'
-          assign first = mobile_menu
+        <!-- 1. New -->
+        <li class="navmenu-item navmenu-basic__item navmenu-id-new" style="display:flex;align-items:center;padding-top:0;height:auto;">
+          <a class="navmenu-link navmenu-link-depth-1" href="/collections/new-arrivals">New</a>
+        </li>
 
-          if bottom_row_blocks.size > 0 and section.settings.divider_size == 'page-width'
-            assign class = class | append: ' divider--page-width'
-          endif
+        <!-- 2. Best Sellers -->
+        <li class="navmenu-item navmenu-basic__item navmenu-id-best-sellers" style="display:flex;align-items:center;padding-top:0;height:auto;">
+          <a class="navmenu-link navmenu-link-depth-1" href="/collections/best-sellers">Best Sellers</a>
+        </li>
 
-          if bottom_row_blocks.size > 0
-            assign border_bottom_setting_id = 'divider_width'
-          else
-            assign border_bottom_setting_id = 'border_width'
-          endif
-        when 'bottom'
-          assign first = ''
-          assign class = class | append: ' mobile:hidden'
+        <!-- 3. MP LUXE -->
+        <li class="navmenu-item navmenu-basic__item navmenu-id-mp-luxe" style="display:flex;align-items:center;padding-top:0;height:auto;">
+          <a class="navmenu-link navmenu-link-depth-1" href="/collections/luxury-piercing-jewellery">MP LUXE</a>
+        </li>
 
-          assign border_bottom_setting_id = 'border_width'
-      endcase
+        <!-- 4. Solid Gold (Mega Menu) -->
+        <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-solid-gold" data-navmenu-meganav-trigger="" data-navmenu-meganav-type="multi-column-menu" data-navmenu-parent="" style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
+          <details data-navmenu-details="">
+            <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent" aria-haspopup="true" aria-expanded="false" data-href="/collections/gold-body-jewellery">
+              Solid Gold
+              <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
+                  <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                  <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                </svg>
+              </span>
+            </summary>
 
-      assign style = '--border-bottom-width: [width]px; ' | replace: '[width]', section.settings[border_bottom_setting_id]
+            <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column" data-navmenu-submenu="" data-meganav-menu="" data-meganav-id="multi_column_menu_NnA9Qk" data-meganav-multi-column="" style="display:none;opacity:0;visibility:hidden;">
+              <style>
+                [data-meganav-id="multi_column_menu_NnA9Qk"] {
+                  background: #fff;
+                  padding: 0;
+                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                  position: absolute !important;
+                  top: 100% !important;
+                  left: 20% !important;
+                  width: 60% !important;
+                  z-index: 9999;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-wrapper {
+                  display: grid;
+                  grid-template-columns: 200px 1fr 240px;
+                  min-height: 350px;
+                  width: 100%;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-categories {
+                  background: #f8f8f8;
+                  border-right: 1px solid #eee;
+                  padding: 20px 0;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-categories-title {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #999;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  padding: 0 20px 12px;
+                  margin: 0;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-list {
+                  list-style: none;
+                  margin: 0;
+                  padding: 0;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-item {
+                  position: relative;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 10px 20px;
+                  color: #333;
+                  text-decoration: none;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s ease;
+                  cursor: pointer;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link:hover,
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active {
+                  background: #fff;
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active {
+                  border-right: 2px solid #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-icon {
+                  width: 24px;
+                  height: 24px;
+                  margin-right: 10px;
+                  object-fit: contain;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-text {
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-arrow {
+                  width: 16px;
+                  height: 16px;
+                  color: #999;
+                  transition: color 0.2s ease;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link:hover .multi-col-category-arrow,
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-category-link.active .multi-col-category-arrow {
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenus {
+                  padding: 20px 30px;
+                  background: #fff;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-panel {
+                  display: none;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-panel.active {
+                  display: block;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-grid {
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 8px 30px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link {
+                  color: #555;
+                  text-decoration: none;
+                  font-size: 13px;
+                  padding: 6px 0;
+                  display: block;
+                  transition: color 0.2s ease;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link:hover {
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-submenu-link--view-all {
+                  font-weight: 600;
+                  color: #da1e37;
+                  margin-top: 15px;
+                  grid-column: 1 / -1;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured {
+                  background: #fafafa;
+                  border-left: 1px solid #eee;
+                  padding: 20px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-title {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #999;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin: 0 0 15px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item {
+                  display: block;
+                  text-decoration: none;
+                  margin-bottom: 20px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item:last-child {
+                  margin-bottom: 0;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-image-wrapper {
+                  display: flex;
+                  gap: 12px;
+                  align-items: flex-start;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-image {
+                  width: 100px;
+                  height: 120px;
+                  object-fit: cover;
+                  border-radius: 6px;
+                  flex-shrink: 0;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-content {
+                  flex: 1;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-item-title {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #333;
+                  margin: 0 0 5px;
+                  line-height: 1.3;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-price {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #da1e37;
+                  display: block;
+                  margin-bottom: 5px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-cta {
+                  font-size: 13px;
+                  color: #da1e37;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-cta svg {
+                  width: 14px;
+                  height: 14px;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-placeholder {
+                  background: #f5f5f5;
+                  display: flex;
+                  align-items: center;
+                  justify-content: center;
+                  overflow: hidden;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-placeholder .placeholder-svg {
+                  width: 60%;
+                  height: 60%;
+                  opacity: 0.5;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-panel {
+                  display: none;
+                }
+                [data-meganav-id="multi_column_menu_NnA9Qk"] .multi-col-featured-panel.active {
+                  display: block;
+                }
+                @media screen and (max-width: 1024px) {
+                  [data-meganav-id="multi_column_menu_NnA9Qk"] {
+                    display: none !important;
+                  }
+                }
+              </style>
 
-      if row == 'top'
-        assign style = style | append: '--border-bottom-width-mobile: [width]px; ' | replace: '[width]', section.settings.border_width
-      endif
-    %}
+              <div class="multi-col-wrapper">
+                <!-- Left Column: Categories -->
+                <div class="multi-col-categories">
+                  <p class="multi-col-categories-title">Browse by category</p>
+                  <ul class="multi-col-category-list">
+                    <li class="multi-col-category-item">
+                      <a href="/collections/gold-body-jewellery" class="multi-col-category-link active" data-category-index="1">
+                        <span class="multi-col-category-text">By Jewellery</span>
+                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </li>
+                    <li class="multi-col-category-item">
+                      <a href="/collections/gold-body-jewellery" class="multi-col-category-link" data-category-index="2">
+                        <span class="multi-col-category-text">By Material/Stone</span>
+                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
 
-    {% capture content %}
-      {% render 'header-row',
-        row: row,
-        order: order,
-        settings: section.settings,
-        first: first,
-        logo: logo,
-        menu: menu,
-        actions: actions,
-        localization: localization_markup,
-        search: search,
-        mobile_search: mobile_search
-      %}
-    {% endcapture %}
+                <!-- Middle Column: Submenus -->
+                <div class="multi-col-submenus">
+                  <div class="multi-col-submenu-panel active" data-submenu-panel="1">
+                    <div class="multi-col-submenu-grid">
+                      <a href="/collections/gold-flat-backs" class="multi-col-submenu-link">Flatback Studs</a>
+                      <a href="/collections/gold-belly-rings" class="multi-col-submenu-link">Belly Rings</a>
+                      <a href="/collections/gold-nose-hoops" class="multi-col-submenu-link">Nose Hoops</a>
+                      <a href="/collections/gold-nose-studs-1" class="multi-col-submenu-link">Nose Studs</a>
+                      <a href="/collections/gold-barbells" class="multi-col-submenu-link">Barbells</a>
+                      <a href="/collections/gold-segment-clickers" class="multi-col-submenu-link">Clicker Rings</a>
+                      <a href="/collections/gold-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All By Jewellery &rarr;</a>
+                    </div>
+                  </div>
+                  <div class="multi-col-submenu-panel" data-submenu-panel="2">
+                    <div class="multi-col-submenu-grid">
+                      <a href="/collections/9k-gold" class="multi-col-submenu-link">9K</a>
+                      <a href="/collections/14k-gold" class="multi-col-submenu-link">14K</a>
+                      <a href="/collections/18k-gold" class="multi-col-submenu-link">18K</a>
+                      <a href="/collections/diamond" class="multi-col-submenu-link">Natural Diamond</a>
+                      <a href="/collections/natural-stones" class="multi-col-submenu-link">Natural Stone</a>
+                      <a href="https://www.monsterpiercing.com/collections/gold-body-jewellery/stone_lab-grown-diamond" class="multi-col-submenu-link">Lab Grown Diamond</a>
+                      <a href="https://www.monsterpiercing.com/collections/gold-body-jewellery/stone_moissanite" class="multi-col-submenu-link">Moissanite</a>
+                      <a href="/collections/gold-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All By Material/Stone &rarr;</a>
+                    </div>
+                  </div>
+                </div>
 
-    {% assign content = content | strip %}
-    {% if content != blank %}
-      <div
-        class="{{ class | strip }}"
-        ref="headerRowTop"
-        {%- if style != blank -%}
-          style="{{ style | strip }}"
-        {%- endif -%}
-      >
-        <div class="header__columns spacing-style">
-          {{ content }}
-        </div>
-      </div>
-    {% endif %}
-  {% endfor %}
+                <!-- Right Column: Featured Products -->
+                <div class="multi-col-featured">
+                  <p class="multi-col-featured-title">Featured</p>
+                  <div class="multi-col-featured-panel active" data-featured-panel="1">
+                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
+                          <span class="multi-col-featured-price">$87.48</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
+                          <span class="multi-col-featured-price">$59.02</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="multi-col-featured-panel" data-featured-panel="2">
+                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
+                          <span class="multi-col-featured-price">$87.48</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
+                          <span class="multi-col-featured-price">$59.02</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
 
-  {% if navigation_bar != blank %}
-    <div class="header__row header__row--mobile desktop:hidden color-{{ section.settings.color_scheme_bottom }}">
-      {{ navigation_bar }}
-    </div>
-  {% endif %}
-</header-component>
+            <script>
+              (function() {
+                var meganav = document.querySelector('[data-meganav-id="multi_column_menu_NnA9Qk"]');
+                if (!meganav) return;
+                var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
+                if (!parentItem) return;
+                var categoryLinks = meganav.querySelectorAll('[data-category-index]');
+                var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
+                var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
+                categoryLinks.forEach(function(link) {
+                  link.addEventListener('mouseenter', function() {
+                    var index = this.dataset.categoryIndex;
+                    categoryLinks.forEach(function(l) { l.classList.remove('active'); });
+                    this.classList.add('active');
+                    submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
+                    var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
+                    if (activePanel) activePanel.classList.add('active');
+                    featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
+                    var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
+                    if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
+                  });
+                  link.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href');
+                    if (href && href !== '#' && href !== '') {
+                      e.preventDefault();
+                      window.location.href = href;
+                    }
+                  });
+                });
+                var isOpen = false;
+                var closeTimeout = null;
+                function openMenu() {
+                  if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+                  if (!isOpen) {
+                    isOpen = true;
+                    document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
+                      if (otherMenu !== meganav) {
+                        otherMenu.style.display = 'none';
+                        otherMenu.style.opacity = '0';
+                        otherMenu.style.visibility = 'hidden';
+                      }
+                    });
+                    meganav.style.display = 'block';
+                    meganav.style.opacity = '1';
+                    meganav.style.visibility = 'visible';
+                    var details = parentItem.querySelector('[data-navmenu-details]');
+                    if (details) details.setAttribute('open', 'open');
+                  }
+                }
+                function closeMenu() {
+                  closeTimeout = setTimeout(function() {
+                    isOpen = false;
+                    meganav.style.display = 'none';
+                    meganav.style.opacity = '0';
+                    meganav.style.visibility = 'hidden';
+                    var details = parentItem.querySelector('[data-navmenu-details]');
+                    if (details) details.removeAttribute('open');
+                    closeTimeout = null;
+                  }, 50);
+                }
+                parentItem.addEventListener('mouseenter', openMenu);
+                parentItem.addEventListener('mouseleave', closeMenu);
+                meganav.addEventListener('mouseenter', openMenu);
+                meganav.addEventListener('mouseleave', closeMenu);
+                var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
+                if (parentLink) {
+                  parentLink.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href') || this.dataset.href;
+                    if (href && href !== '#' && href !== '') {
+                      e.preventDefault();
+                      window.location.href = href;
+                    }
+                  });
+                }
+              })();
+            </script>
+          </details>
+        </li>
 
-<script
-  src="{{ 'header.js' | asset_url }}"
-  type="module"
-></script>
+        <!-- 5. By Jewellery Type (Mega Menu) -->
+        <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-by-jewellery-type" data-navmenu-meganav-trigger="" data-navmenu-meganav-type="multi-column-menu" data-navmenu-parent="" style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
+          <details data-navmenu-details="">
+            <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent" aria-haspopup="true" aria-expanded="false" data-href="https://www.monsterpiercing.com/pages/all-body-jewellery">
+              By Jewellery Type
+              <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
+                  <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                  <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                </svg>
+              </span>
+            </summary>
+
+            <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column" data-navmenu-submenu="" data-meganav-menu="" data-meganav-id="multi_column_menu_aWQkBk" data-meganav-multi-column="" style="display:none;opacity:0;visibility:hidden;">
+              <style>
+                [data-meganav-id="multi_column_menu_aWQkBk"] {
+                  background: #fff;
+                  padding: 0;
+                  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+                  position: absolute !important;
+                  top: 100% !important;
+                  left: 20% !important;
+                  width: 60% !important;
+                  z-index: 9999;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-wrapper {
+                  display: grid;
+                  grid-template-columns: 200px 1fr 240px;
+                  min-height: 350px;
+                  width: 100%;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-categories {
+                  background: #f8f8f8;
+                  border-right: 1px solid #eee;
+                  padding: 20px 0;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-categories-title {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #999;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  padding: 0 20px 12px;
+                  margin: 0;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-list {
+                  list-style: none;
+                  margin: 0;
+                  padding: 0;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-item {
+                  position: relative;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link {
+                  display: flex;
+                  align-items: center;
+                  justify-content: space-between;
+                  padding: 10px 20px;
+                  color: #333;
+                  text-decoration: none;
+                  font-size: 14px;
+                  font-weight: 500;
+                  transition: all 0.2s ease;
+                  cursor: pointer;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link:hover,
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active {
+                  background: #fff;
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active {
+                  border-right: 2px solid #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-icon {
+                  width: 24px;
+                  height: 24px;
+                  margin-right: 10px;
+                  object-fit: contain;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-text {
+                  flex: 1;
+                  display: flex;
+                  align-items: center;
+                  gap: 10px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-arrow {
+                  width: 16px;
+                  height: 16px;
+                  color: #999;
+                  transition: color 0.2s ease;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link:hover .multi-col-category-arrow,
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-category-link.active .multi-col-category-arrow {
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenus {
+                  padding: 20px 30px;
+                  background: #fff;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-panel {
+                  display: none;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-panel.active {
+                  display: block;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-grid {
+                  display: grid;
+                  grid-template-columns: repeat(2, 1fr);
+                  gap: 8px 30px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link {
+                  color: #555;
+                  text-decoration: none;
+                  font-size: 13px;
+                  padding: 6px 0;
+                  display: block;
+                  transition: color 0.2s ease;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link:hover {
+                  color: #da1e37;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-submenu-link--view-all {
+                  font-weight: 600;
+                  color: #da1e37;
+                  margin-top: 15px;
+                  grid-column: 1 / -1;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured {
+                  background: #fafafa;
+                  border-left: 1px solid #eee;
+                  padding: 20px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-title {
+                  font-size: 12px;
+                  font-weight: 500;
+                  color: #999;
+                  text-transform: uppercase;
+                  letter-spacing: 0.5px;
+                  margin: 0 0 15px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item {
+                  display: block;
+                  text-decoration: none;
+                  margin-bottom: 20px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item:last-child {
+                  margin-bottom: 0;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-image-wrapper {
+                  display: flex;
+                  gap: 12px;
+                  align-items: flex-start;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-image {
+                  width: 100px;
+                  height: 120px;
+                  object-fit: cover;
+                  border-radius: 6px;
+                  flex-shrink: 0;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-content {
+                  flex: 1;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-item-title {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #333;
+                  margin: 0 0 5px;
+                  line-height: 1.3;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-price {
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #da1e37;
+                  display: block;
+                  margin-bottom: 5px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-cta {
+                  font-size: 13px;
+                  color: #da1e37;
+                  display: inline-flex;
+                  align-items: center;
+                  gap: 4px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-cta svg {
+                  width: 14px;
+                  height: 14px;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-panel {
+                  display: none;
+                }
+                [data-meganav-id="multi_column_menu_aWQkBk"] .multi-col-featured-panel.active {
+                  display: block;
+                }
+                @media screen and (max-width: 1024px) {
+                  [data-meganav-id="multi_column_menu_aWQkBk"] {
+                    display: none !important;
+                  }
+                }
+              </style>
+
+              <div class="multi-col-wrapper">
+                <!-- Left Column: Categories -->
+                <div class="multi-col-categories">
+                  <p class="multi-col-categories-title">Browse by type</p>
+                  <ul class="multi-col-category-list">
+                    <li class="multi-col-category-item">
+                      <a href="/pages/all-body-jewellery" class="multi-col-category-link active" data-category-index="1">
+                        <span class="multi-col-category-text">Ear Piercings</span>
+                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </li>
+                    <li class="multi-col-category-item">
+                      <a href="/pages/all-body-jewellery" class="multi-col-category-link" data-category-index="2">
+                        <span class="multi-col-category-text">Nose Piercings</span>
+                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </li>
+                    <li class="multi-col-category-item">
+                      <a href="/pages/all-body-jewellery" class="multi-col-category-link" data-category-index="3">
+                        <span class="multi-col-category-text">Body Piercings</span>
+                        <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                          <polyline points="9 18 15 12 9 6"></polyline>
+                        </svg>
+                      </a>
+                    </li>
+                  </ul>
+                </div>
+
+                <!-- Middle Column: Submenus -->
+                <div class="multi-col-submenus">
+                  <!-- TODO: Update these links/labels to match your actual collections -->
+                  <div class="multi-col-submenu-panel active" data-submenu-panel="1">
+                    <div class="multi-col-submenu-grid">
+                      <a href="/collections/gold-flat-backs" class="multi-col-submenu-link">Flatback Studs</a>
+                      <a href="/collections/gold-segment-clickers" class="multi-col-submenu-link">Clicker Rings</a>
+                      <a href="/collections/gold-barbells" class="multi-col-submenu-link">Barbells</a>
+                      <a href="/pages/all-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Ear Piercings &rarr;</a>
+                    </div>
+                  </div>
+                  <div class="multi-col-submenu-panel" data-submenu-panel="2">
+                    <div class="multi-col-submenu-grid">
+                      <a href="/collections/gold-nose-hoops" class="multi-col-submenu-link">Nose Hoops</a>
+                      <a href="/collections/gold-nose-studs-1" class="multi-col-submenu-link">Nose Studs</a>
+                      <a href="/collections/gold-segment-clickers" class="multi-col-submenu-link">Septum Clickers</a>
+                      <a href="/pages/all-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Nose Piercings &rarr;</a>
+                    </div>
+                  </div>
+                  <div class="multi-col-submenu-panel" data-submenu-panel="3">
+                    <div class="multi-col-submenu-grid">
+                      <a href="/collections/gold-belly-rings" class="multi-col-submenu-link">Belly Rings</a>
+                      <a href="/collections/gold-barbells" class="multi-col-submenu-link">Barbells</a>
+                      <a href="/pages/all-body-jewellery" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All Body Piercings &rarr;</a>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Right Column: Featured Products -->
+                <div class="multi-col-featured">
+                  <p class="multi-col-featured-title">Featured</p>
+                  <div class="multi-col-featured-panel active" data-featured-panel="1">
+                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
+                          <span class="multi-col-featured-price">$87.48</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
+                          <span class="multi-col-featured-price">$59.02</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="multi-col-featured-panel" data-featured-panel="2">
+                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
+                          <span class="multi-col-featured-price">$87.48</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
+                          <span class="multi-col-featured-price">$59.02</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                  <div class="multi-col-featured-panel" data-featured-panel="3">
+                    <a href="/products/14k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/82_29d263a4-1909-4377-827d-c68d68b540b7.png?v=1768210323&width=200" alt="14K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">14K Gold Classic Hinged Segment Click...</p>
+                          <span class="multi-col-featured-price">$87.48</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                    <a href="/products/9k-gold-classic-hinged-segment-clicker-ring" class="multi-col-featured-item">
+                      <div class="multi-col-featured-image-wrapper">
+                        <img src="//www.monsterpiercing.com/cdn/shop/files/84_8d2e954d-871f-4a64-9ff1-9c2cecc5c665.png?v=1772099354&width=200" alt="9K Gold Classic Hinged Segment Clicker Ring" class="multi-col-featured-image" loading="lazy">
+                        <div class="multi-col-featured-content">
+                          <p class="multi-col-featured-item-title">9K Gold Classic Hinged Segment Clicke...</p>
+                          <span class="multi-col-featured-price">$59.02</span>
+                          <span class="multi-col-featured-cta">
+                            Shop Now
+                            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <script>
+              (function() {
+                var meganav = document.querySelector('[data-meganav-id="multi_column_menu_aWQkBk"]');
+                if (!meganav) return;
+                var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
+                if (!parentItem) return;
+                var categoryLinks = meganav.querySelectorAll('[data-category-index]');
+                var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
+                var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
+                categoryLinks.forEach(function(link) {
+                  link.addEventListener('mouseenter', function() {
+                    var index = this.dataset.categoryIndex;
+                    categoryLinks.forEach(function(l) { l.classList.remove('active'); });
+                    this.classList.add('active');
+                    submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
+                    var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
+                    if (activePanel) activePanel.classList.add('active');
+                    featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
+                    var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
+                    if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
+                  });
+                  link.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href');
+                    if (href && href !== '#' && href !== '') {
+                      e.preventDefault();
+                      window.location.href = href;
+                    }
+                  });
+                });
+                var isOpen = false;
+                var closeTimeout = null;
+                function openMenu() {
+                  if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+                  if (!isOpen) {
+                    isOpen = true;
+                    document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
+                      if (otherMenu !== meganav) {
+                        otherMenu.style.display = 'none';
+                        otherMenu.style.opacity = '0';
+                        otherMenu.style.visibility = 'hidden';
+                      }
+                    });
+                    meganav.style.display = 'block';
+                    meganav.style.opacity = '1';
+                    meganav.style.visibility = 'visible';
+                    var details = parentItem.querySelector('[data-navmenu-details]');
+                    if (details) details.setAttribute('open', 'open');
+                  }
+                }
+                function closeMenu() {
+                  closeTimeout = setTimeout(function() {
+                    isOpen = false;
+                    meganav.style.display = 'none';
+                    meganav.style.opacity = '0';
+                    meganav.style.visibility = 'hidden';
+                    var details = parentItem.querySelector('[data-navmenu-details]');
+                    if (details) details.removeAttribute('open');
+                    closeTimeout = null;
+                  }, 50);
+                }
+                parentItem.addEventListener('mouseenter', openMenu);
+                parentItem.addEventListener('mouseleave', closeMenu);
+                meganav.addEventListener('mouseenter', openMenu);
+                meganav.addEventListener('mouseleave', closeMenu);
+                var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
+                if (parentLink) {
+                  parentLink.addEventListener('click', function(e) {
+                    var href = this.getAttribute('href') || this.dataset.href;
+                    if (href && href !== '#' && href !== '') {
+                      e.preventDefault();
+                      window.location.href = href;
+                    }
+                  });
+                }
+              })();
+            </script>
+          </details>
+        </li>
+
+      </ul>
+    </nav>
+  </div>
+</header>
 
 {% stylesheet %}
+  /* Base header styles */
+  .site-header {
+    position: relative;
+    background: #fff;
+    z-index: 1000;
+    border-bottom: 1px solid #eee;
+  }
+
+  .site-header[data-nav-header-sticky] {
+    position: sticky;
+    top: 0;
+  }
+
+  .site-navigation-wrapper {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .site-navigation-wrapper.site-header--full-width {
+    max-width: 100%;
+  }
+
+  .site-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Nav menu base */
+  .navmenu {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .navmenu-item {
+    position: relative;
+  }
+
+  .navmenu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 18px;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .navmenu-link:hover {
+    color: #da1e37;
+  }
+
+  /* Summary element reset */
+  summary.navmenu-link {
+    list-style: none;
+  }
+
+  summary.navmenu-link::-webkit-details-marker {
+    display: none;
+  }
+
+  summary.navmenu-link::marker {
+    display: none;
+    content: '';
+  }
+
+  /* Details reset */
+  details[data-navmenu-details] {
+    position: static;
+  }
+
+  /* Chevron icon */
+  .navmenu-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  .navmenu-icon svg {
+    width: 8px;
+    height: 6px;
+    transition: transform 0.2s ease;
+  }
+
+  details[open] > summary .navmenu-icon svg {
+    transform: rotate(180deg);
+  }
+
+  /* Mega menu positioning */
+  .navmenu-meganav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+  }
+
+  /* Mobile: hide mega menus and show simple layout */
+  @media screen and (max-width: 1024px) {
+    .navmenu-meganav--desktop {
+      display: none !important;
+    }
+
+    .site-navigation {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .navmenu-link {
+      padding: 12px 14px;
+      font-size: 12px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .navmenu {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .navmenu-link {
+      padding: 10px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* Header height variable for page offset */
   body {
     --header-height: 0px;
     --header-group-height: var(--header-height);
-    --transparent-header-offset-boolean: 0; /* stylelint-disable-line declaration-property-value-disallowed-list */
   }
 
   body:has(> #header-group > header) {
-    --header-height: 60px;
+    --header-height: 50px;
   }
 
   body:has(> #header-group:empty) {
     --header-group-height: 0px;
   }
-
-  .header[transparent] {
-    --language-button-background-color: transparent;
-    --language-button-border-color: transparent;
-
-    /* used to apply transparency to .header__row, will only ever be transparent or unset */
-    --header-bg-color: transparent;
-
-    /* used to display the appropriate logo based on transparency state */
-    --header-logo-display: none;
-    --header-logo-inverse-display: block;
-
-    position: absolute;
-    top: 0;
-    left: 0;
-    right: 0;
-
-    /* transparent color scheme on .header should never apply its background color */
-    background-color: transparent;
-    z-index: var(--layer-overlay);
-
-    &[transparent='not-sticky'][data-sticky-state='active'],
-    &:hover,
-    /* Multiple selectors for performance: each simple :has() check is faster than one complex selector with multiple conditions */
-    &:has(.header-menu[aria-expanded='true']),
-    &:has(nav[header-menu]:focus-within),
-    &:has(.menu-list__link[data-animating]),
-    &:has(.account-popover[open]),
-    &:has(.localization-wrapper:not([hidden])) {
-      /* should be opaque, negate all transparent properties */
-      --header-logo-display: unset;
-      --header-logo-inverse-display: unset;
-      --header-bg-color: unset;
-      --color-foreground: inherit;
-      --color-foreground-rgb: inherit;
-      --color-background: inherit;
-      --color-background-rgb: inherit;
-      --color-border: inherit;
-      --color-border-rgb: inherit;
-
-      .header__row {
-        /* Faster transition for "in" animation */
-        transition: color var(--animation-values-fast), border-color var(--animation-values-fast),
-          background-color var(--animation-values-fast);
-      }
-    }
-
-    .header__row {
-      /* Slower transition for "out" animation */
-      transition: color var(--animation-values-slow), border-color var(--animation-values-slow),
-        background-color var(--animation-values-slow);
-    }
-  }
-
-  :is(
-      .header[transparent]:not([data-sticky-state='active']),
-      .header[transparent='always'][data-sticky-state='active'],
-      .account-popover[open],
-      .localization-wrapper:not([hidden])
-    )
-    .header__row:not(
-      :hover,
-      :has(
-          .header-menu[aria-expanded='true'],
-          .menu-list__link[data-animating],
-          .account-popover[open],
-          .localization-wrapper:not([hidden])
-        )
-    ) {
-    /* while transparent, header-row ignores its color-scheme settings, pull from the header-component */
-    --color-foreground: inherit;
-    --color-foreground-rgb: inherit;
-    --color-border: inherit;
-    --color-border-rgb: inherit;
-    --color-primary-button-background: inherit;
-    --color-primary-button-text: inherit;
-  }
-
-  .header--inherit-color-scheme-on-menu-open:has(
-      .mega-menu__list:is(:hover),
-      .header-menu:is([aria-expanded='true']),
-      nav[header-menu]:is(:focus-within),
-      .menu-list__link[data-animating]
-    )
-    .header__row {
-    --color-foreground: inherit;
-    --color-foreground-rgb: inherit;
-    --color-background: inherit;
-    --color-background-rgb: inherit;
-    --color-border: inherit;
-    --color-border-rgb: inherit;
-  }
-
-  .header-section {
-    position: relative;
-  }
-
-  #header-group:has(#header-component[sticky]) {
-    display: contents;
-  }
-
-  .header-section:has(> #header-component[sticky='always']),
-  .header-section:has(> #header-component[sticky='scroll-up'][data-sticky-state='active']) {
-    position: sticky;
-
-    /* Use -1 instead of 0 so intersection observer can track sticky state */
-    top: -1px;
-    z-index: var(--layer-sticky);
-  }
-
-  .header[data-sticky-state] {
-    transition: opacity var(--animation-speed) var(--animation-easing);
-    opacity: 1;
-  }
-
-  .header[data-sticky-state='active'] {
-    view-transition-name: sticky-header;
-  }
-
-  .header[data-sticky-state='idle'],
-  .header[data-sticky-state='active'][data-animating] {
-    opacity: 0;
-  }
-
-  .header__row {
-    position: relative;
-
-    /* will default to bg from its color scheme unless --header-bg-color is transparent */
-    background-color: var(--header-bg-color, var(--color-background));
-  }
-
-  .header__row--top:not(.divider--page-width),
-  .header__row--top.divider--page-width .header__columns,
-  .header__row--bottom {
-    border-bottom: var(--border-bottom-width) solid var(--color-border);
-  }
-
-  @media screen and (max-width: 749px) {
-    .header__row--top:not(.divider--page-width),
-    .header__row--top.divider--page-width .header__columns {
-      border-bottom-width: var(--border-bottom-width-mobile);
-    }
-  }
-
-  .header__row.divider--page-width:not(.section--page-width) .header__columns {
-    @media screen and (min-width: 750px) {
-      padding-inline-start: 0;
-      padding-inline-end: 0;
-      margin-inline-start: var(--page-margin);
-      margin-inline-end: var(--page-margin);
-    }
-  }
-
-  .header__column {
-    display: flex;
-    align-items: center;
-
-    /* on mobile, header__column nodes are ignored to create a new grid-template-area based on all visible content */
-    @media screen and (max-width: 749px) {
-      display: contents;
-    }
-  }
-
-  .header__column--left,
-  .header__column--center {
-    gap: var(--gap-xl);
-    grid-area: left;
-  }
-
-  .header__column--center {
-    justify-content: center;
-    grid-area: center;
-
-    header-menu:only-child .overflow-menu::part(list) {
-      justify-content: center;
-    }
-  }
-
-  .header__column--right {
-    gap: var(--gap-xl);
-    justify-content: flex-end;
-    grid-area: right;
-
-    .overflow-menu::part(list) {
-      justify-content: flex-end;
-    }
-  }
-
-  .header__columns {
-    /* Three column layout */
-    --header-left: 1fr;
-    --header-center: auto;
-    --header-right: 1fr;
-    --header-template-columns: var(--header-left) var(--header-center) var(--header-right);
-
-    /* Mobile layout */
-    --header-mobile-bookend: 44px;
-
-    display: grid;
-    grid-template-areas: 'left center right';
-    grid-gap: var(--gap-xl);
-    grid-template-columns: var(--header-template-columns);
-
-    /* If menu is in center column */
-    &:has(.header__column--center header-menu) {
-      --header-center: auto;
-      --header-left: minmax(max-content, 1fr);
-      --header-right: minmax(max-content, 1fr);
-    }
-
-    /* If there is no center column, make the column the menu is in grow eagerly */
-    &:where(:not(:has(.header__column--center))) {
-      @media screen and (min-width: 750px) {
-        --header-template-columns: var(--header-left) var(--header-right);
-
-        grid-template-areas: 'left right';
-      }
-
-      /* If the header-menu is in the right column */
-      &:has(.header__column--right header-menu) {
-        --header-right: auto;
-        --header-left: minmax(max-content, 1fr);
-      }
-
-      /* If the header-menu is in the left column */
-      &:has(.header__column--left header-menu) {
-        --header-left: auto;
-        --header-right: minmax(max-content, 1fr);
-      }
-    }
-
-    @media screen and (max-width: 749px) {
-      --header-template-columns: var(--header-mobile-bookend) var(--header-mobile-bookend) 1fr
-        var(--header-mobile-bookend) var(--header-mobile-bookend);
-
-      grid-template-areas: 'leftA leftB center rightA rightB';
-      grid-column: span 3;
-      column-gap: 0;
-      align-items: center;
-      padding-block: 0;
-      padding-inline: 0 var(--padding-3xs);
-
-      .header-logo {
-        grid-area: center;
-      }
-
-      &:not(:has(header-actions)) .search-action {
-        grid-area: leftB;
-      }
-
-      &:not(:has(.account-actions)) .search-action {
-        grid-area: rightA;
-      }
-
-      .search-action {
-        grid-area: leftB;
-      }
-
-      header-actions {
-        grid-area: rightB;
-      }
-    }
-  }
-
-  /* Single column layout if there are no columns within */
-  .header__columns:not(:has(.header__column)) {
-    grid-template-columns: 1fr;
-  }
-
-  /* Set header paddings based on height setting */
-  .header {
-    --header-padding: var(--padding-sm);
-    --font-paragraph--line-height: 1;
-  }
-
-  .header.header--compact {
-    --header-padding: var(--padding-2xs);
-  }
-
-  .header__columns {
-    --padding-block-start: var(--header-padding);
-    --padding-block-end: var(--header-padding);
-  }
-
-  .header:not(.header--compact) .header__row--bottom {
-    --header-padding: var(--padding-xs);
-  }
-
-  .header--collapse-row-paddings {
-    .header__row--top .header__columns {
-      --padding-block-end: 0px;
-    }
-
-    .header__row--bottom .header__columns {
-      --padding-block-start: 0px;
-    }
-  }
-
-  /* When the header is transparent, add a margin to a potential header-section below it */
-  .header-section:has(.header[transparent]) + .shopify-section {
-    margin-top: var(--header-height);
-  }
-
-  /* When the header is transparent, and when there is no header-section below it, offset the first main-section with
-   * the height of the header
-   */
-
-  main > .shopify-section:first-child .section:not(.disable-section-top-offset) {
-    &.spacing-style,
-    .spacing-style {
-      --section-top-offset: calc(var(--header-height) * var(--transparent-header-offset-boolean));
-
-      /* Any nested sections should not be offset */
-      :is(.spacing-style, .inherit-spacing) {
-        --section-top-offset: 0px;
-      }
-    }
-
-    /* Make sticky content immediately stick to the top of the page */
-    .sticky-content {
-      margin-top: calc(var(--header-height) * var(--transparent-header-offset-boolean) * -1);
-    }
-  }
 {% endstylesheet %}
 
 {% schema %}
 {
-  "name": "t:names.header",
-  "tag": "header",
+  "name": "Header Navigation",
+  "tag": "section",
   "class": "header-section",
-  "settings": [
-    {
-      "type": "header",
-      "content": "t:content.logo"
-    },
-    {
-      "type": "select",
-      "id": "logo_position",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "center"
-    },
-    {
-      "type": "header",
-      "content": "t:content.menu"
-    },
-    {
-      "type": "select",
-      "id": "menu_position",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "center",
-          "label": "t:options.center"
-        },
-        {
-          "value": "right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "left"
-    },
-    {
-      "type": "select",
-      "id": "menu_row",
-      "label": "t:settings.row",
-      "options": [
-        {
-          "value": "top",
-          "label": "t:options.top"
-        },
-        {
-          "value": "bottom",
-          "label": "t:options.bottom"
-        }
-      ],
-      "default": "top"
-    },
-    {
-      "type": "header",
-      "content": "t:content.customer_account"
-    },
-    {
-      "type": "paragraph",
-      "content": "t:content.manage_customer_accounts"
-    },
-    {
-      "type": "header",
-      "content": "t:content.search"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_search",
-      "label": "t:settings.search_icon",
-      "default": true
-    },
-    {
-      "type": "select",
-      "id": "search_position",
-      "label": "t:settings.search_position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "right",
-      "visible_if": "{{ section.settings.show_search }}"
-    },
-    {
-      "type": "select",
-      "id": "search_row",
-      "label": "t:settings.search_row",
-      "options": [
-        {
-          "value": "top",
-          "label": "t:options.top"
-        },
-        {
-          "value": "bottom",
-          "label": "t:options.bottom"
-        }
-      ],
-      "default": "top",
-      "visible_if": "{{ section.settings.show_search }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.localization"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_country",
-      "label": "t:settings.country_region",
-      "info": "t:info.manage_countries_regions",
-      "default": true
-    },
-    {
-      "type": "checkbox",
-      "id": "country_selector_style",
-      "label": "t:settings.flag",
-      "default": true,
-      "visible_if": "{{ section.settings.show_country }}"
-    },
-    {
-      "type": "checkbox",
-      "id": "show_language",
-      "label": "t:settings.language_selector",
-      "info": "t:info.manage_languages",
-      "default": true
-    },
-    {
-      "type": "select",
-      "id": "localization_font",
-      "label": "t:settings.font",
-      "options": [
-        {
-          "value": "heading",
-          "label": "t:options.heading"
-        },
-        {
-          "value": "subheading",
-          "label": "t:options.subheading"
-        },
-        {
-          "value": "body",
-          "label": "t:options.body"
-        },
-        {
-          "value": "accent",
-          "label": "t:options.accent"
-        }
-      ],
-      "default": "heading",
-      "visible_if": "{{ section.settings.show_country or section.settings.show_language }}"
-    },
-    {
-      "type": "select",
-      "id": "localization_font_size",
-      "label": "t:settings.size",
-      "options": [
-        {
-          "value": "0.625rem",
-          "label": "10px"
-        },
-        {
-          "value": "0.75rem",
-          "label": "12px"
-        },
-        {
-          "value": "0.875rem",
-          "label": "14px"
-        },
-        {
-          "value": "1rem",
-          "label": "16px"
-        },
-        {
-          "value": "1.125rem",
-          "label": "18px"
-        }
-      ],
-      "default": "1rem"
-    },
-    {
-      "type": "select",
-      "id": "localization_position",
-      "label": "t:settings.position",
-      "options": [
-        {
-          "value": "left",
-          "label": "t:options.left"
-        },
-        {
-          "value": "right",
-          "label": "t:options.right"
-        }
-      ],
-      "default": "right",
-      "visible_if": "{{ section.settings.show_country or section.settings.show_language }}"
-    },
-    {
-      "type": "select",
-      "id": "localization_row",
-      "label": "t:settings.row",
-      "options": [
-        {
-          "value": "top",
-          "label": "t:options.top"
-        },
-        {
-          "value": "bottom",
-          "label": "t:options.bottom"
-        }
-      ],
-      "default": "top",
-      "visible_if": "{{ section.settings.show_country or section.settings.show_language }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.appearance"
-    },
-    {
-      "type": "select",
-      "id": "section_width",
-      "label": "t:settings.width",
-      "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
-      ]
-    },
-    {
-      "type": "select",
-      "id": "section_height",
-      "label": "t:settings.height",
-      "options": [
-        {
-          "value": "compact",
-          "label": "t:options.compact"
-        },
-        {
-          "value": "standard",
-          "label": "t:options.standard"
-        }
-      ],
-      "default": "standard"
-    },
-    {
-      "type": "select",
-      "id": "enable_sticky_header",
-      "label": "t:settings.sticky_header",
-      "options": [
-        {
-          "value": "always",
-          "label": "t:options.always"
-        },
-        {
-          "value": "scroll-up",
-          "label": "t:options.on_scroll_up"
-        },
-        {
-          "value": "never",
-          "label": "t:options.never"
-        }
-      ],
-      "default": "always"
-    },
-    {
-      "type": "range",
-      "id": "divider_width",
-      "label": "t:settings.divider_thickness",
-      "min": 0,
-      "max": 5,
-      "step": 0.5,
-      "unit": "px",
-      "default": 0,
-      "visible_if": "{{ section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}"
-    },
-    {
-      "type": "select",
-      "id": "divider_size",
-      "label": "t:settings.divider_width",
-      "options": [
-        {
-          "value": "page-width",
-          "label": "t:options.page"
-        },
-        {
-          "value": "full-width",
-          "label": "t:options.full"
-        }
-      ],
-      "visible_if": "{{ section.settings.divider_width > 0 and section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}"
-    },
-    {
-      "type": "range",
-      "id": "border_width",
-      "label": "t:settings.border_width",
-      "min": 0,
-      "max": 5,
-      "step": 0.5,
-      "unit": "px",
-      "default": 0
-    },
-    {
-      "type": "header",
-      "content": "t:content.colors"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme_top",
-      "label": "t:settings.default",
-      "default": "primary"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme_bottom",
-      "label": "t:settings.bottom_row",
-      "default": "primary",
-      "visible_if": "{{ section.settings.menu_row == 'bottom' or section.settings.localization_row == 'bottom' or section.settings.search_row == 'bottom' }}"
-    },
-    {
-      "type": "color_scheme",
-      "id": "color_scheme_transparent",
-      "label": "t:settings.inverse",
-      "default": "primary",
-      "visible_if": "{{ section.settings.enable_transparent_header_home or section.settings.enable_transparent_header_product or section.settings.enable_transparent_header_collection }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.home_page"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_transparent_header_home",
-      "label": "t:settings.transparent_background",
-      "default": false
-    },
-    {
-      "type": "select",
-      "id": "home_color_scheme",
-      "label": "t:settings.color_scheme",
-      "options": [
-        {
-          "value": "default",
-          "label": "t:options.default"
-        },
-        {
-          "value": "inverse",
-          "label": "t:options.inverse"
-        }
-      ],
-      "default": "default",
-      "visible_if": "{{ section.settings.enable_transparent_header_home }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.product_page"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_transparent_header_product",
-      "label": "t:settings.transparent_background",
-      "default": false
-    },
-    {
-      "type": "select",
-      "id": "product_color_scheme",
-      "label": "t:settings.color_scheme",
-      "options": [
-        {
-          "value": "default",
-          "label": "t:options.default"
-        },
-        {
-          "value": "inverse",
-          "label": "t:options.inverse"
-        }
-      ],
-      "default": "default",
-      "visible_if": "{{ section.settings.enable_transparent_header_product }}"
-    },
-    {
-      "type": "header",
-      "content": "t:content.collection_page"
-    },
-    {
-      "type": "checkbox",
-      "id": "enable_transparent_header_collection",
-      "label": "t:settings.transparent_background",
-      "default": false
-    },
-    {
-      "type": "select",
-      "id": "collection_color_scheme",
-      "label": "t:settings.color_scheme",
-      "options": [
-        {
-          "value": "default",
-          "label": "t:options.default"
-        },
-        {
-          "value": "inverse",
-          "label": "t:options.inverse"
-        }
-      ],
-      "default": "default",
-      "visible_if": "{{ section.settings.enable_transparent_header_collection }}"
-    }
-  ],
+  "settings": [],
   "presets": []
 }
 {% endschema %}
