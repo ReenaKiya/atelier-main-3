@@ -1,1 +1,29 @@
-{"type":"header","name":"Header","sections":{"header_section":{"type":"header","blocks":{"header-logo":{"type":"_header-logo","static":true,"settings":{"hide_logo_on_home_page":false,"custom_height":20,"custom_height_mobile":20,"padding-block-start":16,"padding-block-end":16,"padding-inline-start":10,"padding-inline-end":10},"blocks":{}},"header-menu":{"type":"_header-menu","static":true,"settings":{"menu":"main-menu","menu_style":"collection_images","featured_products_aspect_ratio":"adapt","featured_collections_aspect_ratio":"16 \/ 9","image_border_radius":7,"product_title_case":"uppercase","collection_title_case":"default","color_scheme":"","menu_font_style":"inverse","type_font_primary_link":"primary","type_font_primary_size":"var(--font-size--body-sm)","type_case_primary_link":"uppercase","type_font_secondary_link":"primary","type_case_secondary_link":"uppercase","type_font_tertiary_link":"primary","type_case_tertiary_link":"uppercase","navigation_bar":false,"color_scheme_navigation_bar":"","drawer_accordion":false,"drawer_accordion_expand_first":false,"drawer_dividers":false},"blocks":{}}},"settings":{"logo_position":"left","menu_position":"center","menu_row":"top","show_search":true,"search_position":"right","search_row":"top","show_country":true,"country_selector_style":false,"show_language":false,"localization_font":"heading","localization_font_size":"1rem","localization_position":"right","localization_row":"top","section_width":"page-width","section_height":"standard","enable_sticky_header":"always","divider_width":0,"divider_size":"page-width","border_width":0,"color_scheme_top":"scheme-2","color_scheme_bottom":"","color_scheme_transparent":"scheme-6","enable_transparent_header_home":true,"home_color_scheme":"default","enable_transparent_header_product":false,"product_color_scheme":"inverse","enable_transparent_header_collection":true,"collection_color_scheme":"inverse"}},"custom_header_frtTfa":{"type":"custom-header","name":"Custom Header","settings":{"logo":"shopify:\/\/shop_images\/monsterpeircing.avif","search_placeholder":"Search the shiny things...","show_account":true,"show_wishlist":true,"wishlist_url":"","background_color":"#ffffff","text_color":"#000000","border_color":"#eeeeee"}}},"order":["header_section","custom_header_frtTfa"]}
+{
+  "type": "header",
+  "name": "Header",
+  "sections": {
+    "header_section": {
+      "type": "header",
+      "settings": {
+        "menu": "main-menu"
+      }
+    },
+    "custom_header_frtTfa": {
+      "type": "custom-header",
+      "settings": {
+        "logo": "shopify://shop_images/monsterpeircing.avif",
+        "search_placeholder": "Search the shiny things...",
+        "show_account": true,
+        "show_wishlist": true,
+        "wishlist_url": "",
+        "background_color": "#ffffff",
+        "text_color": "#000000",
+        "border_color": "#eeeeee"
+      }
+    }
+  },
+  "order": [
+    "header_section",
+    "custom_header_frtTfa"
+  ]
+}
