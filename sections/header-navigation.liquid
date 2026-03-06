@@ -1,0 +1,740 @@
+<script type="application/ld+json">
+  {
+    "@context": "http://schema.org",
+    "@type": "Organization",
+    "name": {{ shop.name | json }},
+    {% if settings.logo %}
+      "logo": {{ settings.logo | image_url: width: 500 | prepend: "https:" | json }},
+    {% endif %}
+    "url": {{ request.origin | append: page.url | json }}
+  }
+</script>
+
+<header class="site-header site-header-nav--open" role="banner" data-site-header="" data-nav-header-sticky="">
+  <div class="site-navigation-wrapper site-navigation--has-actions site-header--full-width" data-site-navigation="" id="site-header-nav">
+    <nav class="site-navigation" aria-label="Main">
+      <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Hierarchy" style="display:flex;align-items:center;height:auto;margin:0;">
+
+        {% for link in linklists[section.settings.menu].links %}
+          {% assign link_handle = link.title | handleize %}
+
+          {% if link.links.size > 0 %}
+            {% comment %} ========== MEGA MENU ITEM ========== {% endcomment %}
+            {% assign meganav_id = 'meganav_' | append: section.id | append: '_' | append: forloop.index %}
+
+            <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-{{ link_handle }}"
+                data-navmenu-meganav-trigger=""
+                data-navmenu-meganav-type="multi-column-menu"
+                data-navmenu-parent=""
+                style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
+              <details data-navmenu-details="">
+                <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent"
+                         aria-haspopup="true"
+                         aria-expanded="false"
+                         data-href="{{ link.url }}">
+                  {{ link.title }}
+                  <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                    <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
+                      <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                      <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                    </svg>
+                  </span>
+                </summary>
+
+                <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column"
+                     data-navmenu-submenu=""
+                     data-meganav-menu=""
+                     data-meganav-id="{{ meganav_id }}"
+                     data-meganav-multi-column=""
+                     style="display:none;opacity:0;visibility:hidden;">
+                  <div class="multi-col-wrapper">
+
+                    {% comment %} Left Column: Categories (Level 2 links) {% endcomment %}
+                    <div class="multi-col-categories">
+                      <p class="multi-col-categories-title">Browse by category</p>
+                      <ul class="multi-col-category-list">
+                        {% for child_link in link.links %}
+                          <li class="multi-col-category-item">
+                            <a href="{{ child_link.url }}"
+                               class="multi-col-category-link{% if forloop.first %} active{% endif %}"
+                               data-category-index="{{ forloop.index }}">
+                              <span class="multi-col-category-text">{{ child_link.title }}</span>
+                              <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                                <polyline points="9 18 15 12 9 6"></polyline>
+                              </svg>
+                            </a>
+                          </li>
+                        {% endfor %}
+                      </ul>
+                    </div>
+
+                    {% comment %} Middle Column: Submenus (Level 3 links) {% endcomment %}
+                    <div class="multi-col-submenus">
+                      {% for child_link in link.links %}
+                        <div class="multi-col-submenu-panel{% if forloop.first %} active{% endif %}" data-submenu-panel="{{ forloop.index }}">
+                          <div class="multi-col-submenu-grid">
+                            {% for grandchild_link in child_link.links %}
+                              <a href="{{ grandchild_link.url }}" class="multi-col-submenu-link">{{ grandchild_link.title }}</a>
+                            {% endfor %}
+                            <a href="{{ child_link.url }}" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All {{ child_link.title }} &rarr;</a>
+                          </div>
+                        </div>
+                      {% endfor %}
+                    </div>
+
+                    {% comment %} Right Column: Featured (images + products per category) {% endcomment %}
+                    <div class="multi-col-featured">
+                      <p class="multi-col-featured-title">Featured</p>
+
+                      {% for child_link in link.links %}
+                        {% assign child_handle = child_link.title | handleize %}
+                        <div class="multi-col-featured-panel{% if forloop.first %} active{% endif %}" data-featured-panel="{{ forloop.index }}">
+
+                          {% comment %} Featured Images for this category {% endcomment %}
+                          {% for block in section.blocks %}
+                            {% if block.type == 'featured_image' %}
+                              {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                              {% assign block_category_handle = block.settings.category_title | handleize %}
+                              {% if block_parent_handle == link_handle and block_category_handle == child_handle and block.settings.image != blank %}
+                                <a href="{{ block.settings.link | default: child_link.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                  <div class="multi-col-featured-image-wrapper">
+                                    <img src="{{ block.settings.image | image_url: width: 200 }}"
+                                         alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                                         class="multi-col-featured-image"
+                                         loading="lazy">
+                                    <div class="multi-col-featured-content">
+                                      {% if block.settings.heading != blank %}
+                                        <p class="multi-col-featured-item-title">{{ block.settings.heading }}</p>
+                                      {% endif %}
+                                      {% if block.settings.subtext != blank %}
+                                        <span class="multi-col-featured-subtext">{{ block.settings.subtext }}</span>
+                                      {% endif %}
+                                      <span class="multi-col-featured-cta">
+                                        {{ block.settings.cta_text | default: 'Shop Now' }}
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                          <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </a>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+
+                          {% comment %} Featured Products for this category {% endcomment %}
+                          {% for block in section.blocks %}
+                            {% if block.type == 'featured_product' %}
+                              {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                              {% assign block_category_handle = block.settings.category_title | handleize %}
+                              {% if block_parent_handle == link_handle and block.settings.product != blank %}
+                                {% comment %} Match either by category or by parent only (backwards compatible) {% endcomment %}
+                                {% assign show_product = false %}
+                                {% if block.settings.category_title == blank %}
+                                  {% comment %} Old blocks without category: show on all categories of this parent {% endcomment %}
+                                  {% assign show_product = true %}
+                                {% elsif block_category_handle == child_handle %}
+                                  {% assign show_product = true %}
+                                {% endif %}
+                                {% if show_product %}
+                                  {% assign feat_product = block.settings.product %}
+                                  <a href="{{ feat_product.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                    <div class="multi-col-featured-image-wrapper">
+                                      {% if feat_product.featured_image %}
+                                        <img src="{{ feat_product.featured_image | image_url: width: 200 }}"
+                                             alt="{{ feat_product.featured_image.alt | escape }}"
+                                             class="multi-col-featured-image"
+                                             loading="lazy">
+                                      {% endif %}
+                                      <div class="multi-col-featured-content">
+                                        <p class="multi-col-featured-item-title">{{ feat_product.title | truncate: 45 }}</p>
+                                        <span class="multi-col-featured-price">{{ feat_product.price | money }}</span>
+                                        <span class="multi-col-featured-cta">
+                                          Shop Now
+                                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </a>
+                                {% endif %}
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+
+                        </div>
+                      {% endfor %}
+                    </div>
+
+                  </div>
+                </div>
+              </details>
+            </li>
+
+          {% else %}
+            {% comment %} ========== SIMPLE LINK ========== {% endcomment %}
+            <li class="navmenu-item navmenu-basic__item navmenu-id-{{ link_handle }}" style="display:flex;align-items:center;padding-top:0;height:auto;">
+              <a class="navmenu-link navmenu-link-depth-1" href="{{ link.url }}">{{ link.title }}</a>
+            </li>
+          {% endif %}
+        {% endfor %}
+
+      </ul>
+    </nav>
+  </div>
+</header>
+
+<script>
+  (function() {
+    var meganavs = document.querySelectorAll('[data-meganav-multi-column]');
+    meganavs.forEach(function(meganav) {
+      var parentItem = meganav.closest('[data-navmenu-meganav-trigger]');
+      if (!parentItem) return;
+
+      var categoryLinks = meganav.querySelectorAll('[data-category-index]');
+      var submenuPanels = meganav.querySelectorAll('[data-submenu-panel]');
+      var featuredPanels = meganav.querySelectorAll('[data-featured-panel]');
+
+      categoryLinks.forEach(function(link) {
+        link.addEventListener('mouseenter', function() {
+          var index = this.dataset.categoryIndex;
+          categoryLinks.forEach(function(l) { l.classList.remove('active'); });
+          this.classList.add('active');
+          submenuPanels.forEach(function(panel) { panel.classList.remove('active'); });
+          var activePanel = meganav.querySelector('[data-submenu-panel="' + index + '"]');
+          if (activePanel) activePanel.classList.add('active');
+          featuredPanels.forEach(function(panel) { panel.classList.remove('active'); });
+          var activeFeaturedPanel = meganav.querySelector('[data-featured-panel="' + index + '"]');
+          if (activeFeaturedPanel) activeFeaturedPanel.classList.add('active');
+        });
+        link.addEventListener('click', function(e) {
+          var href = this.getAttribute('href');
+          if (href && href !== '#' && href !== '') {
+            e.preventDefault();
+            window.location.href = href;
+          }
+        });
+      });
+
+      var isOpen = false;
+      var closeTimeout = null;
+
+      function openMenu() {
+        if (closeTimeout) { clearTimeout(closeTimeout); closeTimeout = null; }
+        if (!isOpen) {
+          isOpen = true;
+          document.querySelectorAll('[data-meganav-multi-column]').forEach(function(otherMenu) {
+            if (otherMenu !== meganav) {
+              otherMenu.style.display = 'none';
+              otherMenu.style.opacity = '0';
+              otherMenu.style.visibility = 'hidden';
+            }
+          });
+          meganav.style.display = 'block';
+          meganav.style.opacity = '1';
+          meganav.style.visibility = 'visible';
+          var details = parentItem.querySelector('[data-navmenu-details]');
+          if (details) details.setAttribute('open', 'open');
+        }
+      }
+
+      function closeMenu() {
+        closeTimeout = setTimeout(function() {
+          isOpen = false;
+          meganav.style.display = 'none';
+          meganav.style.opacity = '0';
+          meganav.style.visibility = 'hidden';
+          var details = parentItem.querySelector('[data-navmenu-details]');
+          if (details) details.removeAttribute('open');
+          closeTimeout = null;
+        }, 50);
+      }
+
+      parentItem.addEventListener('mouseenter', openMenu);
+      parentItem.addEventListener('mouseleave', closeMenu);
+      meganav.addEventListener('mouseenter', openMenu);
+      meganav.addEventListener('mouseleave', closeMenu);
+
+      var parentLink = parentItem.querySelector('.navmenu-link-depth-1');
+      if (parentLink) {
+        parentLink.addEventListener('click', function(e) {
+          var href = this.getAttribute('href') || this.dataset.href;
+          if (href && href !== '#' && href !== '') {
+            e.preventDefault();
+            window.location.href = href;
+          }
+        });
+      }
+    });
+  })();
+</script>
+
+{% stylesheet %}
+  /* Base header styles */
+  .site-header {
+    position: relative;
+    background: #fff;
+    z-index: 1000;
+    border-bottom: 1px solid #eee;
+  }
+
+  .site-header[data-nav-header-sticky] {
+    position: sticky;
+    top: 0;
+  }
+
+  .site-navigation-wrapper {
+    width: 100%;
+    padding: 0 20px;
+  }
+
+  .site-navigation-wrapper.site-header--full-width {
+    max-width: 100%;
+  }
+
+  .site-navigation {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Nav menu base */
+  .navmenu {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    gap: 0;
+  }
+
+  .navmenu-item {
+    position: relative;
+  }
+
+  .navmenu-item-parent {
+    position: static;
+  }
+
+  .navmenu-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 16px 18px;
+    color: #333;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    transition: color 0.2s ease;
+    cursor: pointer;
+    background: none;
+    border: none;
+  }
+
+  .navmenu-link:hover {
+    color: #da1e37;
+  }
+
+  /* Summary element reset */
+  summary.navmenu-link {
+    list-style: none;
+  }
+
+  summary.navmenu-link::-webkit-details-marker {
+    display: none;
+  }
+
+  summary.navmenu-link::marker {
+    display: none;
+    content: '';
+  }
+
+  /* Details reset */
+  details[data-navmenu-details] {
+    position: static;
+  }
+
+  /* Chevron icon */
+  .navmenu-icon {
+    display: inline-flex;
+    align-items: center;
+    margin-left: 2px;
+  }
+
+  .navmenu-icon svg {
+    width: 8px;
+    height: 6px;
+    transition: transform 0.2s ease;
+  }
+
+  details[open] > summary .navmenu-icon svg {
+    transform: rotate(180deg);
+  }
+
+  /* Mega menu positioning */
+  .navmenu-meganav {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    width: 100%;
+    z-index: 9999;
+  }
+
+  /* ===== Multi-column Mega Menu Styles ===== */
+  .navmenu-meganav-multi-column {
+    background: #fff;
+    padding: 0;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+    position: absolute !important;
+    top: 100% !important;
+    left: 50% !important;
+    transform: translateX(-50%);
+    width: 60% !important;
+    z-index: 9999;
+  }
+
+  .multi-col-wrapper {
+    display: grid;
+    grid-template-columns: 200px 1fr 240px;
+    min-height: 350px;
+    width: 100%;
+  }
+
+  /* Left column: Categories */
+  .multi-col-categories {
+    background: #f8f8f8;
+    border-right: 1px solid #eee;
+    padding: 20px 0;
+  }
+
+  .multi-col-categories-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    padding: 0 20px 12px;
+    margin: 0;
+  }
+
+  .multi-col-category-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .multi-col-category-item {
+    position: relative;
+  }
+
+  .multi-col-category-link {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 20px;
+    color: #333;
+    text-decoration: none;
+    font-size: 14px;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    cursor: pointer;
+  }
+
+  .multi-col-category-link:hover,
+  .multi-col-category-link.active {
+    background: #fff;
+    color: #da1e37;
+  }
+
+  .multi-col-category-link.active {
+    border-right: 2px solid #da1e37;
+  }
+
+  .multi-col-category-text {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .multi-col-category-arrow {
+    width: 16px;
+    height: 16px;
+    color: #999;
+    transition: color 0.2s ease;
+  }
+
+  .multi-col-category-link:hover .multi-col-category-arrow,
+  .multi-col-category-link.active .multi-col-category-arrow {
+    color: #da1e37;
+  }
+
+  /* Middle column: Submenus */
+  .multi-col-submenus {
+    padding: 20px 30px;
+    background: #fff;
+  }
+
+  .multi-col-submenu-panel {
+    display: none;
+  }
+
+  .multi-col-submenu-panel.active {
+    display: block;
+  }
+
+  .multi-col-submenu-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px 30px;
+  }
+
+  .multi-col-submenu-link {
+    color: #555;
+    text-decoration: none;
+    font-size: 13px;
+    padding: 6px 0;
+    display: block;
+    transition: color 0.2s ease;
+  }
+
+  .multi-col-submenu-link:hover {
+    color: #da1e37;
+  }
+
+  .multi-col-submenu-link--view-all {
+    font-weight: 600;
+    color: #da1e37;
+    margin-top: 15px;
+    grid-column: 1 / -1;
+  }
+
+  /* Right column: Featured */
+  .multi-col-featured {
+    background: #fafafa;
+    border-left: 1px solid #eee;
+    padding: 20px;
+  }
+
+  .multi-col-featured-title {
+    font-size: 12px;
+    font-weight: 500;
+    color: #999;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin: 0 0 15px;
+  }
+
+  .multi-col-featured-panel {
+    display: none;
+  }
+
+  .multi-col-featured-panel.active {
+    display: block;
+  }
+
+  .multi-col-featured-item {
+    display: block;
+    text-decoration: none;
+    margin-bottom: 20px;
+  }
+
+  .multi-col-featured-item:last-child {
+    margin-bottom: 0;
+  }
+
+  .multi-col-featured-image-wrapper {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+  }
+
+  .multi-col-featured-image {
+    width: 100px;
+    height: 120px;
+    object-fit: cover;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .multi-col-featured-content {
+    flex: 1;
+  }
+
+  .multi-col-featured-item-title {
+    font-size: 14px;
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 5px;
+    line-height: 1.3;
+  }
+
+  .multi-col-featured-subtext {
+    font-size: 13px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1.4;
+  }
+
+  .multi-col-featured-price {
+    font-size: 14px;
+    font-weight: 600;
+    color: #da1e37;
+    display: block;
+    margin-bottom: 5px;
+  }
+
+  .multi-col-featured-cta {
+    font-size: 13px;
+    color: #da1e37;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  .multi-col-featured-cta svg {
+    width: 14px;
+    height: 14px;
+  }
+
+  /* Mobile: hide mega menus and show simple layout */
+  @media screen and (max-width: 1024px) {
+    .navmenu-meganav--desktop {
+      display: none !important;
+    }
+
+    .site-navigation {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+
+    .navmenu-link {
+      padding: 12px 14px;
+      font-size: 12px;
+    }
+  }
+
+  @media screen and (max-width: 749px) {
+    .navmenu {
+      flex-wrap: nowrap;
+      overflow-x: auto;
+    }
+
+    .navmenu-link {
+      padding: 10px 10px;
+      font-size: 11px;
+    }
+  }
+
+  /* Header height variable for page offset */
+  body {
+    --header-height: 0px;
+    --header-group-height: var(--header-height);
+  }
+
+  body:has(> #header-group > header) {
+    --header-height: 50px;
+  }
+
+  body:has(> #header-group:empty) {
+    --header-group-height: 0px;
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Header Navigation",
+  "tag": "section",
+  "class": "header-section",
+  "settings": [
+    {
+      "type": "link_list",
+      "id": "menu",
+      "label": "Main Menu",
+      "default": "main-menu",
+      "info": "Select the navigation menu. Manage links in Admin > Navigation."
+    }
+  ],
+  "blocks": [
+    {
+      "type": "featured_image",
+      "name": "Featured Image",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_menu_title",
+          "label": "Top-Level Menu Title",
+          "info": "Enter the exact top-level menu title (e.g. 'Solid Gold', 'By Jewellery Type', 'By Body Part')."
+        },
+        {
+          "type": "text",
+          "id": "category_title",
+          "label": "Category Title",
+          "info": "Enter the exact category title this image belongs to (e.g. 'Labrets', 'Hoops & Rings', 'Ear Piercing', 'Nose Studs')."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Featured Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Featured Collection"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtext",
+          "info": "Optional description or price text."
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional. Defaults to the category link."
+        }
+      ]
+    },
+    {
+      "type": "featured_product",
+      "name": "Featured Product",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_menu_title",
+          "label": "Top-Level Menu Title",
+          "info": "Enter the exact top-level menu title (e.g. 'Solid Gold', 'By Jewellery Type', 'By Body Part')."
+        },
+        {
+          "type": "text",
+          "id": "category_title",
+          "label": "Category Title",
+          "info": "Optional. Enter the exact category title (e.g. 'Labrets', 'Earrings'). Leave blank to show on all categories under the parent."
+        },
+        {
+          "type": "product",
+          "id": "product",
+          "label": "Product"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "Header Navigation"
+    }
+  ]
+}
+{% endschema %}

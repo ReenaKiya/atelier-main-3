@@ -15,8 +15,8 @@
         "border_color": "#eeeeee"
       }
     },
-    "header_navigation": {
-      "type": "header",
+    "header_nav": {
+      "type": "header-navigation",
       "settings": {
         "menu": "monsterheader"
       }
@@ -24,6 +24,6 @@
   },
   "order": [
     "custom_header_frtTfa",
-    "header_navigation"
+    "header_nav"
   ]
 }
