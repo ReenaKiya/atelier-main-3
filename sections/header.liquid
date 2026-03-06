@@ -82,36 +82,88 @@
                       {% endfor %}
                     </div>
 
-                    {% comment %} Right Column: Featured Products (from blocks) {% endcomment %}
+                    {% comment %} Right Column: Featured (images + products per category) {% endcomment %}
                     <div class="multi-col-featured">
                       <p class="multi-col-featured-title">Featured</p>
-                      {% for block in section.blocks %}
-                        {% if block.type == 'featured_product' %}
-                          {% assign block_menu_handle = block.settings.menu_item_title | handleize %}
-                          {% if block_menu_handle == link_handle and block.settings.product != blank %}
-                            {% assign feat_product = block.settings.product %}
-                            <a href="{{ feat_product.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
-                              <div class="multi-col-featured-image-wrapper">
-                                {% if feat_product.featured_image %}
-                                  <img src="{{ feat_product.featured_image | image_url: width: 200 }}"
-                                       alt="{{ feat_product.featured_image.alt | escape }}"
-                                       class="multi-col-featured-image"
-                                       loading="lazy">
+
+                      {% for child_link in link.links %}
+                        {% assign child_handle = child_link.title | handleize %}
+                        <div class="multi-col-featured-panel{% if forloop.first %} active{% endif %}" data-featured-panel="{{ forloop.index }}">
+
+                          {% comment %} Featured Images for this category {% endcomment %}
+                          {% for block in section.blocks %}
+                            {% if block.type == 'featured_image' %}
+                              {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                              {% assign block_category_handle = block.settings.category_title | handleize %}
+                              {% if block_parent_handle == link_handle and block_category_handle == child_handle and block.settings.image != blank %}
+                                <a href="{{ block.settings.link | default: child_link.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                  <div class="multi-col-featured-image-wrapper">
+                                    <img src="{{ block.settings.image | image_url: width: 200 }}"
+                                         alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                                         class="multi-col-featured-image"
+                                         loading="lazy">
+                                    <div class="multi-col-featured-content">
+                                      {% if block.settings.heading != blank %}
+                                        <p class="multi-col-featured-item-title">{{ block.settings.heading }}</p>
+                                      {% endif %}
+                                      {% if block.settings.subtext != blank %}
+                                        <span class="multi-col-featured-subtext">{{ block.settings.subtext }}</span>
+                                      {% endif %}
+                                      <span class="multi-col-featured-cta">
+                                        {{ block.settings.cta_text | default: 'Shop Now' }}
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                          <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </a>
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+
+                          {% comment %} Featured Products for this category {% endcomment %}
+                          {% for block in section.blocks %}
+                            {% if block.type == 'featured_product' %}
+                              {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                              {% assign block_category_handle = block.settings.category_title | handleize %}
+                              {% if block_parent_handle == link_handle and block.settings.product != blank %}
+                                {% comment %} Match either by category or by parent only (backwards compatible) {% endcomment %}
+                                {% assign show_product = false %}
+                                {% if block.settings.category_title == blank %}
+                                  {% comment %} Old blocks without category: show on all categories of this parent {% endcomment %}
+                                  {% assign show_product = true %}
+                                {% elsif block_category_handle == child_handle %}
+                                  {% assign show_product = true %}
                                 {% endif %}
-                                <div class="multi-col-featured-content">
-                                  <p class="multi-col-featured-item-title">{{ feat_product.title | truncate: 45 }}</p>
-                                  <span class="multi-col-featured-price">{{ feat_product.price | money }}</span>
-                                  <span class="multi-col-featured-cta">
-                                    Shop Now
-                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
-                                      <polyline points="9 18 15 12 9 6"></polyline>
-                                    </svg>
-                                  </span>
-                                </div>
-                              </div>
-                            </a>
-                          {% endif %}
-                        {% endif %}
+                                {% if show_product %}
+                                  {% assign feat_product = block.settings.product %}
+                                  <a href="{{ feat_product.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                    <div class="multi-col-featured-image-wrapper">
+                                      {% if feat_product.featured_image %}
+                                        <img src="{{ feat_product.featured_image | image_url: width: 200 }}"
+                                             alt="{{ feat_product.featured_image.alt | escape }}"
+                                             class="multi-col-featured-image"
+                                             loading="lazy">
+                                      {% endif %}
+                                      <div class="multi-col-featured-content">
+                                        <p class="multi-col-featured-item-title">{{ feat_product.title | truncate: 45 }}</p>
+                                        <span class="multi-col-featured-price">{{ feat_product.price | money }}</span>
+                                        <span class="multi-col-featured-cta">
+                                          Shop Now
+                                          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                            <polyline points="9 18 15 12 9 6"></polyline>
+                                          </svg>
+                                        </span>
+                                      </div>
+                                    </div>
+                                  </a>
+                                {% endif %}
+                              {% endif %}
+                            {% endif %}
+                          {% endfor %}
+
+                        </div>
                       {% endfor %}
                     </div>
 
@@ -460,7 +512,7 @@
     grid-column: 1 / -1;
   }
 
-  /* Right column: Featured products */
+  /* Right column: Featured */
   .multi-col-featured {
     background: #fafafa;
     border-left: 1px solid #eee;
@@ -474,6 +526,14 @@
     text-transform: uppercase;
     letter-spacing: 0.5px;
     margin: 0 0 15px;
+  }
+
+  .multi-col-featured-panel {
+    display: none;
+  }
+
+  .multi-col-featured-panel.active {
+    display: block;
   }
 
   .multi-col-featured-item {
@@ -510,6 +570,14 @@
     color: #333;
     margin: 0 0 5px;
     line-height: 1.3;
+  }
+
+  .multi-col-featured-subtext {
+    font-size: 13px;
+    color: #666;
+    display: block;
+    margin-bottom: 5px;
+    line-height: 1.4;
   }
 
   .multi-col-featured-price {
@@ -593,14 +661,67 @@
   ],
   "blocks": [
     {
+      "type": "featured_image",
+      "name": "Featured Image",
+      "settings": [
+        {
+          "type": "text",
+          "id": "parent_menu_title",
+          "label": "Top-Level Menu Title",
+          "info": "Enter the exact top-level menu title (e.g. 'Solid Gold', 'By Jewellery Type', 'By Body Part')."
+        },
+        {
+          "type": "text",
+          "id": "category_title",
+          "label": "Category Title",
+          "info": "Enter the exact category title this image belongs to (e.g. 'Labrets', 'Hoops & Rings', 'Ear Piercing', 'Nose Studs')."
+        },
+        {
+          "type": "image_picker",
+          "id": "image",
+          "label": "Featured Image"
+        },
+        {
+          "type": "text",
+          "id": "heading",
+          "label": "Heading",
+          "default": "Featured Collection"
+        },
+        {
+          "type": "text",
+          "id": "subtext",
+          "label": "Subtext",
+          "info": "Optional description or price text."
+        },
+        {
+          "type": "text",
+          "id": "cta_text",
+          "label": "Button Text",
+          "default": "Shop Now"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link",
+          "info": "Optional. Defaults to the category link."
+        }
+      ]
+    },
+    {
       "type": "featured_product",
       "name": "Featured Product",
       "settings": [
         {
           "type": "text",
-          "id": "menu_item_title",
-          "label": "Menu Item Title",
-          "info": "Enter the exact title of the top-level menu item this product belongs to (e.g. 'Solid Gold', 'By Jewellery Type')."
+          "id": "parent_menu_title",
+          "label": "Top-Level Menu Title",
+          "info": "Enter the exact top-level menu title (e.g. 'Solid Gold', 'By Jewellery Type', 'By Body Part')."
+        },
+        {
+          "type": "text",
+          "id": "category_title",
+          "label": "Category Title",
+          "info": "Optional. Enter the exact category title (e.g. 'Labrets', 'Earrings'). Leave blank to show on all categories under the parent."
         },
         {
           "type": "product",
