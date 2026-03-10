@@ -343,6 +343,7 @@
         "icon_xh9hH8": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/EAR.webp",
             "label": "Ear",
             "link": ""
           }
