@@ -372,6 +372,14 @@
             "link": ""
           }
         },
+        "icon_pjhkzz": {
+          "type": "icon",
+          "settings": {
+            "image": "shopify://shop_images/lip.webp",
+            "label": "Lips",
+            "link": ""
+          }
+        },
         "icon_Nb4BpX": {
           "type": "icon",
           "settings": {
@@ -394,6 +402,7 @@
         "icon_RhFfwd",
         "icon_ChDF7b",
         "icon_C3NkkB",
+        "icon_pjhkzz",
         "icon_Nb4BpX",
         "icon_MBFRHw"
       ],
