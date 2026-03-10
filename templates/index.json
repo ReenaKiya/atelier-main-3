@@ -183,6 +183,7 @@
           "type": "_slide",
           "settings": {
             "media_type_1": "image",
+            "image_1": "shopify://shop_images/Desktop_Slideshow_1.webp",
             "content_direction": "column",
             "vertical_on_mobile": true,
             "horizontal_alignment": "flex-start",
@@ -244,7 +245,7 @@
                 "text_zg9KnW": {
                   "type": "text",
                   "settings": {
-                    "text": "<h2>Bestsellers</h2>",
+                    "text": "",
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -269,7 +270,7 @@
                 "text_EzWF3j": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Discover the bestsellers that have captured the hearts of our customers with their perfect blend of functionality and style.</p>",
+                    "text": "",
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -293,8 +294,9 @@
                 },
                 "button_66iXUD": {
                   "type": "button",
+                  "disabled": true,
                   "settings": {
-                    "label": "Shop now",
+                    "label": "",
                     "link": "shopify://collections/all",
                     "button_background_color": "#000000",
                     "open_in_new_tab": false,
