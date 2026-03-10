@@ -335,6 +335,7 @@
         "icon_FNAEEC": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/eyebrow.webp",
             "label": "Eye",
             "link": ""
           }
