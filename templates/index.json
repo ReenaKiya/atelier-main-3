@@ -18,23 +18,6 @@
       "name": "As Seen In",
       "settings": {}
     },
-    "customer_favourites": {
-      "type": "featured-collection",
-      "settings": {
-        "heading": "Customer Favourites",
-        "collection": "",
-        "products_limit": 20,
-        "products_per_view": 5,
-        "show_swatches": true,
-        "swatch_option": "Color",
-        "bg_color": "#ffffff",
-        "heading_color": "#333333",
-        "title_color": "#333333",
-        "price_color": "#e53935",
-        "padding_top": 40,
-        "padding_bottom": 40
-      }
-    },
     "slideshow_PgMy3q": {
       "type": "slideshow",
       "blocks": {
@@ -341,7 +324,6 @@
   },
   "order": [
     "as_seen_in_Fd8yFr",
-    "customer_favourites",
     "slideshow_PgMy3q"
   ]
 }
