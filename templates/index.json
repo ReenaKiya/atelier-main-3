@@ -327,7 +327,8 @@
         "icon_9xFaW6": {
           "type": "icon",
           "settings": {
-            "label": "Belly",
+            "image": "shopify://shop_images/Tunge.webp",
+            "label": "Tongue",
             "link": ""
           }
         },
