@@ -383,6 +383,7 @@
         "icon_Nb4BpX": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/stretched_1.webp",
             "label": "Stretch",
             "link": ""
           }
