@@ -104,7 +104,7 @@
                 "text_gNXVzx": {
                   "type": "text",
                   "settings": {
-                    "text": "<h2>New arrivals</h2>",
+                    "text": "",
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -129,7 +129,7 @@
                 "text_hDtttY": {
                   "type": "text",
                   "settings": {
-                    "text": "<p>Introducing our latest products, made especially for the season. Shop your favorites before they're gone!</p>",
+                    "text": "",
                     "width": "fit-content",
                     "max_width": "normal",
                     "alignment": "left",
@@ -153,8 +153,9 @@
                 },
                 "button_YPYYpj": {
                   "type": "button",
+                  "disabled": true,
                   "settings": {
-                    "label": "Shop now",
+                    "label": "",
                     "link": "shopify://collections/all",
                     "button_background_color": "#000000",
                     "open_in_new_tab": false,
