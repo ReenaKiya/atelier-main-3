@@ -359,6 +359,7 @@
         "icon_ChDF7b": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/nose.webp",
             "label": "Nose",
             "link": ""
           }
