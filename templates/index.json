@@ -367,6 +367,7 @@
         "icon_C3NkkB": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/surface.webp",
             "label": "Surface",
             "link": ""
           }
