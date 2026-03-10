@@ -391,7 +391,8 @@
         "icon_MBFRHw": {
           "type": "icon",
           "settings": {
-            "label": "Lips",
+            "image": "shopify://shop_images/Belly.webp",
+            "label": "Belly",
             "link": ""
           }
         }
