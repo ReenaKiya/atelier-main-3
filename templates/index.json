@@ -320,10 +320,91 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "icon_marquee_WGNUpx": {
+      "type": "icon-marquee",
+      "blocks": {
+        "icon_9xFaW6": {
+          "type": "icon",
+          "settings": {
+            "label": "Belly",
+            "link": ""
+          }
+        },
+        "icon_FNAEEC": {
+          "type": "icon",
+          "settings": {
+            "label": "Eye",
+            "link": ""
+          }
+        },
+        "icon_xh9hH8": {
+          "type": "icon",
+          "settings": {
+            "label": "Ear",
+            "link": ""
+          }
+        },
+        "icon_RhFfwd": {
+          "type": "icon",
+          "settings": {
+            "label": "Tongue",
+            "link": ""
+          }
+        },
+        "icon_ChDF7b": {
+          "type": "icon",
+          "settings": {
+            "label": "Nose",
+            "link": ""
+          }
+        },
+        "icon_C3NkkB": {
+          "type": "icon",
+          "settings": {
+            "label": "Surface",
+            "link": ""
+          }
+        },
+        "icon_Nb4BpX": {
+          "type": "icon",
+          "settings": {
+            "label": "Stretch",
+            "link": ""
+          }
+        },
+        "icon_MBFRHw": {
+          "type": "icon",
+          "settings": {
+            "label": "Lips",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "icon_9xFaW6",
+        "icon_FNAEEC",
+        "icon_xh9hH8",
+        "icon_RhFfwd",
+        "icon_ChDF7b",
+        "icon_C3NkkB",
+        "icon_Nb4BpX",
+        "icon_MBFRHw"
+      ],
+      "name": "Icon Marquee",
+      "settings": {
+        "speed": 20,
+        "icon_size": 90,
+        "background_color": "#F5F5F5",
+        "border_color": "#c41e3a",
+        "padding_top": 20,
+        "padding_bottom": 20
+      }
     }
   },
   "order": [
     "as_seen_in_Fd8yFr",
-    "slideshow_PgMy3q"
+    "slideshow_PgMy3q",
+    "icon_marquee_WGNUpx"
   ]
 }
