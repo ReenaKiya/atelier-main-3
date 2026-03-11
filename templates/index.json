@@ -431,18 +431,18 @@
         "tab_3kjbaq": {
           "type": "tab",
           "settings": {
-            "tab_label": "Nose",
-            "collection": ""
-          }
-        },
-        "tab_XVU34n": {
-          "type": "tab",
-          "settings": {
-            "tab_label": "Lips",
+            "tab_label": "More",
             "collection": ""
           }
         },
         "tab_q8YgaA": {
+          "type": "tab",
+          "settings": {
+            "tab_label": "More",
+            "collection": ""
+          }
+        },
+        "tab_qpThEp": {
           "type": "tab",
           "settings": {
             "tab_label": "More",
@@ -453,8 +453,8 @@
       "block_order": [
         "tab_L9PpB8",
         "tab_3kjbaq",
-        "tab_XVU34n",
-        "tab_q8YgaA"
+        "tab_q8YgaA",
+        "tab_qpThEp"
       ],
       "name": "Shop by Type",
       "settings": {
