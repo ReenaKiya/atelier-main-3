@@ -525,7 +525,7 @@
       "name": "Customer Favourites",
       "settings": {
         "heading": "Customer Favourites",
-        "collection": "amour",
+        "collection": "customer-favourites",
         "products_limit": 20,
         "products_per_view": 5,
         "show_swatches": true,
