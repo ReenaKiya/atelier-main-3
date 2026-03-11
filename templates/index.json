@@ -446,12 +446,86 @@
         "heading": "Shop by Type",
         "bg_color": "#fce4ec"
       }
+    },
+    "trust_icons_mhBL7W": {
+      "type": "trust-icons",
+      "blocks": {
+        "badge_iWEkfL": {
+          "type": "badge",
+          "settings": {
+            "icon": "truck",
+            "icon_size": 44,
+            "text": "Free shipping",
+            "link": ""
+          }
+        },
+        "badge_t7AqnV": {
+          "type": "badge",
+          "settings": {
+            "icon": "bottle",
+            "icon_size": 44,
+            "text": "Piercing Aftercare",
+            "link": ""
+          }
+        },
+        "badge_gLMrCf": {
+          "type": "badge",
+          "settings": {
+            "icon": "return",
+            "icon_size": 44,
+            "text": "30-days returns",
+            "link": ""
+          }
+        },
+        "badge_qkUgFa": {
+          "type": "badge",
+          "settings": {
+            "icon": "star",
+            "icon_size": 44,
+            "text": "4.8/5 Reviews",
+            "link": ""
+          }
+        },
+        "badge_dNM68B": {
+          "type": "badge",
+          "settings": {
+            "icon": "check_box",
+            "icon_size": 44,
+            "text": "Premium Quality",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "badge_iWEkfL",
+        "badge_t7AqnV",
+        "badge_gLMrCf",
+        "badge_qkUgFa",
+        "badge_dNM68B"
+      ],
+      "name": "Trust icons",
+      "settings": {
+        "color_scheme": "scheme-2",
+        "section_width": "page-width",
+        "icon_color": "#b6465a",
+        "text_size": 16,
+        "icon_margin_bottom": 10,
+        "gap": 48,
+        "show_top_border": false,
+        "show_bottom_border": false,
+        "border_color": "#00000014",
+        "padding-block-start": 24,
+        "padding-block-end": 24,
+        "padding-inline-start": 0,
+        "padding-inline-end": 0
+      }
     }
   },
   "order": [
     "as_seen_in_Fd8yFr",
     "slideshow_PgMy3q",
     "icon_marquee_WGNUpx",
-    "shop_by_type_afLXVP"
+    "shop_by_type_afLXVP",
+    "trust_icons_mhBL7W"
   ]
 }
