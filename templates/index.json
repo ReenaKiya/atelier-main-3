@@ -519,6 +519,24 @@
         "padding-inline-start": 0,
         "padding-inline-end": 0
       }
+    },
+    "featured_collection_wwdfbm": {
+      "type": "featured-collection",
+      "name": "Customer Favourites",
+      "settings": {
+        "heading": "Customer Favourites",
+        "collection": "",
+        "products_limit": 20,
+        "products_per_view": 5,
+        "show_swatches": true,
+        "swatch_option": "Color",
+        "bg_color": "#ffffff",
+        "heading_color": "#333333",
+        "title_color": "#333333",
+        "price_color": "#e53935",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
     }
   },
   "order": [
@@ -526,6 +544,7 @@
     "slideshow_PgMy3q",
     "icon_marquee_WGNUpx",
     "shop_by_type_afLXVP",
-    "trust_icons_mhBL7W"
+    "trust_icons_mhBL7W",
+    "featured_collection_wwdfbm"
   ]
 }
