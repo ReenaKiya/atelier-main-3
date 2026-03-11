@@ -434,27 +434,11 @@
             "tab_label": "More",
             "collection": ""
           }
-        },
-        "tab_q8YgaA": {
-          "type": "tab",
-          "settings": {
-            "tab_label": "More",
-            "collection": ""
-          }
-        },
-        "tab_qpThEp": {
-          "type": "tab",
-          "settings": {
-            "tab_label": "More",
-            "collection": ""
-          }
         }
       },
       "block_order": [
         "tab_L9PpB8",
-        "tab_3kjbaq",
-        "tab_q8YgaA",
-        "tab_qpThEp"
+        "tab_3kjbaq"
       ],
       "name": "Shop by Type",
       "settings": {
