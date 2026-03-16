@@ -67,15 +67,6 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "judge_me_reviews_review_widget_yHtrYi": {
-              "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
-              "settings": {
-                "review_data": "sample_data",
-                "max_width": 1200,
-                "show_shop_reviews": false,
-                "empty_state": "empty_widget"
-              }
-            },
             "review_hddTi3": {
               "type": "review",
               "name": "t:names.product_review_stars",
@@ -374,7 +365,6 @@
             }
           },
           "block_order": [
-            "judge_me_reviews_review_widget_yHtrYi",
             "review_hddTi3",
             "text_idAt7H",
             "price_PHGQkM",
@@ -900,10 +890,20 @@
         "essential_upsell_product_addon_app_block_Hhqhgn": {
           "type": "shopify://apps/essential-upsell/blocks/product-addon-app-block/50627fd9-24fd-4250-8614-accc12826d80",
           "settings": {}
+        },
+        "judge_me_reviews_review_widget_HLL7Un": {
+          "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+          "settings": {
+            "review_data": "sample_data",
+            "max_width": 1200,
+            "show_shop_reviews": false,
+            "empty_state": "empty_widget"
+          }
         }
       },
       "block_order": [
-        "essential_upsell_product_addon_app_block_Hhqhgn"
+        "essential_upsell_product_addon_app_block_Hhqhgn",
+        "judge_me_reviews_review_widget_HLL7Un"
       ],
       "settings": {
         "content_direction": "column",
