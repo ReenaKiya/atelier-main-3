@@ -41,11 +41,40 @@ export class MediaGallery extends Component {
     const source = event.detail.data.html;
 
     if (!source) return;
-    const newMediaGallery = source.querySelector('media-gallery');
+    const newMediaGallery = /** @type {HTMLElement|null} */ (source.querySelector('media-gallery'));
 
     if (!newMediaGallery) return;
 
-    this.replaceWith(newMediaGallery);
+    // Fade out current gallery
+    this.style.transition = 'opacity 0.2s ease-out';
+    this.style.opacity = '0';
+
+    const onFadeOutDone = () => {
+      // Hide scroll-snap sliding by making new gallery invisible initially
+      newMediaGallery.style.opacity = '0';
+      this.replaceWith(newMediaGallery);
+
+      // Force a reflow so the browser registers opacity:0 before transitioning to 1
+      void newMediaGallery.offsetHeight;
+
+      // Fade in the new gallery
+      newMediaGallery.style.transition = 'opacity 0.35s ease-in';
+      newMediaGallery.style.opacity = '1';
+
+      const onFadeInDone = () => {
+        newMediaGallery.style.removeProperty('transition');
+        newMediaGallery.style.removeProperty('opacity');
+        newMediaGallery.removeEventListener('transitionend', onFadeInDone);
+      };
+      newMediaGallery.addEventListener('transitionend', onFadeInDone, { once: true });
+
+      // Safety cleanup in case transitionend doesn't fire
+      setTimeout(onFadeInDone, 400);
+    };
+
+    this.addEventListener('transitionend', onFadeOutDone, { once: true });
+    // Safety fallback in case transitionend doesn't fire
+    setTimeout(onFadeOutDone, 250);
   };
 
   /**
