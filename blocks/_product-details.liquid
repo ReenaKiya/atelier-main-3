@@ -23,31 +23,7 @@
       </a>
     </div>
 
-    {% assign rating = product.metafields.custom.star_rating.value | default: 0 %}
-{% assign full_stars = rating | floor %}
-{% assign half_star = rating | minus: full_stars %}
-{% assign empty_stars = 5 | minus: full_stars %}
-
-{% if rating > 0 %}
-<div class="product-rating">
-
-  {% for i in (1..full_stars) %}
-    <span class="star filled">★</span>
-  {% endfor %}
-
-  {% if half_star >= 0.5 %}
-    <span class="star half">☆</span>
-    {% assign empty_stars = empty_stars | minus: 1 %}
-  {% endif %}
-
-  {% for i in (1..empty_stars) %}
-    <span class="star">☆</span>
-  {% endfor %}
-
-  <span class="rating-value">{{ rating }}</span>
-
-</div>
-{% endif %}
+    
 
   {% if product.metafields.custom.number_of_days_for_delivery != blank %}
     <div class="delivery-date" style="margin: 15px 0;">
@@ -96,7 +72,7 @@ document.getElementById('toDate').innerHTML = toDate.toString('dddd MMMM dS');
   }
 
   .view-product-title {
-    display: block;
+    display: none;
   }
 
   /* Container styles */
@@ -122,28 +98,7 @@ document.getElementById('toDate').innerHTML = toDate.toString('dddd MMMM dS');
     }
   }
 
-  /* review rating star */
-  .product-rating{
-  display:flex;
-  align-items:center;
-  gap:4px;
-  margin-top:6px;
-}
-
-.star{
-  font-size:18px;
-  color:#ccc;
-}
-
-.star.filled{
-  color:#f5a623;
-}
-
-.rating-value{
-  margin-left:6px;
-  font-size:14px;
-  font-weight:500;
-}
+ 
 {% endstylesheet %}
 
 {% schema %}
