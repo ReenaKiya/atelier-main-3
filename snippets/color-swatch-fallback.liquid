@@ -1,0 +1,119 @@
+{%- doc -%}
+  Renders a color swatch circle based on color name when Shopify native swatches are not configured.
+
+  @param {string} color_name - The color option value name (e.g., "Plain", "Gold", "Black")
+  @param {boolean} is_checked - Whether this swatch is currently selected
+  @param {string} input_name - The radio input name attribute
+  @param {string} input_value - The radio input value
+  @param {number} option_position - The option position
+  @param {number} option_index - The option index in loop
+  @param {string} option_value_id - The option value ID
+  @param {boolean} is_available - Whether the variant is available
+  @param {string} variant_id - The variant ID
+  @param {string} connected_product_url - Connected product URL for combined listings
+{%- enddoc -%}
+
+{%- liquid
+  assign color_lower = color_name | downcase | strip
+  assign swatch_bg = ''
+  assign swatch_border = '1px solid #ddd'
+
+  case color_lower
+    when 'plain' or 'silver' or 'platinum'
+      assign swatch_bg = '#C0C0C0'
+    when 'gold' or 'golden'
+      assign swatch_bg = '#FFD700'
+    when 'rose gold' or 'rosegold' or 'rose-gold'
+      assign swatch_bg = '#E8A090'
+    when 'rainbow' or 'multicolor' or 'multi' or 'multicolour'
+      assign swatch_bg = 'conic-gradient(red, yellow, lime, aqua, blue, magenta, red)'
+    when 'black'
+      assign swatch_bg = '#000000'
+    when 'white'
+      assign swatch_bg = '#FFFFFF'
+      assign swatch_border = '1px solid #ccc'
+    when 'red'
+      assign swatch_bg = '#FF0000'
+    when 'blue'
+      assign swatch_bg = '#0000FF'
+    when 'green'
+      assign swatch_bg = '#008000'
+    when 'pink'
+      assign swatch_bg = '#FFC0CB'
+    when 'purple'
+      assign swatch_bg = '#800080'
+    when 'orange'
+      assign swatch_bg = '#FFA500'
+    when 'yellow'
+      assign swatch_bg = '#FFFF00'
+      assign swatch_border = '1px solid #ccc'
+    when 'brown'
+      assign swatch_bg = '#8B4513'
+    when 'navy'
+      assign swatch_bg = '#000080'
+    when 'grey' or 'gray'
+      assign swatch_bg = '#808080'
+    when 'beige' or 'cream'
+      assign swatch_bg = '#F5F5DC'
+      assign swatch_border = '1px solid #ccc'
+    when 'burgundy' or 'maroon'
+      assign swatch_bg = '#800020'
+    when 'teal'
+      assign swatch_bg = '#008080'
+    when 'coral'
+      assign swatch_bg = '#FF7F50'
+    when 'ivory'
+      assign swatch_bg = '#FFFFF0'
+      assign swatch_border = '1px solid #ccc'
+    when 'lavender'
+      assign swatch_bg = '#E6E6FA'
+      assign swatch_border = '1px solid #ccc'
+    when 'mint'
+      assign swatch_bg = '#98FF98'
+      assign swatch_border = '1px solid #ccc'
+    when 'olive'
+      assign swatch_bg = '#808000'
+    when 'tan'
+      assign swatch_bg = '#D2B48C'
+    when 'turquoise'
+      assign swatch_bg = '#40E0D0'
+    when 'copper'
+      assign swatch_bg = '#B87333'
+    when 'bronze'
+      assign swatch_bg = '#CD7F32'
+    when 'champagne'
+      assign swatch_bg = '#F7E7CE'
+      assign swatch_border = '1px solid #ccc'
+    when 'charcoal'
+      assign swatch_bg = '#36454F'
+    when 'steel' or 'steel blue'
+      assign swatch_bg = '#4682B4'
+    when 'titanium'
+      assign swatch_bg = '#878681'
+    when 'clear'
+      assign swatch_bg = 'linear-gradient(135deg, #fff 40%, #e0e0e0 60%)'
+      assign swatch_border = '1px solid #ccc'
+    else
+      assign swatch_bg = '#CCCCCC'
+  endcase
+-%}
+
+<label class="color-swatch-label" title="{{ color_name }}">
+  <input
+    type="radio"
+    name="{{ input_name }}"
+    value="{{ input_value | escape }}"
+    aria-label="{{ color_name }}"
+    {% if is_available == false %}aria-disabled="true"{% endif %}
+    data-input-id="{{ option_position }}-{{ option_index }}"
+    data-option-value-id="{{ option_value_id }}"
+    data-option-available="{{ is_available }}"
+    data-connected-product-url="{{ connected_product_url }}"
+    {% if variant_id %}data-variant-id="{{ variant_id }}"{% endif %}
+    {% if is_checked %}checked{% endif %}
+  >
+  <span
+    class="color-swatch-circle"
+    style="background: {{ swatch_bg }}; border: {{ swatch_border }};"
+  ></span>
+</label>
