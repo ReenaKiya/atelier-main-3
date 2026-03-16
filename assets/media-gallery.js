@@ -41,11 +41,32 @@ export class MediaGallery extends Component {
     const source = event.detail.data.html;
 
     if (!source) return;
-    const newMediaGallery = source.querySelector('media-gallery');
+    const newMediaGallery = /** @type {HTMLElement|null} */ (source.querySelector('media-gallery'));
 
     if (!newMediaGallery) return;
 
-    this.replaceWith(newMediaGallery);
+    // Fade out current gallery, then replace with new one fading in
+    this.style.transition = 'opacity 0.25s ease, transform 0.25s ease';
+    this.style.opacity = '0';
+    this.style.transform = 'scale(0.95)';
+
+    setTimeout(() => {
+      newMediaGallery.style.opacity = '0';
+      newMediaGallery.style.transform = 'scale(0.95)';
+      newMediaGallery.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+      this.replaceWith(newMediaGallery);
+
+      requestAnimationFrame(() => {
+        newMediaGallery.style.opacity = '1';
+        newMediaGallery.style.transform = 'scale(1)';
+        // Clean up inline styles after animation
+        setTimeout(() => {
+          newMediaGallery.style.removeProperty('transition');
+          newMediaGallery.style.removeProperty('opacity');
+          newMediaGallery.style.removeProperty('transform');
+        }, 300);
+      });
+    }, 250);
   };
 
   /**
