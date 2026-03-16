@@ -23,6 +23,21 @@
       </a>
     </div>
 
+    {% assign rating = product.metafields.custom.star_rating.value %}
+
+{% if rating %}
+<div class="product-rating">
+  {% for i in (1..5) %}
+    {% if i <= rating %}
+      <span class="star filled">★</span>
+    {% else %}
+      <span class="star">☆</span>
+    {% endif %}
+  {% endfor %}
+  <span class="rating-value">{{ rating }}</span>
+</div>
+{% endif %}
+
   {% if product.metafields.custom.number_of_days_for_delivery != blank %}
     <div class="delivery-date" style="margin: 15px 0;">
       <p style="display: inline;"><b>Estimated Delivery Date:</b></p>
