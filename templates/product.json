@@ -67,6 +67,15 @@
             "padding-inline-end": 0
           },
           "blocks": {
+            "judge_me_reviews_review_widget_apLb8J": {
+              "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
+              "settings": {
+                "review_data": "sample_data",
+                "max_width": 1200,
+                "show_shop_reviews": true,
+                "empty_state": "empty_widget"
+              }
+            },
             "review_hddTi3": {
               "type": "review",
               "name": "t:names.product_review_stars",
@@ -365,6 +374,7 @@
             }
           },
           "block_order": [
+            "judge_me_reviews_review_widget_apLb8J",
             "review_hddTi3",
             "text_idAt7H",
             "price_PHGQkM",
@@ -578,7 +588,10 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": ["text_CayfE3", "price_ahRCgD"]
+                  "block_order": [
+                    "text_CayfE3",
+                    "price_ahRCgD"
+                  ]
                 },
                 "group_PihxwT": {
                   "type": "_product-card-group",
@@ -633,16 +646,26 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": ["swatches_EdNBpW"]
+                  "block_order": [
+                    "swatches_EdNBpW"
+                  ]
                 }
               },
-              "block_order": ["group_tEHPmM", "group_PihxwT"]
+              "block_order": [
+                "group_tEHPmM",
+                "group_PihxwT"
+              ]
             }
           },
-          "block_order": ["product_card_gallery_YYPH6q", "group_396y6r"]
+          "block_order": [
+            "product_card_gallery_YYPH6q",
+            "group_396y6r"
+          ]
         }
       },
-      "block_order": ["text_GbxcYC"],
+      "block_order": [
+        "text_GbxcYC"
+      ],
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
@@ -830,7 +853,9 @@
           "blocks": {}
         }
       },
-      "block_order": ["payment_icons_pmydfC"],
+      "block_order": [
+        "payment_icons_pmydfC"
+      ],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -867,7 +892,9 @@
           "settings": {}
         }
       },
-      "block_order": ["essential_upsell_product_addon_app_block_Hhqhgn"],
+      "block_order": [
+        "essential_upsell_product_addon_app_block_Hhqhgn"
+      ],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -965,7 +992,9 @@
               "blocks": {}
             }
           },
-          "block_order": ["text_WMgFEh"]
+          "block_order": [
+            "text_WMgFEh"
+          ]
         },
         "static-collection-card": {
           "type": "_collection-card",
@@ -1027,13 +1056,20 @@
               "blocks": {}
             }
           },
-          "block_order": ["collection_title_Q6KrTf"]
+          "block_order": [
+            "collection_title_Q6KrTf"
+          ]
         }
       },
-      "block_order": ["group_W4NQTi"],
+      "block_order": [
+        "group_W4NQTi"
+      ],
       "name": "t:names.collections_grid",
       "settings": {
-        "collection_list": ["baby-cloths", "frontpage"],
+        "collection_list": [
+          "baby-cloths",
+          "frontpage"
+        ],
         "layout_type": "grid",
         "carousel_on_mobile": false,
         "columns": 3,
