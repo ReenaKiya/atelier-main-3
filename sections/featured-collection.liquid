@@ -62,6 +62,7 @@
                         {% endfor %}
                       </div>
 
+
                       {%- comment -%} Product Image {%- endcomment -%}
                       {% if product.featured_image != blank %}
                         <img
@@ -92,7 +93,6 @@
 
                   {%- comment -%} Color Swatches {%- endcomment -%}
                   {% if show_swatches %}
-                    {% assign swatch_values = '' %}
                     {% assign swatch_count = 0 %}
                     {% for option in product.options_with_values %}
                       {% assign option_name_lower = option.name | downcase %}
@@ -135,6 +135,35 @@
                       {% endif %}
                     </div>
                   </a>
+
+                  {%- comment -%} Star Reviews {%- endcomment -%}
+                  {%- assign cf_rating = product.metafields.reviews.rating.value.rating -%}
+                  {%- assign cf_rating_count = product.metafields.reviews.rating_count -%}
+                  {% if cf_rating_count > 0 %}
+                    {%- assign cf_filled = cf_rating | floor -%}
+                    {%- assign cf_decimal = cf_rating | modulo: 1 -%}
+                    {%- assign cf_half = false -%}
+                    {%- if cf_decimal >= 0.3 and cf_decimal <= 0.7 -%}
+                      {%- assign cf_half = true -%}
+                      {%- assign cf_filled = cf_filled | plus: 1 -%}
+                    {%- elsif cf_decimal > 0.7 -%}
+                      {%- assign cf_filled = cf_filled | plus: 1 -%}
+                    {%- endif -%}
+                    <div class="cf-card__stars">
+                      {% for i in (1..5) %}
+                        <svg class="cf-star {% if i <= cf_filled %}cf-star--filled{% endif %}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                          <path d="M31.547 12a.848.848 0 00-.677-.577l-9.427-1.376-4.224-8.532a.847.847 0 00-1.516 0l-4.218 8.534-9.427 1.355a.847.847 0 00-.467 1.467l6.823 6.664-1.612 9.375a.847.847 0 001.23.893l8.428-4.434 8.432 4.432a.847.847 0 001.229-.894l-1.615-9.373 6.822-6.665a.845.845 0 00.214-.869z"/>
+                        </svg>
+                      {% endfor %}
+                      <span class="cf-review-count">{{ cf_rating_count }} Reviews</span>
+                    </div>
+                  {% endif %}
+
+                  {%- comment -%} Hover Action Buttons {%- endcomment -%}
+                  <div class="cf-card__actions">
+                    <a href="{{ product.url }}" class="cf-card__btn cf-card__btn--quickshop">Quick Shop</a>
+                    <a href="{{ product.url }}" class="cf-card__btn cf-card__btn--options">Choose Options</a>
+                  </div>
                 </div>
               </div>
             {% endfor %}
@@ -274,12 +303,59 @@
   opacity: 0;
 }
 
-.cf-card__link:hover .cf-card__image--primary {
+.cf-slide:hover .cf-card__image--primary {
   opacity: 0;
 }
 
-.cf-card__link:hover .cf-card__image--hover {
+.cf-slide:hover .cf-card__image--hover {
   opacity: 1;
+}
+
+/* Hover Action Buttons */
+.cf-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.cf-slide:hover .cf-card__actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cf-card__btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 8px 12px;
+  border-radius: 3px;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.cf-card__btn:hover {
+  opacity: 0.88;
+}
+
+.cf-card__btn--quickshop {
+  background: #fff;
+  color: #DA1E37;
+  border: 1.5px solid #DA1E37;
+}
+
+.cf-card__btn--options {
+  background: #111;
+  color: #fff;
+  border: 1.5px solid #111;
 }
 
 /* Badges */
@@ -418,6 +494,33 @@
   color: #999;
   text-decoration: line-through;
   margin-left: 6px;
+}
+
+/* Star Reviews */
+.cf-card__stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 5px;
+  flex-wrap: nowrap;
+}
+
+.cf-star {
+  width: 13px;
+  height: 13px;
+  fill: #e0e0e0;
+  flex-shrink: 0;
+}
+
+.cf-star--filled {
+  fill: #DA1E37;
+}
+
+.cf-review-count {
+  font-size: 11px;
+  color: #888;
+  margin-left: 4px;
+  white-space: nowrap;
 }
 
 /* Responsive */
