@@ -45,25 +45,30 @@ export class MediaGallery extends Component {
 
     if (!newMediaGallery) return;
 
-    // Fade out current gallery
-    this.style.transition = 'opacity 0.2s ease-out';
+    // Scale down and fade out current gallery (recede into back)
+    this.style.transition = 'opacity 0.2s ease-out, transform 0.2s ease-out';
     this.style.opacity = '0';
+    this.style.transform = 'scale(0.92)';
 
     const onFadeOutDone = () => {
-      // Hide scroll-snap sliding by making new gallery invisible initially
+      // Set new gallery behind (scaled down) and invisible initially
       newMediaGallery.style.opacity = '0';
+      newMediaGallery.style.transform = 'scale(0.92)';
+      newMediaGallery.style.transition = 'none';
       this.replaceWith(newMediaGallery);
 
-      // Force a reflow so the browser registers opacity:0 before transitioning to 1
+      // Force a reflow so the browser registers the initial state before transitioning
       void newMediaGallery.offsetHeight;
 
-      // Fade in the new gallery
-      newMediaGallery.style.transition = 'opacity 0.35s ease-in';
+      // Scale up and fade in the new gallery (come from back to front)
+      newMediaGallery.style.transition = 'opacity 0.35s ease-in, transform 0.35s ease-in';
       newMediaGallery.style.opacity = '1';
+      newMediaGallery.style.transform = 'scale(1)';
 
       const onFadeInDone = () => {
         newMediaGallery.style.removeProperty('transition');
         newMediaGallery.style.removeProperty('opacity');
+        newMediaGallery.style.removeProperty('transform');
         newMediaGallery.removeEventListener('transitionend', onFadeInDone);
       };
       newMediaGallery.addEventListener('transitionend', onFadeInDone, { once: true });
