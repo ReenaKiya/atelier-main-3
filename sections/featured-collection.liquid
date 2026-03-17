@@ -46,20 +46,36 @@
                   <a href="{{ product.url }}" class="cf-card__link">
                     <div class="cf-card__image-wrap">
                       {%- comment -%} Badges {%- endcomment -%}
+                      {%- assign badge_title = product.title | downcase -%}
+                      {%- assign badge_type = product.type | downcase -%}
+                      {%- assign show_14k = false -%}
+                      {%- assign show_9k = false -%}
+                      {%- assign show_18k = false -%}
+                      {%- assign show_925 = false -%}
+                      {%- assign show_bestseller = false -%}
+
+                      {%- comment -%} Check tags first {%- endcomment -%}
+                      {%- for tag in product.tags -%}
+                        {%- assign tl = tag | downcase -%}
+                        {%- if tl == '14k' or tl == '14k gold' -%}{%- assign show_14k = true -%}{%- endif -%}
+                        {%- if tl == '9k' or tl == '9k gold' -%}{%- assign show_9k = true -%}{%- endif -%}
+                        {%- if tl == '18k' or tl == '18k gold' -%}{%- assign show_18k = true -%}{%- endif -%}
+                        {%- if tl == '925' or tl == '925 sterling' or tl == 'sterling silver' -%}{%- assign show_925 = true -%}{%- endif -%}
+                        {%- if tl == 'best seller' or tl == 'best-seller' or tl == 'bestseller' -%}{%- assign show_bestseller = true -%}{%- endif -%}
+                      {%- endfor -%}
+
+                      {%- comment -%} Fallback: check product title {%- endcomment -%}
+                      {%- if badge_title contains '14k' -%}{%- assign show_14k = true -%}{%- endif -%}
+                      {%- if badge_title contains '9k' -%}{%- assign show_9k = true -%}{%- endif -%}
+                      {%- if badge_title contains '18k' -%}{%- assign show_18k = true -%}{%- endif -%}
+                      {%- if badge_title contains '925' or badge_title contains 'sterling' -%}{%- assign show_925 = true -%}{%- endif -%}
+
                       <div class="cf-card__badges">
-                        {% for tag in product.tags %}
-                          {% assign tag_lower = tag | downcase %}
-                          {% if tag_lower == '14k' %}
-                            <span class="cf-badge cf-badge--gold">14K</span>
-                          {% elsif tag_lower == '9k' %}
-                            <span class="cf-badge cf-badge--gold">9K</span>
-                          {% elsif tag_lower == '18k' %}
-                            <span class="cf-badge cf-badge--gold">18K</span>
-                          {% endif %}
-                          {% if tag_lower == 'best seller' or tag_lower == 'best-seller' or tag_lower == 'bestseller' %}
-                            <span class="cf-badge cf-badge--bestseller">BEST SELLER</span>
-                          {% endif %}
-                        {% endfor %}
+                        {%- if show_14k -%}<span class="cf-badge cf-badge--gold">14K</span>{%- endif -%}
+                        {%- if show_9k -%}<span class="cf-badge cf-badge--gold">9K</span>{%- endif -%}
+                        {%- if show_18k -%}<span class="cf-badge cf-badge--gold">18K</span>{%- endif -%}
+                        {%- if show_925 -%}<span class="cf-badge cf-badge--silver">925</span>{%- endif -%}
+                        {%- if show_bestseller -%}<span class="cf-badge cf-badge--bestseller">BEST SELLER</span>{%- endif -%}
                       </div>
 
 
@@ -383,6 +399,11 @@
 
 .cf-badge--gold {
   background: #d4af37;
+  color: #fff;
+}
+
+.cf-badge--silver {
+  background: #888;
   color: #fff;
 }
 
