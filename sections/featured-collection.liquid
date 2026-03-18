@@ -337,11 +337,11 @@
   opacity: 0;
 }
 
-.cf-slide:hover .cf-card__image--primary {
+.cf-card__image-wrap:hover .cf-card__image--primary {
   opacity: 0;
 }
 
-.cf-slide:hover .cf-card__image--hover {
+.cf-card__image-wrap:hover .cf-card__image--hover {
   opacity: 1;
 }
 
@@ -357,7 +357,8 @@
   pointer-events: none;
 }
 
-.cf-slide:hover .cf-card__actions {
+.cf-slide:hover .cf-card__actions,
+.cf-card:hover .cf-card__actions {
   opacity: 1;
   transform: translateY(0);
   pointer-events: auto;
