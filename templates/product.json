@@ -923,6 +923,15 @@
         "padding-block-end": 0
       }
     },
+    "frequently_bought_together": {
+      "type": "frequently-bought-together",
+      "settings": {
+        "heading": "Frequently Bought Together",
+        "product_1": null,
+        "product_2": null,
+        "product_3": null
+      }
+    },
     "collection_list_Ec6EQn": {
       "type": "collection-list",
       "blocks": {
@@ -1091,6 +1100,7 @@
   },
   "order": [
     "main",
+    "frequently_bought_together",
     "product_recommendations_qnzPkn",
     "17655238379a0febe2",
     "1765524498d58a01f3",
