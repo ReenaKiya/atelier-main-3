@@ -345,12 +345,12 @@
   opacity: 1;
 }
 
-/* When hovering a swatch, kill the image-wrap hover effect */
-.cf-card:has(.cf-swatch:hover) .cf-card__image-wrap:hover .cf-card__image--primary {
+/* When hovering a swatch, cancel the card hover flip so JS swatch preview works */
+.cf-card:has(.cf-swatch:hover) .cf-card__image--primary {
   opacity: 1;
 }
 
-.cf-card:has(.cf-swatch:hover) .cf-card__image-wrap:hover .cf-card__image--hover {
+.cf-card:has(.cf-swatch:hover) .cf-card__image--hover {
   opacity: 0;
 }
 
