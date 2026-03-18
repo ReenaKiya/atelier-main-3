@@ -612,128 +612,121 @@
 </style>
 
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-  var section = document.querySelector('.cf-section[data-section-id="{{ section.id }}"]');
-  if (!section) return;
+(function () {
+  var sectionId = "{{ section.id }}";
 
-  var slider = section.querySelector(".cf-slider");
-  if (!slider) return;
+  function initSection() {
+    var section = document.querySelector('.cf-section[data-section-id="' + sectionId + '"]');
+    if (!section) return;
 
-  var track = slider.querySelector(".cf-track");
-  var slides = track.querySelectorAll(".cf-slide");
-  var prevBtn = section.querySelector(".cf-nav--prev");
-  var nextBtn = section.querySelector(".cf-nav--next");
-  var perView = parseInt(slider.dataset.perView) || 5;
-  var currentIndex = 0;
+    var slider = section.querySelector(".cf-slider");
+    if (!slider) return;
 
-  /* Touch / drag support */
-  var startX = 0;
-  var isDragging = false;
+    var track = slider.querySelector(".cf-track");
+    var slides = track.querySelectorAll(".cf-slide");
+    var prevBtn = section.querySelector(".cf-nav--prev");
+    var nextBtn = section.querySelector(".cf-nav--next");
+    var perView = parseInt(slider.dataset.perView) || 5;
+    var currentIndex = 0;
+    var startX = 0;
+    var isDragging = false;
 
-  function getPerView() {
-    if (window.innerWidth <= 600) return 2;
-    if (window.innerWidth <= 999) return 3;
-    return perView;
-  }
-
-  function getMaxIndex() {
-    return Math.max(0, slides.length - getPerView());
-  }
-
-  function updateSlider() {
-    var pv = getPerView();
-    var slideWidth = 100 / pv;
-    slides.forEach(function (s) {
-      s.style.flex = "0 0 " + slideWidth + "%";
-      s.style.maxWidth = slideWidth + "%";
-    });
-    track.style.transform = "translateX(-" + (currentIndex * slideWidth) + "%)";
-
-    if (prevBtn) prevBtn.style.visibility = currentIndex <= 0 ? "hidden" : "visible";
-    if (nextBtn) nextBtn.style.visibility = currentIndex >= getMaxIndex() ? "hidden" : "visible";
-  }
-
-  if (prevBtn) {
-    prevBtn.addEventListener("click", function () {
-      if (currentIndex > 0) {
-        currentIndex--;
-        updateSlider();
-      }
-    });
-  }
-
-  if (nextBtn) {
-    nextBtn.addEventListener("click", function () {
-      if (currentIndex < getMaxIndex()) {
-        currentIndex++;
-        updateSlider();
-      }
-    });
-  }
-
-  /* Touch events */
-  slider.addEventListener("touchstart", function (e) {
-    startX = e.touches[0].clientX;
-    isDragging = true;
-  }, { passive: true });
-
-  slider.addEventListener("touchend", function (e) {
-    if (!isDragging) return;
-    isDragging = false;
-    var diff = startX - e.changedTouches[0].clientX;
-    if (Math.abs(diff) > 40) {
-      if (diff > 0 && currentIndex < getMaxIndex()) {
-        currentIndex++;
-      } else if (diff < 0 && currentIndex > 0) {
-        currentIndex--;
-      }
-      updateSlider();
+    function getPerView() {
+      if (window.innerWidth <= 600) return 2;
+      if (window.innerWidth <= 999) return 3;
+      return perView;
     }
-  }, { passive: true });
 
-  updateSlider();
+    function getMaxIndex() {
+      return Math.max(0, slides.length - getPerView());
+    }
 
-  var resizeTimer;
-  window.addEventListener("resize", function () {
-    clearTimeout(resizeTimer);
-    resizeTimer = setTimeout(function () {
-      if (currentIndex > getMaxIndex()) currentIndex = getMaxIndex();
-      updateSlider();
-    }, 150);
-  });
+    function updateSlider() {
+      var pv = getPerView();
+      var slideWidth = 100 / pv;
+      slides.forEach(function (s) {
+        s.style.flex = "0 0 " + slideWidth + "%";
+        s.style.maxWidth = slideWidth + "%";
+      });
+      track.style.transform = "translateX(-" + (currentIndex * slideWidth) + "%)";
+      if (prevBtn) prevBtn.style.visibility = currentIndex <= 0 ? "hidden" : "visible";
+      if (nextBtn) nextBtn.style.visibility = currentIndex >= getMaxIndex() ? "hidden" : "visible";
+    }
 
-  /* Swatch image swap */
-  section.querySelectorAll(".cf-swatch").forEach(function (swatch) {
-    swatch.addEventListener("click", function (e) {
+    if (prevBtn) {
+      prevBtn.addEventListener("click", function () {
+        if (currentIndex > 0) { currentIndex--; updateSlider(); }
+      });
+    }
+    if (nextBtn) {
+      nextBtn.addEventListener("click", function () {
+        if (currentIndex < getMaxIndex()) { currentIndex++; updateSlider(); }
+      });
+    }
+
+    slider.addEventListener("touchstart", function (e) {
+      startX = e.touches[0].clientX;
+      isDragging = true;
+    }, { passive: true });
+
+    slider.addEventListener("touchend", function (e) {
+      if (!isDragging) return;
+      isDragging = false;
+      var diff = startX - e.changedTouches[0].clientX;
+      if (Math.abs(diff) > 40) {
+        if (diff > 0 && currentIndex < getMaxIndex()) currentIndex++;
+        else if (diff < 0 && currentIndex > 0) currentIndex--;
+        updateSlider();
+      }
+    }, { passive: true });
+
+    updateSlider();
+
+    var resizeTimer;
+    window.addEventListener("resize", function () {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(function () {
+        if (currentIndex > getMaxIndex()) currentIndex = getMaxIndex();
+        updateSlider();
+      }, 150);
+    });
+
+    /* ── Swatch image swap via event delegation ── */
+    section.addEventListener("click", function (e) {
+      var swatch = e.target.closest(".cf-swatch");
+      if (!swatch) return;
+
+      e.preventDefault();
       e.stopPropagation();
 
-      var newSrc = swatch.dataset.image;
-      var newSrcset = swatch.dataset.srcset;
+      var newSrc = swatch.getAttribute("data-image");
       if (!newSrc) return;
 
       var card = swatch.closest(".cf-card");
       if (!card) return;
 
-      var primaryImg = card.querySelector(".cf-card__image--primary");
-      if (!primaryImg) return;
+      var img = card.querySelector(".cf-card__image--primary");
+      if (!img) return;
 
-      /* Clear srcset first — otherwise the browser ignores the src change */
-      primaryImg.removeAttribute("srcset");
-      primaryImg.src = newSrc;
-      if (newSrcset) {
-        requestAnimationFrame(function () {
-          primaryImg.setAttribute("srcset", newSrcset);
-        });
-      }
+      /* Strip srcset + sizes so the browser is forced to use src */
+      img.removeAttribute("srcset");
+      img.removeAttribute("sizes");
+      img.setAttribute("src", newSrc);
 
-      /* Mark this swatch as active */
       card.querySelectorAll(".cf-swatch").forEach(function (s) {
         s.classList.remove("cf-swatch--active");
       });
       swatch.classList.add("cf-swatch--active");
     });
-  });
-});
+  }
+
+  /* Run immediately if DOM is ready, otherwise wait */
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initSection);
+  } else {
+    initSection();
+  }
+})();
 </script>
 
 {% schema %}
