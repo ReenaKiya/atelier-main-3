@@ -205,6 +205,8 @@ export class ProductCard extends Component {
 
         slide.hidden = slide.getAttribute('slide-id') !== selectedImageId;
       }
+
+      slideshow.select({ id: selectedImageId }, undefined, { animate: false });
     }
   }
 
