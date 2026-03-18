@@ -345,6 +345,15 @@
   opacity: 1;
 }
 
+/* When hovering a swatch, kill the image-wrap hover effect */
+.cf-card:has(.cf-swatch:hover) .cf-card__image-wrap:hover .cf-card__image--primary {
+  opacity: 1;
+}
+
+.cf-card:has(.cf-swatch:hover) .cf-card__image-wrap:hover .cf-card__image--hover {
+  opacity: 0;
+}
+
 /* Hover Action Buttons */
 .cf-card__actions {
   display: flex;
@@ -692,32 +701,50 @@
       }, 150);
     });
 
-    /* ── Swatch image swap via event delegation ── */
-    section.addEventListener("click", function (e) {
-      var swatch = e.target.closest(".cf-swatch");
-      if (!swatch) return;
-
-      e.preventDefault();
-      e.stopPropagation();
-
-      var newSrc = swatch.getAttribute("data-image");
-      if (!newSrc) return;
-
-      var card = swatch.closest(".cf-card");
-      if (!card) return;
-
+    /* ── Swatch image preview on hover + permanent swap on click ── */
+    section.querySelectorAll(".cf-card").forEach(function (card) {
       var img = card.querySelector(".cf-card__image--primary");
       if (!img) return;
 
-      /* Strip srcset + sizes so the browser is forced to use src */
-      img.removeAttribute("srcset");
-      img.removeAttribute("sizes");
-      img.setAttribute("src", newSrc);
+      /* Store the original src so we can reset if no swatch is active */
+      img.setAttribute("data-original-src", img.getAttribute("src"));
 
-      card.querySelectorAll(".cf-swatch").forEach(function (s) {
-        s.classList.remove("cf-swatch--active");
+      function setImage(src) {
+        if (!src) return;
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        img.setAttribute("src", src);
+      }
+
+      card.querySelectorAll(".cf-swatch").forEach(function (swatch) {
+        /* Hover: preview this swatch's image */
+        swatch.addEventListener("mouseenter", function () {
+          var previewSrc = swatch.getAttribute("data-image");
+          if (previewSrc) setImage(previewSrc);
+        });
+
+        /* Mouse leave: reset to active swatch or original */
+        swatch.addEventListener("mouseleave", function () {
+          var active = card.querySelector(".cf-swatch--active");
+          var resetSrc = active
+            ? active.getAttribute("data-image")
+            : img.getAttribute("data-original-src");
+          setImage(resetSrc);
+        });
+
+        /* Click: permanently select this swatch */
+        swatch.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var newSrc = swatch.getAttribute("data-image");
+          if (!newSrc) return;
+          setImage(newSrc);
+          card.querySelectorAll(".cf-swatch").forEach(function (s) {
+            s.classList.remove("cf-swatch--active");
+          });
+          swatch.classList.add("cf-swatch--active");
+        });
       });
-      swatch.classList.add("cf-swatch--active");
     });
   }
 
