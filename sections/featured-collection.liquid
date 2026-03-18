@@ -119,11 +119,29 @@
                             {% assign swatch_count = swatch_count | plus: 1 %}
                             {% if swatch_count <= 6 %}
                               {% assign swatch_handle = value | handleize %}
+                              {%- comment -%} Find the first variant image for this color value {%- endcomment -%}
+                              {%- assign variant_image = nil -%}
+                              {%- for variant in product.variants -%}
+                                {%- if option.position == 1 and variant.option1 == value -%}
+                                  {%- assign variant_image = variant.featured_image -%}
+                                  {%- break -%}
+                                {%- elsif option.position == 2 and variant.option2 == value -%}
+                                  {%- assign variant_image = variant.featured_image -%}
+                                  {%- break -%}
+                                {%- elsif option.position == 3 and variant.option3 == value -%}
+                                  {%- assign variant_image = variant.featured_image -%}
+                                  {%- break -%}
+                                {%- endif -%}
+                              {%- endfor -%}
                               <span
                                 class="cf-swatch"
                                 title="{{ value }}"
                                 style="background-color: {{ swatch_handle }};"
                                 data-swatch-color="{{ swatch_handle }}"
+                                {% if variant_image %}
+                                  data-image="{{ variant_image | image_url: width: 500 }}"
+                                  data-srcset="{{ variant_image | image_url: width: 250 }} 250w, {{ variant_image | image_url: width: 400 }} 400w, {{ variant_image | image_url: width: 500 }} 500w"
+                                {% endif %}
                               ></span>
                             {% endif %}
                           {% endfor %}
@@ -431,7 +449,8 @@
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.cf-swatch:hover {
+.cf-swatch:hover,
+.cf-swatch--active {
   transform: scale(1.15);
   box-shadow: 0 0 0 2px #fff, 0 0 0 3px #999;
 }
@@ -681,6 +700,38 @@ document.addEventListener("DOMContentLoaded", function () {
       if (currentIndex > getMaxIndex()) currentIndex = getMaxIndex();
       updateSlider();
     }, 150);
+  });
+
+  /* Swatch image swap */
+  section.querySelectorAll(".cf-swatch").forEach(function (swatch) {
+    swatch.addEventListener("click", function (e) {
+      e.stopPropagation();
+
+      var newSrc = swatch.dataset.image;
+      var newSrcset = swatch.dataset.srcset;
+      if (!newSrc) return;
+
+      var card = swatch.closest(".cf-card");
+      if (!card) return;
+
+      var primaryImg = card.querySelector(".cf-card__image--primary");
+      if (!primaryImg) return;
+
+      /* Clear srcset first — otherwise the browser ignores the src change */
+      primaryImg.removeAttribute("srcset");
+      primaryImg.src = newSrc;
+      if (newSrcset) {
+        requestAnimationFrame(function () {
+          primaryImg.setAttribute("srcset", newSrcset);
+        });
+      }
+
+      /* Mark this swatch as active */
+      card.querySelectorAll(".cf-swatch").forEach(function (s) {
+        s.classList.remove("cf-swatch--active");
+      });
+      swatch.classList.add("cf-swatch--active");
+    });
   });
 });
 </script>
