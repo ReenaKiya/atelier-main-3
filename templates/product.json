@@ -12,6 +12,10 @@
     "main": {
       "type": "product-information",
       "blocks": {
+        "essential_upsell_frequently_bought_together_app_block_9mdKTN": {
+          "type": "shopify://apps/essential-upsell/blocks/frequently-bought-together-app-block/50627fd9-24fd-4250-8614-accc12826d80",
+          "settings": {}
+        },
         "media-gallery": {
           "type": "_product-media-gallery",
           "static": true,
@@ -154,46 +158,6 @@
               },
               "blocks": {}
             },
-            "ai_gen_block_61a192f_UnbiCg": {
-              "type": "ai_gen_block_61a192f",
-              "settings": {
-                "columns_desktop": 4,
-                "columns_mobile": "1",
-                "alignment": "center",
-                "spacing": 10,
-                "spacing_mobile": 20,
-                "section_padding": 0,
-                "icon_text_gap": 15,
-                "icon_size": 40,
-                "icon_size_mobile": 30,
-                "icon_stroke_width": 1.5,
-                "icon_color": "#000000",
-                "heading_size": 13,
-                "heading_size_mobile": 12,
-                "heading_weight": "700",
-                "heading_color": "#000000",
-                "description_size": 12,
-                "description_size_mobile": 11,
-                "description_color": "#666666",
-                "feature_1_enabled": true,
-                "feature_1_icon": "shipping",
-                "feature_1_heading": "Free shipping",
-                "feature_1_description": "On orders over $50",
-                "feature_2_enabled": true,
-                "feature_2_icon": "gift",
-                "feature_2_heading": "Special offers",
-                "feature_2_description": "Exclusive deals for members",
-                "feature_3_enabled": true,
-                "feature_3_icon": "return",
-                "feature_3_heading": "Easy returns",
-                "feature_3_description": "30-day return policy",
-                "feature_4_enabled": true,
-                "feature_4_icon": "support",
-                "feature_4_heading": "24/7 support",
-                "feature_4_description": "Always here to help"
-              },
-              "blocks": {}
-            },
             "buy_buttons_9MVfWi": {
               "type": "buy-buttons",
               "name": "t:names.product_buy_buttons",
@@ -229,114 +193,6 @@
               },
               "block_order": []
             },
-            "essential_upsell_app_block_JGLMax": {
-              "type": "shopify://apps/essential-upsell/blocks/app-block/50627fd9-24fd-4250-8614-accc12826d80",
-              "settings": {}
-            },
-            "ai_gen_block_a13ae2a_Rr9ETL": {
-              "type": "ai_gen_block_a13ae2a",
-              "settings": {
-                "heading": "Pairs Well With",
-                "heading_alignment": "left",
-                "button_text": "Add to cart",
-                "product_1": "flower",
-                "product_2": "body-parts",
-                "product_3": "automatic-espress",
-                "product_4": "",
-                "product_5": "",
-                "product_6": "",
-                "product_7": "",
-                "product_8": "",
-                "products_per_row_desktop": 3,
-                "products_per_row_mobile": "2",
-                "grid_gap": 16,
-                "section_padding": 40,
-                "heading_spacing": 24,
-                "card_background": "#ffffff",
-                "card_border_color": "#e6e6e6",
-                "card_border_width": 1,
-                "card_border_radius": 0,
-                "card_padding": 12,
-                "heading_size": 24,
-                "heading_color": "#000000",
-                "product_title_size": 14,
-                "product_title_color": "#000000",
-                "product_title_hover_color": "#666666",
-                "price_size": 14,
-                "price_color": "#000000",
-                "icon_size": 14,
-                "button_background": "#000000",
-                "button_text_color": "#ffffff",
-                "button_border_color": "#000000",
-                "button_hover_background": "#383838",
-                "button_hover_text_color": "#ffffff",
-                "button_hover_border_color": "#383838",
-                "button_border_width": 0,
-                "button_border_radius": 0,
-                "button_text_size": 10
-              },
-              "blocks": {}
-            },
-            "ai_gen_block_aa810be_NeYxwn": {
-              "type": "ai_gen_block_aa810be",
-              "settings": {
-                "heading": "Special Offers",
-                "heading_size": 32,
-                "heading_color": "#000000",
-                "section_padding": 40,
-                "discount_1": "10% OFF",
-                "title_1": "First Purchase",
-                "description_1": "Get 10% off on your first order",
-                "details_1": "Enjoy 10% off your first purchase! This exclusive offer is available for new customers only. Shop now and save on your favorite products.",
-                "terms_1": "Valid for new customers only. Cannot be combined with other offers. Expires in 30 days.",
-                "discount_2": "20% OFF",
-                "title_2": "Bulk Order",
-                "description_2": "Save 20% when you buy 3 or more items",
-                "details_2": "Purchase 3 or more items and receive 20% off your entire order! Perfect for stocking up on your favorites or trying new products.",
-                "terms_2": "Minimum 3 items required. Discount applied automatically at checkout. Valid on all products.",
-                "discount_3": "30% OFF",
-                "title_3": "VIP Member",
-                "description_3": "Exclusive 30% discount for VIP members",
-                "details_3": "Join our VIP membership program and unlock 30% off all purchases! Plus, get early access to new products and exclusive deals.",
-                "terms_3": "VIP membership required. Annual fee applies. Discount valid on all products year-round.",
-                "card_background": "#ffffff",
-                "card_border_color": "#e6e6e6",
-                "card_border_width": 1,
-                "card_border_radius": 8,
-                "badge_background": "#000000",
-                "badge_text_color": "#ffffff",
-                "badge_font_size": 16,
-                "badge_border_radius": 4,
-                "card_title_color": "#000000",
-                "card_title_size": 24,
-                "card_description_color": "#666666",
-                "card_description_size": 14,
-                "button_text": "Get Offer Details",
-                "button_background": "#000000",
-                "button_text_color": "#ffffff",
-                "button_hover_background": "#333333",
-                "button_font_size": 14,
-                "button_border_radius": 4,
-                "drawer_width": 460,
-                "drawer_background": "#ffffff",
-                "drawer_background_image": "shopify://shop_images/5766638053525_3759b884-7c5d-4afb-a0dd-48b714a8a894.jpg",
-                "drawer_bg_opacity": 100,
-                "drawer_content_background": "rgba(0,0,0,0)",
-                "drawer_text_color": "#ffffff",
-                "drawer_accent_color": "#000000",
-                "drawer_title_size": 24,
-                "drawer_discount_size": 32,
-                "drawer_description_size": 16,
-                "drawer_terms_size": 12,
-                "drawer_cta_text": "Apply Offer",
-                "drawer_cta_background": "#000000",
-                "drawer_cta_text_color": "#ffffff",
-                "drawer_cta_hover_background": "#333333",
-                "drawer_cta_font_size": 16,
-                "drawer_cta_border_radius": 4
-              },
-              "blocks": {}
-            },
             "product_description_gYXQyD": {
               "type": "product-description",
               "name": "t:names.product_description",
@@ -370,15 +226,14 @@
             "price_PHGQkM",
             "product_inventory_cf9Nct",
             "variant_picker_R3rGDr",
-            "ai_gen_block_61a192f_UnbiCg",
             "buy_buttons_9MVfWi",
-            "essential_upsell_app_block_JGLMax",
-            "ai_gen_block_a13ae2a_Rr9ETL",
-            "ai_gen_block_aa810be_NeYxwn",
             "product_description_gYXQyD"
           ]
         }
       },
+      "block_order": [
+        "essential_upsell_frequently_bought_together_app_block_9mdKTN"
+      ],
       "settings": {
         "content_width": "content-center-aligned",
         "desktop_media_position": "left",
@@ -923,15 +778,6 @@
         "padding-block-end": 0
       }
     },
-    "frequently_bought_together": {
-      "type": "frequently-bought-together",
-      "settings": {
-        "heading": "Frequently Bought Together",
-        "product_1": null,
-        "product_2": null,
-        "product_3": null
-      }
-    },
     "collection_list_Ec6EQn": {
       "type": "collection-list",
       "blocks": {
@@ -1100,7 +946,6 @@
   },
   "order": [
     "main",
-    "frequently_bought_together",
     "product_recommendations_qnzPkn",
     "17655238379a0febe2",
     "1765524498d58a01f3",
