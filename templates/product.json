@@ -12,6 +12,10 @@
     "main": {
       "type": "product-information",
       "blocks": {
+        "essential_upsell_frequently_bought_together_app_block_WLNEmK": {
+          "type": "shopify://apps/essential-upsell/blocks/frequently-bought-together-app-block/50627fd9-24fd-4250-8614-accc12826d80",
+          "settings": {}
+        },
         "media-gallery": {
           "type": "_product-media-gallery",
           "static": true,
@@ -227,6 +231,9 @@
           ]
         }
       },
+      "block_order": [
+        "essential_upsell_frequently_bought_together_app_block_WLNEmK"
+      ],
       "settings": {
         "content_width": "content-center-aligned",
         "desktop_media_position": "left",
