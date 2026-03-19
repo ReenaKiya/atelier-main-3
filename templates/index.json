@@ -537,6 +537,16 @@
         "padding_top": 40,
         "padding_bottom": 40
       }
+    },
+    "frequently_bought_together_Kj3kXg": {
+      "type": "frequently-bought-together",
+      "name": "Frequently Bought",
+      "settings": {
+        "heading": "Frequently Bought Together",
+        "product_1": "14k-gold",
+        "product_2": "nose-ring",
+        "product_3": "14k-gold-round-cz-jewelled-crescent-segment-clicker-ring"
+      }
     }
   },
   "order": [
@@ -545,6 +555,7 @@
     "icon_marquee_WGNUpx",
     "shop_by_type_afLXVP",
     "trust_icons_mhBL7W",
-    "featured_collection_wwdfbm"
+    "featured_collection_wwdfbm",
+    "frequently_bought_together_Kj3kXg"
   ]
 }
