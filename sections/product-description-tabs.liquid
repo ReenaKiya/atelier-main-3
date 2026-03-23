@@ -1,0 +1,287 @@
+<style>
+  .pdt-container{max-width:1550px;margin:20px auto;color:#222;box-sizing:border-box;padding:0 15px}
+  .pdt-tabs{width:100%}
+  .pdt-tab-nav{display:flex;align-items:center;margin-bottom:0;padding:0;position:relative;gap:8px}
+  .pdt-arrow{background:#f5f5f5;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;flex-shrink:0}
+  .pdt-arrow:hover{background:#e0e0e0}
+  .pdt-arrow svg{pointer-events:none}
+  .pdt-tabs-scroll{flex:1;overflow-x:auto;display:flex;gap:8px;scrollbar-width:none;-ms-overflow-style:none}
+  .pdt-tabs-scroll::-webkit-scrollbar{display:none}
+  .pdt-tab-buttons{display:flex;min-width:max-content;width:100%;gap:8px}
+  .pdt-tab-btn{padding:8px 20px;background:#f8f9fa;border:1px solid #e9ecef;border-bottom:none;border-radius:8px 8px 0 0;margin-bottom:-1px;font-size:16px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .3s ease;color:#212529;font-family:inherit}
+  .pdt-tab-btn.active{background:#db1e37;color:#fff;border-color:#db1e37;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
+  .pdt-tab-content{display:none;padding:10px 24px 24px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-top:-1px;animation:pdtFadeIn .3s ease}
+  .pdt-tab-content.active{display:block}
+  .pdt-tab-content table{border-collapse:collapse;width:100%}
+  .pdt-tab-content table th,.pdt-tab-content table td{border:1px solid #000;padding:8px 12px;text-align:left}
+  .pdt-tab-content ul,.pdt-tab-content ol{padding-left:20px;line-height:1.8}
+  .pdt-tab-content li{margin-bottom:4px}
+  @keyframes pdtFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* Mobile accordion */
+  .pdt-accordion{display:none}
+  .pdt-acc-item{border:1px solid #eee;background:#fff;overflow:hidden;margin-bottom:8px;border-radius:8px}
+  .pdt-acc-header{padding:16px 20px;font-size:16px;color:#212529;background:#f5f5f5;cursor:pointer;font-weight:600;display:flex;justify-content:space-between;align-items:center;transition:all .2s;border:none;width:100%;font-family:inherit}
+  .pdt-acc-header:hover{background:#fff}
+  .pdt-acc-header.active{background:#fff;color:#212529}
+  .pdt-acc-icon::before{content:'+';font-size:20px;line-height:1;font-weight:300}
+  .pdt-acc-header.active .pdt-acc-icon::before{content:'-'}
+  .pdt-acc-content{padding:0 20px;display:none;background:#fff;border-top:1px solid #f0f0f0}
+  .pdt-acc-content.active{display:block;padding:18px 20px}
+
+  @media (max-width:749px){
+    .pdt-desktop{display:none!important}
+    .pdt-accordion{display:block}
+    .pdt-acc-header,.pdt-acc-content{padding:12px 16px;font-size:15px}
+  }
+  @media (min-width:750px){
+    .pdt-accordion{display:none!important}
+    .pdt-desktop{display:block}
+  }
+</style>
+
+<div class="pdt-container">
+  <!-- Desktop Tabs -->
+  <div class="pdt-desktop">
+    <div class="pdt-tabs">
+      <div class="pdt-tab-nav">
+        <button class="pdt-arrow pdt-arrow-left" aria-label="Scroll left">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+        </button>
+        <div class="pdt-tabs-scroll">
+          <div class="pdt-tab-buttons">
+            {%- if section.settings.description_content != blank -%}
+              <button class="pdt-tab-btn active" data-pdt-tab="description">Description</button>
+            {%- elsif product.description != blank -%}
+              <button class="pdt-tab-btn active" data-pdt-tab="description">Description</button>
+            {%- endif -%}
+            {%- if section.settings.specifications_content != blank -%}
+              <button class="pdt-tab-btn{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-tab="specifications">Specifications</button>
+            {%- endif -%}
+            {%- if section.settings.features_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="features">Features</button>
+            {%- endif -%}
+            {%- if section.settings.how_to_use_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="how-to-use">How to Use</button>
+            {%- endif -%}
+            {%- if section.settings.care_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="care">Care Instructions</button>
+            {%- endif -%}
+            {%- if section.settings.materials_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="materials">Materials</button>
+            {%- endif -%}
+            {%- if section.settings.ideal_usages_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="ideal-usages">Ideal Usages</button>
+            {%- endif -%}
+            {%- if section.settings.size_guide_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="size-guide">Gauge Size Guide</button>
+            {%- endif -%}
+            {%- if section.settings.faq_content != blank -%}
+              <button class="pdt-tab-btn" data-pdt-tab="faq">FAQ</button>
+            {%- endif -%}
+          </div>
+        </div>
+        <button class="pdt-arrow pdt-arrow-right" aria-label="Scroll right">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#222" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+        </button>
+      </div>
+
+      {%- if section.settings.description_content != blank -%}
+        <div class="pdt-tab-content active" data-pdt-panel="description">{{ section.settings.description_content }}</div>
+      {%- elsif product.description != blank -%}
+        <div class="pdt-tab-content active" data-pdt-panel="description">{{ product.description }}</div>
+      {%- endif -%}
+      {%- if section.settings.specifications_content != blank -%}
+        <div class="pdt-tab-content{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-panel="specifications">{{ section.settings.specifications_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.features_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="features">{{ section.settings.features_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.how_to_use_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="how-to-use">{{ section.settings.how_to_use_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.care_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="care">{{ section.settings.care_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.materials_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="materials">{{ section.settings.materials_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.ideal_usages_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="ideal-usages">{{ section.settings.ideal_usages_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.size_guide_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="size-guide">{{ section.settings.size_guide_content }}</div>
+      {%- endif -%}
+      {%- if section.settings.faq_content != blank -%}
+        <div class="pdt-tab-content" data-pdt-panel="faq">{{ section.settings.faq_content }}</div>
+      {%- endif -%}
+    </div>
+  </div>
+
+  <!-- Mobile Accordion -->
+  <div class="pdt-accordion">
+    {%- if section.settings.description_content != blank or product.description != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Description <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">
+          {%- if section.settings.description_content != blank -%}
+            {{ section.settings.description_content }}
+          {%- else -%}
+            {{ product.description }}
+          {%- endif -%}
+        </div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.specifications_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Specifications <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.specifications_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.features_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Features <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.features_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.how_to_use_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">How to Use <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.how_to_use_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.care_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Care Instructions <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.care_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.materials_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Materials <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.materials_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.ideal_usages_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Ideal Usages <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.ideal_usages_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.size_guide_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">Gauge Size Guide <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.size_guide_content }}</div>
+      </div>
+    {%- endif -%}
+    {%- if section.settings.faq_content != blank -%}
+      <div class="pdt-acc-item">
+        <button class="pdt-acc-header">FAQ <span class="pdt-acc-icon"></span></button>
+        <div class="pdt-acc-content">{{ section.settings.faq_content }}</div>
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+<script>
+  (function(){
+    const section = document.querySelector('.pdt-container');
+    if (!section) return;
+
+    // Desktop tabs
+    section.querySelectorAll('.pdt-tab-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const tab = btn.getAttribute('data-pdt-tab');
+        section.querySelectorAll('.pdt-tab-btn').forEach(b => b.classList.remove('active'));
+        section.querySelectorAll('.pdt-tab-content').forEach(p => p.classList.remove('active'));
+        btn.classList.add('active');
+        const panel = section.querySelector('[data-pdt-panel="' + tab + '"]');
+        if (panel) panel.classList.add('active');
+      });
+    });
+
+    // Arrow scroll
+    const scrollContainer = section.querySelector('.pdt-tabs-scroll');
+    const leftArrow = section.querySelector('.pdt-arrow-left');
+    const rightArrow = section.querySelector('.pdt-arrow-right');
+    if (leftArrow && scrollContainer) {
+      leftArrow.addEventListener('click', () => { scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }); });
+    }
+    if (rightArrow && scrollContainer) {
+      rightArrow.addEventListener('click', () => { scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }); });
+    }
+
+    // Mobile accordion
+    section.querySelectorAll('.pdt-acc-header').forEach(header => {
+      header.addEventListener('click', () => {
+        const content = header.nextElementSibling;
+        const isActive = header.classList.contains('active');
+        section.querySelectorAll('.pdt-acc-header').forEach(h => h.classList.remove('active'));
+        section.querySelectorAll('.pdt-acc-content').forEach(c => c.classList.remove('active'));
+        if (!isActive) {
+          header.classList.add('active');
+          content.classList.add('active');
+        }
+      });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Product Desc Tabs",
+  "settings": [
+    {
+      "type": "richtext",
+      "id": "description_content",
+      "label": "Description",
+      "info": "Leave blank to use the product description automatically"
+    },
+    {
+      "type": "richtext",
+      "id": "specifications_content",
+      "label": "Specifications"
+    },
+    {
+      "type": "richtext",
+      "id": "features_content",
+      "label": "Features"
+    },
+    {
+      "type": "richtext",
+      "id": "how_to_use_content",
+      "label": "How to Use"
+    },
+    {
+      "type": "richtext",
+      "id": "care_content",
+      "label": "Care Instructions"
+    },
+    {
+      "type": "richtext",
+      "id": "materials_content",
+      "label": "Materials"
+    },
+    {
+      "type": "richtext",
+      "id": "ideal_usages_content",
+      "label": "Ideal Usages"
+    },
+    {
+      "type": "richtext",
+      "id": "size_guide_content",
+      "label": "Gauge Size Guide"
+    },
+    {
+      "type": "richtext",
+      "id": "faq_content",
+      "label": "FAQ"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product Desc Tabs"
+    }
+  ]
+}
+{% endschema %}
