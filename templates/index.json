@@ -554,7 +554,7 @@
         "webrex_ai_seo_optimizer_product_description_tabs_rCW3i7": {
           "type": "shopify://apps/webrex-ai-seo-optimizer/blocks/productDescriptionTabs/b26797ad-bb4d-48f5-8ef3-7c561521049c",
           "settings": {
-            "layout_view": "accordion",
+            "layout_view": "tabs",
             "description_position": "inside",
             "description_tab_title": "Description",
             "max_width": 1100,
