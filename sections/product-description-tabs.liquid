@@ -12,8 +12,9 @@
   .pdt-tab-btn.active{background:#db1e37;color:#fff;border-color:#db1e37;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
   .pdt-tab-content{display:none;padding:10px 24px 24px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-top:-1px;animation:pdtFadeIn .3s ease}
   .pdt-tab-content.active{display:block}
-  .pdt-tab-content table{border-collapse:collapse;width:100%}
-  .pdt-tab-content table th,.pdt-tab-content table td{border:1px solid #000;padding:8px 12px;text-align:left}
+  .pdt-tab-content table,.pdt-acc-content table{border-collapse:collapse;width:100%}
+  .pdt-tab-content table th,.pdt-tab-content table td,.pdt-acc-content table th,.pdt-acc-content table td{border:1px solid #000;padding:8px 12px;text-align:left}
+  .pdt-tab-content table th,.pdt-acc-content table th{background:#f8f9fa;font-weight:700}
   .pdt-tab-content ul,.pdt-tab-content ol{padding-left:20px;line-height:1.8}
   .pdt-tab-content li{margin-bottom:4px}
   @keyframes pdtFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
@@ -55,7 +56,14 @@
             {%- elsif product.description != blank -%}
               <button class="pdt-tab-btn active" data-pdt-tab="description">Description</button>
             {%- endif -%}
-            {%- if section.settings.specifications_content != blank -%}
+            {%- assign has_spec_blocks_nav = false -%}
+            {%- for block in section.blocks -%}
+              {%- if block.type == 'spec_row' -%}
+                {%- assign has_spec_blocks_nav = true -%}
+                {%- break -%}
+              {%- endif -%}
+            {%- endfor -%}
+            {%- if has_spec_blocks_nav or section.settings.specifications_content != blank -%}
               <button class="pdt-tab-btn{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-tab="specifications">Specifications</button>
             {%- endif -%}
             {%- if section.settings.features_content != blank -%}
@@ -91,8 +99,38 @@
       {%- elsif product.description != blank -%}
         <div class="pdt-tab-content active" data-pdt-panel="description">{{ product.description }}</div>
       {%- endif -%}
-      {%- if section.settings.specifications_content != blank -%}
-        <div class="pdt-tab-content{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-panel="specifications">{{ section.settings.specifications_content }}</div>
+      {%- assign has_spec_blocks = false -%}
+      {%- for block in section.blocks -%}
+        {%- if block.type == 'spec_row' -%}
+          {%- assign has_spec_blocks = true -%}
+          {%- break -%}
+        {%- endif -%}
+      {%- endfor -%}
+      {%- if has_spec_blocks or section.settings.specifications_content != blank -%}
+        <div class="pdt-tab-content{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-panel="specifications">
+          {%- if has_spec_blocks -%}
+            <table>
+              <thead>
+                <tr>
+                  <th>Specification</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'spec_row' -%}
+                    <tr {{ block.shopify_attributes }}>
+                      <td>{{ block.settings.spec_label }}</td>
+                      <td>{{ block.settings.spec_value }}</td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </tbody>
+            </table>
+          {%- else -%}
+            {{ section.settings.specifications_content }}
+          {%- endif -%}
+        </div>
       {%- endif -%}
       {%- if section.settings.features_content != blank -%}
         <div class="pdt-tab-content" data-pdt-panel="features">{{ section.settings.features_content }}</div>
@@ -132,10 +170,40 @@
         </div>
       </div>
     {%- endif -%}
-    {%- if section.settings.specifications_content != blank -%}
+    {%- assign has_spec_blocks_mob = false -%}
+    {%- for block in section.blocks -%}
+      {%- if block.type == 'spec_row' -%}
+        {%- assign has_spec_blocks_mob = true -%}
+        {%- break -%}
+      {%- endif -%}
+    {%- endfor -%}
+    {%- if has_spec_blocks_mob or section.settings.specifications_content != blank -%}
       <div class="pdt-acc-item">
         <button class="pdt-acc-header">Specifications <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.specifications_content }}</div>
+        <div class="pdt-acc-content">
+          {%- if has_spec_blocks_mob -%}
+            <table>
+              <thead>
+                <tr>
+                  <th>Specification</th>
+                  <th>Details</th>
+                </tr>
+              </thead>
+              <tbody>
+                {%- for block in section.blocks -%}
+                  {%- if block.type == 'spec_row' -%}
+                    <tr>
+                      <td>{{ block.settings.spec_label }}</td>
+                      <td>{{ block.settings.spec_value }}</td>
+                    </tr>
+                  {%- endif -%}
+                {%- endfor -%}
+              </tbody>
+            </table>
+          {%- else -%}
+            {{ section.settings.specifications_content }}
+          {%- endif -%}
+        </div>
       </div>
     {%- endif -%}
     {%- if section.settings.features_content != blank -%}
@@ -276,6 +344,26 @@
       "type": "richtext",
       "id": "faq_content",
       "label": "FAQ"
+    }
+  ],
+  "blocks": [
+    {
+      "type": "spec_row",
+      "name": "Specification Row",
+      "settings": [
+        {
+          "type": "text",
+          "id": "spec_label",
+          "label": "Specification",
+          "default": "Material"
+        },
+        {
+          "type": "text",
+          "id": "spec_value",
+          "label": "Details",
+          "default": "Grade 23 Titanium"
+        }
+      ]
     }
   ],
   "presets": [
