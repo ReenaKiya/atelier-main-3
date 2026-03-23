@@ -1,23 +1,39 @@
 <style>
   .pdt-container{max-width:1550px;margin:20px auto;color:#222;box-sizing:border-box;padding:0 15px}
   .pdt-tabs{width:100%}
-  .pdt-tab-nav{display:flex;align-items:center;margin-bottom:0;padding:0;position:relative;gap:8px}
+  .pdt-tab-nav{display:flex;align-items:center;margin-bottom:0;padding:0;position:relative;gap:8px;min-height:auto}
   .pdt-arrow{background:#f5f5f5;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;flex-shrink:0}
   .pdt-arrow:hover{background:#e0e0e0}
   .pdt-arrow svg{pointer-events:none}
-  .pdt-tabs-scroll{flex:1;overflow-x:auto;display:flex;gap:8px;scrollbar-width:none;-ms-overflow-style:none}
+  .pdt-tabs-scroll{flex:1;overflow-x:auto;display:flex;gap:8px;scrollbar-width:none;-ms-overflow-style:none;align-items:center}
   .pdt-tabs-scroll::-webkit-scrollbar{display:none}
-  .pdt-tab-buttons{display:flex;min-width:max-content;width:100%;gap:8px}
+  .pdt-tab-buttons{display:flex;min-width:max-content;width:100%;gap:8px;align-items:center}
   .pdt-tab-btn{padding:8px 20px;background:#f8f9fa;border:1px solid #e9ecef;border-bottom:none;border-radius:8px 8px 0 0;margin-bottom:-1px;font-size:16px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .3s ease;color:#212529;font-family:inherit}
   .pdt-tab-btn.active{background:#db1e37;color:#fff;border-color:#db1e37;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
   .pdt-tab-content{display:none;padding:10px 24px 24px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-top:-1px;animation:pdtFadeIn .3s ease}
   .pdt-tab-content.active{display:block}
-  .pdt-tab-content table,.pdt-acc-content table{border-collapse:collapse;width:100%}
+  .pdt-tab-content table,.pdt-acc-content table{border-collapse:collapse;width:100%;border:1px solid #000}
   .pdt-tab-content table th,.pdt-tab-content table td,.pdt-acc-content table th,.pdt-acc-content table td{border:1px solid #000;padding:8px 12px;text-align:left}
   .pdt-tab-content table th,.pdt-acc-content table th{background:#f8f9fa;font-weight:700}
-  .pdt-tab-content ul,.pdt-tab-content ol{padding-left:20px;line-height:1.8}
-  .pdt-tab-content li{margin-bottom:4px}
+  .pdt-tab-content ul,.pdt-tab-content ol,.pdt-acc-content ul,.pdt-acc-content ol{padding-left:20px;line-height:1.8}
+  .pdt-tab-content li,.pdt-acc-content li{margin-bottom:4px}
+  .pdt-tab-content p,.pdt-acc-content p{margin:0 0 12px;line-height:1.6}
+  .pdt-tab-content p:last-child,.pdt-acc-content p:last-child{margin-bottom:0}
   @keyframes pdtFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
+
+  /* FAQ styles */
+  .pdt-faq-list{list-style:none;padding:0;margin:0}
+  .pdt-faq-item{border:1px solid #eee;margin-bottom:8px;background:#fff;border-radius:4px;overflow:hidden}
+  .pdt-faq-item:last-child{margin-bottom:0}
+  .pdt-faq-item details{width:100%}
+  .pdt-faq-item summary{padding:15px 20px;cursor:pointer;font-weight:600;font-size:16px;color:#000;background:#f5f5f5;display:flex;justify-content:space-between;align-items:center;transition:background-color .2s;list-style:none}
+  .pdt-faq-item summary::-webkit-details-marker{display:none}
+  .pdt-faq-item summary:hover{background:#e8e8e8}
+  .pdt-faq-item details[open] summary{background:#fff;color:#333}
+  .pdt-faq-icon{width:20px;height:20px;transition:transform .2s;flex-shrink:0;margin-left:12px}
+  .pdt-faq-item details[open] .pdt-faq-icon{transform:rotate(180deg)}
+  .pdt-faq-answer{padding:18px 20px;background:#fff;border-top:1px solid #eee;color:inherit;font-size:inherit}
+  .pdt-faq-answer p{margin:0;line-height:1.6}
 
   /* Mobile accordion */
   .pdt-accordion{display:none}
@@ -34,6 +50,8 @@
     .pdt-desktop{display:none!important}
     .pdt-accordion{display:block}
     .pdt-acc-header,.pdt-acc-content{padding:12px 16px;font-size:15px}
+    .pdt-tab-content table,.pdt-acc-content table{display:block;overflow-x:auto}
+    .pdt-faq-item summary,.pdt-faq-answer{padding:12px 15px}
   }
   @media (min-width:750px){
     .pdt-accordion{display:none!important}
@@ -41,6 +59,92 @@
   }
 </style>
 
+{%- comment -%}
+  ============================================================
+  DYNAMIC PRODUCT DESC TABS
+  Reads from product metafields first (dynamic/app-populated),
+  falls back to section settings (manual HTML), then product description.
+
+  Required metafields (namespace: custom, type: multi_line_text_field):
+    - custom.pdt_description
+    - custom.pdt_specifications
+    - custom.pdt_features
+    - custom.pdt_how_to_use
+    - custom.pdt_care_instructions
+    - custom.pdt_materials
+    - custom.pdt_ideal_usages
+    - custom.pdt_size_guide
+    - custom.pdt_faq
+  ============================================================
+{%- endcomment -%}
+
+{%- comment -%} Resolve content: metafield > section setting > product description {%- endcomment -%}
+{%- assign pdt_description = product.metafields.custom.pdt_description.value | default: blank -%}
+{%- if pdt_description == blank -%}
+  {%- assign pdt_description = section.settings.description_content -%}
+{%- endif -%}
+{%- if pdt_description == blank and product.description != blank -%}
+  {%- assign pdt_description = product.description -%}
+{%- endif -%}
+
+{%- assign pdt_specifications = product.metafields.custom.pdt_specifications.value | default: blank -%}
+{%- if pdt_specifications == blank -%}
+  {%- assign pdt_specifications = section.settings.specifications_content -%}
+{%- endif -%}
+
+{%- assign pdt_features = product.metafields.custom.pdt_features.value | default: blank -%}
+{%- if pdt_features == blank -%}
+  {%- assign pdt_features = section.settings.features_content -%}
+{%- endif -%}
+
+{%- assign pdt_how_to_use = product.metafields.custom.pdt_how_to_use.value | default: blank -%}
+{%- if pdt_how_to_use == blank -%}
+  {%- assign pdt_how_to_use = section.settings.how_to_use_content -%}
+{%- endif -%}
+
+{%- assign pdt_care = product.metafields.custom.pdt_care_instructions.value | default: blank -%}
+{%- if pdt_care == blank -%}
+  {%- assign pdt_care = section.settings.care_content -%}
+{%- endif -%}
+
+{%- assign pdt_materials = product.metafields.custom.pdt_materials.value | default: blank -%}
+{%- if pdt_materials == blank -%}
+  {%- assign pdt_materials = section.settings.materials_content -%}
+{%- endif -%}
+
+{%- assign pdt_ideal_usages = product.metafields.custom.pdt_ideal_usages.value | default: blank -%}
+{%- if pdt_ideal_usages == blank -%}
+  {%- assign pdt_ideal_usages = section.settings.ideal_usages_content -%}
+{%- endif -%}
+
+{%- assign pdt_size_guide = product.metafields.custom.pdt_size_guide.value | default: blank -%}
+{%- if pdt_size_guide == blank -%}
+  {%- assign pdt_size_guide = section.settings.size_guide_content -%}
+{%- endif -%}
+
+{%- assign pdt_faq = product.metafields.custom.pdt_faq.value | default: blank -%}
+{%- if pdt_faq == blank -%}
+  {%- assign pdt_faq = section.settings.faq_content -%}
+{%- endif -%}
+
+{%- comment -%} Build tabs array from available content {%- endcomment -%}
+{%- assign tabs = '' -%}
+{%- if pdt_description != blank -%}{%- assign tabs = tabs | append: 'description,' -%}{%- endif -%}
+{%- if pdt_specifications != blank -%}{%- assign tabs = tabs | append: 'specifications,' -%}{%- endif -%}
+{%- if pdt_features != blank -%}{%- assign tabs = tabs | append: 'features,' -%}{%- endif -%}
+{%- if pdt_how_to_use != blank -%}{%- assign tabs = tabs | append: 'how-to-use,' -%}{%- endif -%}
+{%- if pdt_care != blank -%}{%- assign tabs = tabs | append: 'care-instructions,' -%}{%- endif -%}
+{%- if pdt_materials != blank -%}{%- assign tabs = tabs | append: 'materials,' -%}{%- endif -%}
+{%- if pdt_ideal_usages != blank -%}{%- assign tabs = tabs | append: 'ideal-usages,' -%}{%- endif -%}
+{%- if pdt_size_guide != blank -%}{%- assign tabs = tabs | append: 'gauge-size-guide,' -%}{%- endif -%}
+{%- if pdt_faq != blank -%}{%- assign tabs = tabs | append: 'faq,' -%}{%- endif -%}
+
+{%- assign tabs_array = tabs | split: ',' -%}
+{%- assign first_tab = tabs_array | first -%}
+
+{%- assign tab_labels = 'description:Description,specifications:Specifications,features:Features,how-to-use:How to Use,care-instructions:Care Instructions,materials:Materials,ideal-usages:Ideal Usages,gauge-size-guide:Gauge Size Guide,faq:FAQ' | split: ',' -%}
+
+{%- if tabs != '' -%}
 <div class="pdt-container">
   <!-- Desktop Tabs -->
   <div class="pdt-desktop">
@@ -51,42 +155,19 @@
         </button>
         <div class="pdt-tabs-scroll">
           <div class="pdt-tab-buttons">
-            {%- if section.settings.description_content != blank -%}
-              <button class="pdt-tab-btn active" data-pdt-tab="description">Description</button>
-            {%- elsif product.description != blank -%}
-              <button class="pdt-tab-btn active" data-pdt-tab="description">Description</button>
-            {%- endif -%}
-            {%- assign has_spec_blocks_nav = false -%}
-            {%- for block in section.blocks -%}
-              {%- if block.type == 'spec_row' -%}
-                {%- assign has_spec_blocks_nav = true -%}
-                {%- break -%}
+            {%- for tab_id in tabs_array -%}
+              {%- if tab_id != '' -%}
+                {%- assign tab_label = '' -%}
+                {%- for pair in tab_labels -%}
+                  {%- assign pair_parts = pair | split: ':' -%}
+                  {%- if pair_parts[0] == tab_id -%}
+                    {%- assign tab_label = pair_parts[1] -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                <button class="pdt-tab-btn{% if tab_id == first_tab %} active{% endif %}" data-pdt-tab="{{ tab_id }}"><strong>{{ tab_label }}</strong></button>
               {%- endif -%}
             {%- endfor -%}
-            {%- if has_spec_blocks_nav or section.settings.specifications_content != blank -%}
-              <button class="pdt-tab-btn{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-tab="specifications">Specifications</button>
-            {%- endif -%}
-            {%- if section.settings.features_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="features">Features</button>
-            {%- endif -%}
-            {%- if section.settings.how_to_use_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="how-to-use">How to Use</button>
-            {%- endif -%}
-            {%- if section.settings.care_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="care">Care Instructions</button>
-            {%- endif -%}
-            {%- if section.settings.materials_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="materials">Materials</button>
-            {%- endif -%}
-            {%- if section.settings.ideal_usages_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="ideal-usages">Ideal Usages</button>
-            {%- endif -%}
-            {%- if section.settings.size_guide_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="size-guide">Gauge Size Guide</button>
-            {%- endif -%}
-            {%- if section.settings.faq_content != blank -%}
-              <button class="pdt-tab-btn" data-pdt-tab="faq">FAQ</button>
-            {%- endif -%}
           </div>
         </div>
         <button class="pdt-arrow pdt-arrow-right" aria-label="Scroll right">
@@ -94,162 +175,79 @@
         </button>
       </div>
 
-      {%- if section.settings.description_content != blank -%}
-        <div class="pdt-tab-content active" data-pdt-panel="description">{{ section.settings.description_content }}</div>
-      {%- elsif product.description != blank -%}
-        <div class="pdt-tab-content active" data-pdt-panel="description">{{ product.description }}</div>
+      {%- if pdt_description != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'description' %} active{% endif %}" data-pdt-panel="description">{{ pdt_description }}</div>
       {%- endif -%}
-      {%- assign has_spec_blocks = false -%}
-      {%- for block in section.blocks -%}
-        {%- if block.type == 'spec_row' -%}
-          {%- assign has_spec_blocks = true -%}
-          {%- break -%}
-        {%- endif -%}
-      {%- endfor -%}
-      {%- if has_spec_blocks or section.settings.specifications_content != blank -%}
-        <div class="pdt-tab-content{% if section.settings.description_content == blank and product.description == blank %} active{% endif %}" data-pdt-panel="specifications">
-          {%- if has_spec_blocks -%}
-            <table>
-              <thead>
-                <tr>
-                  <th>Specification</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {%- for block in section.blocks -%}
-                  {%- if block.type == 'spec_row' -%}
-                    <tr {{ block.shopify_attributes }}>
-                      <td>{{ block.settings.spec_label }}</td>
-                      <td>{{ block.settings.spec_value }}</td>
-                    </tr>
-                  {%- endif -%}
-                {%- endfor -%}
-              </tbody>
-            </table>
-          {%- else -%}
-            {{ section.settings.specifications_content }}
-          {%- endif -%}
-        </div>
+      {%- if pdt_specifications != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'specifications' %} active{% endif %}" data-pdt-panel="specifications">{{ pdt_specifications }}</div>
       {%- endif -%}
-      {%- if section.settings.features_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="features">{{ section.settings.features_content }}</div>
+      {%- if pdt_features != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'features' %} active{% endif %}" data-pdt-panel="features">{{ pdt_features }}</div>
       {%- endif -%}
-      {%- if section.settings.how_to_use_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="how-to-use">{{ section.settings.how_to_use_content }}</div>
+      {%- if pdt_how_to_use != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'how-to-use' %} active{% endif %}" data-pdt-panel="how-to-use">{{ pdt_how_to_use }}</div>
       {%- endif -%}
-      {%- if section.settings.care_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="care">{{ section.settings.care_content }}</div>
+      {%- if pdt_care != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'care-instructions' %} active{% endif %}" data-pdt-panel="care-instructions">{{ pdt_care }}</div>
       {%- endif -%}
-      {%- if section.settings.materials_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="materials">{{ section.settings.materials_content }}</div>
+      {%- if pdt_materials != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'materials' %} active{% endif %}" data-pdt-panel="materials">{{ pdt_materials }}</div>
       {%- endif -%}
-      {%- if section.settings.ideal_usages_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="ideal-usages">{{ section.settings.ideal_usages_content }}</div>
+      {%- if pdt_ideal_usages != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'ideal-usages' %} active{% endif %}" data-pdt-panel="ideal-usages">{{ pdt_ideal_usages }}</div>
       {%- endif -%}
-      {%- if section.settings.size_guide_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="size-guide">{{ section.settings.size_guide_content }}</div>
+      {%- if pdt_size_guide != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'gauge-size-guide' %} active{% endif %}" data-pdt-panel="gauge-size-guide">{{ pdt_size_guide }}</div>
       {%- endif -%}
-      {%- if section.settings.faq_content != blank -%}
-        <div class="pdt-tab-content" data-pdt-panel="faq">{{ section.settings.faq_content }}</div>
+      {%- if pdt_faq != blank -%}
+        <div class="pdt-tab-content{% if first_tab == 'faq' %} active{% endif %}" data-pdt-panel="faq">{{ pdt_faq }}</div>
       {%- endif -%}
     </div>
   </div>
 
   <!-- Mobile Accordion -->
   <div class="pdt-accordion">
-    {%- if section.settings.description_content != blank or product.description != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Description <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">
-          {%- if section.settings.description_content != blank -%}
-            {{ section.settings.description_content }}
-          {%- else -%}
-            {{ product.description }}
+    {%- for tab_id in tabs_array -%}
+      {%- if tab_id != '' -%}
+        {%- assign tab_label = '' -%}
+        {%- for pair in tab_labels -%}
+          {%- assign pair_parts = pair | split: ':' -%}
+          {%- if pair_parts[0] == tab_id -%}
+            {%- assign tab_label = pair_parts[1] -%}
+            {%- break -%}
           {%- endif -%}
+        {%- endfor -%}
+
+        <div class="pdt-acc-item">
+          <button class="pdt-acc-header">{{ tab_label }} <span class="pdt-acc-icon"></span></button>
+          <div class="pdt-acc-content">
+            {%- case tab_id -%}
+              {%- when 'description' -%}
+                {{ pdt_description }}
+              {%- when 'specifications' -%}
+                {{ pdt_specifications }}
+              {%- when 'features' -%}
+                {{ pdt_features }}
+              {%- when 'how-to-use' -%}
+                {{ pdt_how_to_use }}
+              {%- when 'care-instructions' -%}
+                {{ pdt_care }}
+              {%- when 'materials' -%}
+                {{ pdt_materials }}
+              {%- when 'ideal-usages' -%}
+                {{ pdt_ideal_usages }}
+              {%- when 'gauge-size-guide' -%}
+                {{ pdt_size_guide }}
+              {%- when 'faq' -%}
+                {{ pdt_faq }}
+            {%- endcase -%}
+          </div>
         </div>
-      </div>
-    {%- endif -%}
-    {%- assign has_spec_blocks_mob = false -%}
-    {%- for block in section.blocks -%}
-      {%- if block.type == 'spec_row' -%}
-        {%- assign has_spec_blocks_mob = true -%}
-        {%- break -%}
       {%- endif -%}
     {%- endfor -%}
-    {%- if has_spec_blocks_mob or section.settings.specifications_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Specifications <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">
-          {%- if has_spec_blocks_mob -%}
-            <table>
-              <thead>
-                <tr>
-                  <th>Specification</th>
-                  <th>Details</th>
-                </tr>
-              </thead>
-              <tbody>
-                {%- for block in section.blocks -%}
-                  {%- if block.type == 'spec_row' -%}
-                    <tr>
-                      <td>{{ block.settings.spec_label }}</td>
-                      <td>{{ block.settings.spec_value }}</td>
-                    </tr>
-                  {%- endif -%}
-                {%- endfor -%}
-              </tbody>
-            </table>
-          {%- else -%}
-            {{ section.settings.specifications_content }}
-          {%- endif -%}
-        </div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.features_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Features <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.features_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.how_to_use_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">How to Use <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.how_to_use_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.care_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Care Instructions <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.care_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.materials_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Materials <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.materials_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.ideal_usages_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Ideal Usages <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.ideal_usages_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.size_guide_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">Gauge Size Guide <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.size_guide_content }}</div>
-      </div>
-    {%- endif -%}
-    {%- if section.settings.faq_content != blank -%}
-      <div class="pdt-acc-item">
-        <button class="pdt-acc-header">FAQ <span class="pdt-acc-icon"></span></button>
-        <div class="pdt-acc-content">{{ section.settings.faq_content }}</div>
-      </div>
-    {%- endif -%}
   </div>
 </div>
+{%- endif -%}
 
 <script>
   (function(){
@@ -268,15 +266,31 @@
       });
     });
 
-    // Arrow scroll
+    // Arrow scroll with opacity
     const scrollContainer = section.querySelector('.pdt-tabs-scroll');
     const leftArrow = section.querySelector('.pdt-arrow-left');
     const rightArrow = section.querySelector('.pdt-arrow-right');
+
+    function updateArrows() {
+      if (!scrollContainer || !leftArrow || !rightArrow) return;
+      const { scrollLeft, scrollWidth, clientWidth } = scrollContainer;
+      const atStart = scrollLeft <= 5;
+      const atEnd = scrollLeft + clientWidth >= scrollWidth - 5;
+      leftArrow.style.opacity = atStart ? '0.3' : '0.85';
+      leftArrow.style.pointerEvents = atStart ? 'none' : 'auto';
+      rightArrow.style.opacity = atEnd ? '0.3' : '0.85';
+      rightArrow.style.pointerEvents = atEnd ? 'none' : 'auto';
+    }
+
     if (leftArrow && scrollContainer) {
       leftArrow.addEventListener('click', () => { scrollContainer.scrollBy({ left: -200, behavior: 'smooth' }); });
     }
     if (rightArrow && scrollContainer) {
       rightArrow.addEventListener('click', () => { scrollContainer.scrollBy({ left: 200, behavior: 'smooth' }); });
+    }
+    if (scrollContainer) {
+      scrollContainer.addEventListener('scroll', updateArrows);
+      updateArrows();
     }
 
     // Mobile accordion
@@ -300,70 +314,71 @@
   "name": "Product Desc Tabs",
   "settings": [
     {
-      "type": "richtext",
+      "type": "header",
+      "content": "Dynamic Content (Metafields)",
+      "info": "Content is auto-loaded from product metafields (namespace: custom). If a metafield is empty, falls back to manual HTML below."
+    },
+    {
+      "type": "paragraph",
+      "content": "Metafield keys: pdt_description, pdt_specifications, pdt_features, pdt_how_to_use, pdt_care_instructions, pdt_materials, pdt_ideal_usages, pdt_size_guide, pdt_faq"
+    },
+    {
+      "type": "header",
+      "content": "Manual HTML Fallback"
+    },
+    {
+      "type": "html",
       "id": "description_content",
       "label": "Description",
-      "info": "Leave blank to use the product description automatically"
+      "info": "Leave blank to use product description. Metafield overrides this."
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "specifications_content",
-      "label": "Specifications"
+      "label": "Specifications",
+      "info": "Paste HTML tables. Metafield: custom.pdt_specifications"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "features_content",
-      "label": "Features"
+      "label": "Features",
+      "info": "HTML lists. Metafield: custom.pdt_features"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "how_to_use_content",
-      "label": "How to Use"
+      "label": "How to Use",
+      "info": "HTML content. Metafield: custom.pdt_how_to_use"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "care_content",
-      "label": "Care Instructions"
+      "label": "Care Instructions",
+      "info": "HTML content. Metafield: custom.pdt_care_instructions"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "materials_content",
-      "label": "Materials"
+      "label": "Materials",
+      "info": "HTML tables. Metafield: custom.pdt_materials"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "ideal_usages_content",
-      "label": "Ideal Usages"
+      "label": "Ideal Usages",
+      "info": "HTML content. Metafield: custom.pdt_ideal_usages"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "size_guide_content",
-      "label": "Gauge Size Guide"
+      "label": "Gauge Size Guide",
+      "info": "HTML tables. Metafield: custom.pdt_size_guide"
     },
     {
-      "type": "richtext",
+      "type": "html",
       "id": "faq_content",
-      "label": "FAQ"
-    }
-  ],
-  "blocks": [
-    {
-      "type": "spec_row",
-      "name": "Specification Row",
-      "settings": [
-        {
-          "type": "text",
-          "id": "spec_label",
-          "label": "Specification",
-          "default": "Material"
-        },
-        {
-          "type": "text",
-          "id": "spec_value",
-          "label": "Details",
-          "default": "Grade 23 Titanium"
-        }
-      ]
+      "label": "FAQ",
+      "info": "FAQ HTML with details/summary. Metafield: custom.pdt_faq"
     }
   ],
   "presets": [
