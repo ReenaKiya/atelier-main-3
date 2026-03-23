@@ -1008,7 +1008,7 @@
       "name": "Product Desc Tabs",
       "settings": {
         "description_content": "<p>Shop our G23 Titanium Hinged Segment Clicker Ring — implant-grade, hypoallergenic body jewellery for septum, nostril, helix, and tragus piercings. Multiple gauges and colours. Free UK delivery over £20.<br/><br/></p>",
-        "specifications_content": "",
+        "specifications_content": "<p>{{ product.metafields.custom.size_chart_title.value }}</p>",
         "features_content": "",
         "how_to_use_content": "",
         "care_content": "",
