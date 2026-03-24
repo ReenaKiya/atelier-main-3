@@ -195,7 +195,7 @@
 
                   {%- comment -%} Hover Action Buttons {%- endcomment -%}
                   <div class="cf-card__actions">
-                    <a href="{{ product.url }}" class="cf-card__btn cf-card__btn--quickshop">Quick Shop</a>
+                    <button type="button" class="cf-card__btn cf-card__btn--quickshop" data-quickshop-url="{{ product.url }}">Quick Shop</button>
                     <a href="{{ product.url }}" class="cf-card__btn cf-card__btn--options">Choose Options</a>
                   </div>
                 </div>
@@ -213,6 +213,18 @@
     {% else %}
       <p style="text-align: center; color: #999;">Select a collection in the section settings.</p>
     {% endif %}
+  </div>
+
+  {%- comment -%} Quick Shop Modal {%- endcomment -%}
+  <div class="cf-quickshop-overlay" id="cf-quickshop-overlay-{{ section.id }}"></div>
+  <div class="cf-quickshop-modal" id="cf-quickshop-modal-{{ section.id }}">
+    <button type="button" class="cf-quickshop-modal__close" aria-label="Close">&times;</button>
+    <div class="cf-quickshop-modal__body">
+      <div class="cf-quickshop-modal__loading">
+        <svg class="cf-quickshop-spinner" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#ccc" stroke-width="4" stroke-linecap="round" stroke-dasharray="90,150" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" dur="0.8s" from="0 25 25" to="360 25 25" repeatCount="indefinite"/></circle></svg>
+      </div>
+      <div class="cf-quickshop-modal__content" id="cf-quickshop-content-{{ section.id }}"></div>
+    </div>
   </div>
 </section>
 
@@ -573,6 +585,333 @@
   white-space: nowrap;
 }
 
+/* ===== Quick Shop Modal ===== */
+.cf-quickshop-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 9998;
+  cursor: pointer;
+}
+
+.cf-quickshop-overlay.cf-active {
+  display: block;
+}
+
+.cf-quickshop-modal {
+  display: none;
+  position: fixed;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  background: #fff;
+  z-index: 9999;
+  border-radius: 8px;
+  width: 90%;
+  max-width: 900px;
+  max-height: 90vh;
+  overflow: hidden;
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+}
+
+.cf-quickshop-modal.cf-active {
+  display: block;
+  animation: cfModalIn 0.3s ease forwards;
+}
+
+@keyframes cfModalIn {
+  from { opacity: 0; transform: translate(-50%, -48%); }
+  to { opacity: 1; transform: translate(-50%, -50%); }
+}
+
+.cf-quickshop-modal__close {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 36px;
+  height: 36px;
+  border: none;
+  background: #fff;
+  font-size: 24px;
+  line-height: 1;
+  cursor: pointer;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  transition: background 0.2s;
+}
+
+.cf-quickshop-modal__close:hover {
+  background: #f0f0f0;
+}
+
+.cf-quickshop-modal__body {
+  overflow-y: auto;
+  max-height: 90vh;
+}
+
+.cf-quickshop-modal__loading {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.cf-quickshop-modal__loading.cf-hidden {
+  display: none;
+}
+
+.cf-quickshop-spinner {
+  width: 40px;
+  height: 40px;
+}
+
+.cf-quickshop-modal__content {
+  display: none;
+}
+
+.cf-quickshop-modal__content.cf-loaded {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0;
+}
+
+.cf-quickshop__images {
+  padding: 20px;
+  background: #fafafa;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.cf-quickshop__images img {
+  width: 100%;
+  max-width: 400px;
+  height: auto;
+  object-fit: contain;
+  border-radius: 4px;
+}
+
+.cf-quickshop__images .cf-quickshop__thumbs {
+  display: flex;
+  gap: 8px;
+  margin-top: 12px;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.cf-quickshop__images .cf-quickshop__thumb {
+  width: 60px;
+  height: 60px;
+  object-fit: contain;
+  border: 2px solid transparent;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: border-color 0.2s;
+}
+
+.cf-quickshop__images .cf-quickshop__thumb:hover,
+.cf-quickshop__images .cf-quickshop__thumb.cf-thumb-active {
+  border-color: #333;
+}
+
+.cf-quickshop__details {
+  padding: 30px 25px;
+  overflow-y: auto;
+  max-height: 85vh;
+}
+
+.cf-quickshop__vendor {
+  font-size: 13px;
+  color: #e53935;
+  margin: 0 0 4px;
+}
+
+.cf-quickshop__vendor a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.cf-quickshop__title {
+  font-size: 22px;
+  font-weight: 600;
+  margin: 0 0 8px;
+  color: #333;
+  line-height: 1.3;
+}
+
+.cf-quickshop__reviews {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.cf-quickshop__reviews .cf-star {
+  width: 16px;
+  height: 16px;
+}
+
+.cf-quickshop__price {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 16px;
+}
+
+.cf-quickshop__price .cf-price--compare {
+  font-size: 16px;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 8px;
+}
+
+.cf-quickshop__option-group {
+  margin-bottom: 16px;
+}
+
+.cf-quickshop__option-label {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.cf-quickshop__swatches {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.cf-quickshop__swatch-btn {
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 2px solid #ddd;
+  cursor: pointer;
+  padding: 0;
+  transition: border-color 0.2s, box-shadow 0.2s;
+}
+
+.cf-quickshop__swatch-btn:hover,
+.cf-quickshop__swatch-btn.cf-selected {
+  border-color: #333;
+  box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+}
+
+.cf-quickshop__select {
+  width: 100%;
+  padding: 12px 14px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.cf-quickshop__quantity-row {
+  display: flex;
+  gap: 12px;
+  align-items: stretch;
+  margin-bottom: 12px;
+}
+
+.cf-quickshop__qty {
+  display: flex;
+  align-items: center;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  overflow: hidden;
+}
+
+.cf-quickshop__qty button {
+  width: 40px;
+  height: 44px;
+  border: none;
+  background: #fff;
+  font-size: 18px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: background 0.2s;
+}
+
+.cf-quickshop__qty button:hover {
+  background: #f5f5f5;
+}
+
+.cf-quickshop__qty input {
+  width: 50px;
+  text-align: center;
+  border: none;
+  border-left: 1px solid #ddd;
+  border-right: 1px solid #ddd;
+  font-size: 15px;
+  -moz-appearance: textfield;
+}
+
+.cf-quickshop__qty input::-webkit-inner-spin-button,
+.cf-quickshop__qty input::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+.cf-quickshop__atc {
+  flex: 1;
+  padding: 12px 20px;
+  border: 1.5px solid #DA1E37;
+  background: #fff;
+  color: #DA1E37;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background 0.2s, color 0.2s;
+}
+
+.cf-quickshop__atc:hover {
+  background: #DA1E37;
+  color: #fff;
+}
+
+.cf-quickshop__atc:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.cf-quickshop__buy-now {
+  width: 100%;
+  padding: 14px;
+  background: #5a31f4;
+  color: #fff;
+  border: none;
+  border-radius: 4px;
+  font-size: 15px;
+  font-weight: 600;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.cf-quickshop__view-full {
+  display: block;
+  text-align: center;
+  margin-top: 16px;
+  font-size: 13px;
+  color: #666;
+  text-decoration: underline;
+}
+
 /* Responsive */
 @media screen and (max-width: 999px) {
   .cf-slide {
@@ -617,6 +956,24 @@
   .cf-nav svg {
     width: 12px;
     height: 12px;
+  }
+
+  .cf-quickshop-modal {
+    width: 95%;
+    max-height: 95vh;
+  }
+
+  .cf-quickshop-modal__content.cf-loaded {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-quickshop__images {
+    padding: 15px;
+  }
+
+  .cf-quickshop__details {
+    padding: 20px 15px;
+    max-height: none;
   }
 }
 </style>
@@ -744,6 +1101,300 @@
           });
           swatch.classList.add("cf-swatch--active");
         });
+      });
+    });
+
+    /* ── Quick Shop Modal ── */
+    var overlay = document.getElementById("cf-quickshop-overlay-" + sectionId);
+    var modal = document.getElementById("cf-quickshop-modal-" + sectionId);
+    var modalContent = document.getElementById("cf-quickshop-content-" + sectionId);
+    var modalLoading = modal ? modal.querySelector(".cf-quickshop-modal__loading") : null;
+    var closeBtn = modal ? modal.querySelector(".cf-quickshop-modal__close") : null;
+
+    function openModal() {
+      if (overlay) overlay.classList.add("cf-active");
+      if (modal) modal.classList.add("cf-active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      if (overlay) overlay.classList.remove("cf-active");
+      if (modal) modal.classList.remove("cf-active");
+      document.body.style.overflow = "";
+    }
+
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (overlay) overlay.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal && modal.classList.contains("cf-active")) closeModal();
+    });
+
+    section.querySelectorAll("[data-quickshop-url]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var productUrl = btn.getAttribute("data-quickshop-url");
+        if (!productUrl) return;
+
+        /* Reset & show modal with loading */
+        if (modalContent) { modalContent.innerHTML = ""; modalContent.classList.remove("cf-loaded"); }
+        if (modalLoading) modalLoading.classList.remove("cf-hidden");
+        openModal();
+
+        /* Fetch product page */
+        fetch(productUrl)
+          .then(function (res) { return res.text(); })
+          .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, "text/html");
+
+            /* Extract product data from the fetched page */
+            var title = doc.querySelector("h1") ? doc.querySelector("h1").textContent.trim() : "";
+            var vendor = "";
+            var vendorEl = doc.querySelector(".product-vendor, [class*='vendor']");
+            if (vendorEl) vendor = vendorEl.textContent.trim();
+
+            /* Get price */
+            var priceHtml = "";
+            var priceEl = doc.querySelector("product-price, .product-price, [class*='product__price'], .price");
+            if (priceEl) priceHtml = priceEl.innerHTML;
+
+            /* Get images */
+            var images = [];
+            doc.querySelectorAll(".product-media img, .product__media img, [data-product-grid-content] img, .media-gallery img").forEach(function (img) {
+              var src = img.getAttribute("src");
+              if (src && images.indexOf(src) === -1) images.push(src);
+            });
+            /* Fallback: get from og:image or any product image */
+            if (images.length === 0) {
+              var ogImg = doc.querySelector('meta[property="og:image"]');
+              if (ogImg) images.push(ogImg.getAttribute("content"));
+            }
+
+            /* Get product form (for variant selection and add to cart) */
+            var productForm = doc.querySelector('form[action*="/cart/add"]');
+            var formHtml = "";
+            var variantSelectHtml = "";
+            var variantId = "";
+
+            if (productForm) {
+              /* Extract variant select/options */
+              var variantSelect = productForm.querySelector('select[name="id"]');
+              var variantInput = productForm.querySelector('input[name="id"]');
+
+              if (variantSelect) {
+                variantSelectHtml = '<div class="cf-quickshop__option-group"><label class="cf-quickshop__option-label">Thickness | Inner Diameter</label><select class="cf-quickshop__select" id="cf-qs-variant-' + sectionId + '">' + variantSelect.innerHTML + '</select></div>';
+                variantId = variantSelect.value;
+              } else if (variantInput) {
+                variantId = variantInput.value;
+              }
+
+              /* Extract option groups (like Color swatches) from the page */
+              var optionGroups = doc.querySelectorAll(".variant-option, .product-form__option, fieldset[class*='variant']");
+              var optionHtml = "";
+              optionGroups.forEach(function (group) {
+                var legend = group.querySelector("legend, label, .variant-option__label");
+                var legendText = legend ? legend.textContent.trim() : "";
+
+                /* Check if this is a color/swatch option */
+                var isColor = /colou?r/i.test(legendText);
+                var inputs = group.querySelectorAll("input[type='radio']");
+
+                if (inputs.length > 0) {
+                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
+
+                  if (isColor) {
+                    optionHtml += '<div class="cf-quickshop__swatches">';
+                    inputs.forEach(function (input, idx) {
+                      var val = input.value;
+                      var handle = val.toLowerCase().replace(/\s+/g, "-");
+                      var checked = input.checked || idx === 0 ? " cf-selected" : "";
+                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + legendText + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
+                    });
+                    optionHtml += '</div>';
+                  } else {
+                    optionHtml += '<select class="cf-quickshop__select" data-option-name="' + legendText + '">';
+                    inputs.forEach(function (input) {
+                      var val = input.value;
+                      var selected = input.checked ? " selected" : "";
+                      optionHtml += '<option value="' + val + '"' + selected + '>' + val + '</option>';
+                    });
+                    optionHtml += '</select>';
+                  }
+                  optionHtml += '</div>';
+                }
+              });
+            }
+
+            /* Get star reviews */
+            var reviewsHtml = "";
+            var reviewEl = doc.querySelector("[class*='rating'], [class*='review'], .spr-badge, .jdgm-widget");
+            if (reviewEl) reviewsHtml = '<div class="cf-quickshop__reviews">' + reviewEl.innerHTML + '</div>';
+
+            /* Build the modal content */
+            var imagesHtml = '<div class="cf-quickshop__images">';
+            if (images.length > 0) {
+              imagesHtml += '<img class="cf-quickshop__main-img" src="' + images[0] + '" alt="' + title + '">';
+              if (images.length > 1) {
+                imagesHtml += '<div class="cf-quickshop__thumbs">';
+                images.slice(0, 5).forEach(function (src, i) {
+                  imagesHtml += '<img class="cf-quickshop__thumb' + (i === 0 ? ' cf-thumb-active' : '') + '" src="' + src + '" alt="Thumbnail ' + (i + 1) + '">';
+                });
+                imagesHtml += '</div>';
+              }
+            }
+            imagesHtml += '</div>';
+
+            var detailsHtml = '<div class="cf-quickshop__details">';
+            if (vendor) detailsHtml += '<p class="cf-quickshop__vendor">by <a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '">' + vendor + '</a></p>';
+            detailsHtml += '<h2 class="cf-quickshop__title">' + title + '</h2>';
+            detailsHtml += reviewsHtml;
+            if (priceHtml) detailsHtml += '<div class="cf-quickshop__price">' + priceHtml + '</div>';
+            if (optionHtml) detailsHtml += optionHtml;
+            if (variantSelectHtml) detailsHtml += variantSelectHtml;
+            detailsHtml += '<div class="cf-quickshop__quantity-row">';
+            detailsHtml += '<div class="cf-quickshop__qty"><button type="button" class="cf-qs-minus">&minus;</button><input type="number" class="cf-qs-qty-input" value="1" min="1" max="99"><button type="button" class="cf-qs-plus">&plus;</button></div>';
+            detailsHtml += '<button type="button" class="cf-quickshop__atc" data-variant-id="' + variantId + '">Add to cart</button>';
+            detailsHtml += '</div>';
+            detailsHtml += '<a href="' + productUrl + '" class="cf-quickshop__view-full">View full details</a>';
+            detailsHtml += '</div>';
+
+            if (modalContent) {
+              modalContent.innerHTML = imagesHtml + detailsHtml;
+              modalContent.classList.add("cf-loaded");
+            }
+            if (modalLoading) modalLoading.classList.add("cf-hidden");
+
+            /* ── Thumbnail click ── */
+            modalContent.querySelectorAll(".cf-quickshop__thumb").forEach(function (thumb) {
+              thumb.addEventListener("click", function () {
+                var mainImg = modalContent.querySelector(".cf-quickshop__main-img");
+                if (mainImg) mainImg.src = thumb.src;
+                modalContent.querySelectorAll(".cf-quickshop__thumb").forEach(function (t) { t.classList.remove("cf-thumb-active"); });
+                thumb.classList.add("cf-thumb-active");
+              });
+            });
+
+            /* ── Color swatch selection ── */
+            modalContent.querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (swBtn) {
+              swBtn.addEventListener("click", function () {
+                swBtn.closest(".cf-quickshop__swatches").querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (s) { s.classList.remove("cf-selected"); });
+                swBtn.classList.add("cf-selected");
+                updateVariantFromOptions();
+              });
+            });
+
+            /* ── Select change ── */
+            modalContent.querySelectorAll(".cf-quickshop__select[data-option-name]").forEach(function (sel) {
+              sel.addEventListener("change", function () { updateVariantFromOptions(); });
+            });
+
+            /* ── Variant select direct change ── */
+            var directVariantSelect = document.getElementById("cf-qs-variant-" + sectionId);
+            if (directVariantSelect) {
+              directVariantSelect.addEventListener("change", function () {
+                var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
+                if (atcBtn) atcBtn.setAttribute("data-variant-id", directVariantSelect.value);
+                /* Update price from option text */
+                var selectedOpt = directVariantSelect.options[directVariantSelect.selectedIndex];
+                if (selectedOpt) {
+                  var priceDiv = modalContent.querySelector(".cf-quickshop__price");
+                  if (priceDiv && selectedOpt.textContent.indexOf("-") > -1) {
+                    var parts = selectedOpt.textContent.split("-");
+                    var priceText = parts[parts.length - 1].trim();
+                    if (priceText) priceDiv.textContent = priceText;
+                  }
+                }
+              });
+            }
+
+            function updateVariantFromOptions() {
+              /* Try to match variant from selected options with the direct variant select */
+              if (!directVariantSelect) return;
+              var selectedColor = "";
+              var colorBtn = modalContent.querySelector(".cf-quickshop__swatch-btn.cf-selected");
+              if (colorBtn) selectedColor = colorBtn.getAttribute("data-option-value") || "";
+
+              var opts = directVariantSelect.options;
+              for (var i = 0; i < opts.length; i++) {
+                var optText = opts[i].textContent.toLowerCase();
+                if (selectedColor && optText.indexOf(selectedColor.toLowerCase()) > -1) {
+                  directVariantSelect.selectedIndex = i;
+                  directVariantSelect.dispatchEvent(new Event("change"));
+                  break;
+                }
+              }
+            }
+
+            /* ── Quantity buttons ── */
+            var qtyInput = modalContent.querySelector(".cf-qs-qty-input");
+            var minusBtn = modalContent.querySelector(".cf-qs-minus");
+            var plusBtn = modalContent.querySelector(".cf-qs-plus");
+
+            if (minusBtn && qtyInput) {
+              minusBtn.addEventListener("click", function () {
+                var v = parseInt(qtyInput.value) || 1;
+                if (v > 1) qtyInput.value = v - 1;
+              });
+            }
+            if (plusBtn && qtyInput) {
+              plusBtn.addEventListener("click", function () {
+                var v = parseInt(qtyInput.value) || 1;
+                qtyInput.value = v + 1;
+              });
+            }
+
+            /* ── Add to Cart ── */
+            var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
+            if (atcBtn) {
+              atcBtn.addEventListener("click", function () {
+                var vid = atcBtn.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+
+                atcBtn.disabled = true;
+                atcBtn.textContent = "Adding...";
+
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                  if (data.status && data.status === 422) {
+                    atcBtn.textContent = data.description || "Error";
+                    setTimeout(function () { atcBtn.textContent = "Add to cart"; atcBtn.disabled = false; }, 2000);
+                  } else {
+                    atcBtn.textContent = "Added!";
+                    setTimeout(function () {
+                      atcBtn.textContent = "Add to cart";
+                      atcBtn.disabled = false;
+                      closeModal();
+                      /* Refresh cart count if theme supports it */
+                      fetch("/cart.js").then(function (r) { return r.json(); }).then(function (cart) {
+                        var cartCountEls = document.querySelectorAll("[data-cart-count], .cart-count-bubble span, .cart-count");
+                        cartCountEls.forEach(function (el) { el.textContent = cart.item_count; });
+                      });
+                    }, 1000);
+                  }
+                })
+                .catch(function () {
+                  atcBtn.textContent = "Error - try again";
+                  setTimeout(function () { atcBtn.textContent = "Add to cart"; atcBtn.disabled = false; }, 2000);
+                });
+              });
+            }
+          })
+          .catch(function (err) {
+            console.error("Quick Shop fetch error:", err);
+            if (modalLoading) modalLoading.classList.add("cf-hidden");
+            if (modalContent) {
+              modalContent.innerHTML = '<div style="padding:40px;text-align:center;grid-column:1/-1;"><p>Could not load product. <a href="' + productUrl + '">View product page</a></p></div>';
+              modalContent.classList.add("cf-loaded");
+            }
+          });
       });
     });
   }
