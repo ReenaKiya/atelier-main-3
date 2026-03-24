@@ -1002,6 +1002,21 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "product_description_tabs_yHU4Mm": {
+      "type": "product-description-tabs",
+      "name": "Product Desc Tabs",
+      "settings": {
+        "description_content": "",
+        "specifications_content": "",
+        "features_content": "",
+        "how_to_use_content": "",
+        "care_content": "",
+        "materials_content": "",
+        "ideal_usages_content": "",
+        "size_guide_content": "",
+        "faq_content": ""
+      }
     }
   },
   "order": [
@@ -1015,6 +1030,7 @@
     "17659686154e89d66d",
     "176603826003e86eb7",
     "collection_list_Ec6EQn",
-    "177426350820ff0335"
+    "177426350820ff0335",
+    "product_description_tabs_yHU4Mm"
   ]
 }
