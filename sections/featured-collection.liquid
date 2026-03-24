@@ -1150,7 +1150,15 @@
             var doc = new DOMParser().parseFromString(html, "text/html");
 
             /* Extract product data from the fetched page */
-            var title = doc.querySelector("h1") ? doc.querySelector("h1").textContent.trim() : "";
+            var titleEl = doc.querySelector(".view-product-title a")
+              || doc.querySelector(".view-product-title")
+              || doc.querySelector("h1");
+            var title = titleEl ? titleEl.textContent.trim() : "";
+            /* Fallback: use og:title meta tag */
+            if (!title) {
+              var ogTitle = doc.querySelector('meta[property="og:title"]');
+              if (ogTitle) title = ogTitle.getAttribute("content") || "";
+            }
             var vendor = "";
             var vendorEl = doc.querySelector(".product-vendor, [class*='vendor']");
             if (vendorEl) vendor = vendorEl.textContent.trim();
