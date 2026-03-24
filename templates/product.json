@@ -1002,24 +1002,6 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
-<<<<<<< HEAD
-    },
-    "product_description_tabs_yHU4Mm": {
-      "type": "product-description-tabs",
-      "name": "Product Desc Tabs",
-      "settings": {
-        "description_content": "",
-        "specifications_content": "",
-        "features_content": "",
-        "how_to_use_content": "",
-        "care_content": "",
-        "materials_content": "",
-        "ideal_usages_content": "",
-        "size_guide_content": "",
-        "faq_content": ""
-      }
-=======
->>>>>>> aac26ea (description removed)
     }
   },
   "order": [
