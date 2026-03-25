@@ -433,10 +433,7 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": [
-                    "text_CayfE3",
-                    "price_ahRCgD"
-                  ]
+                  "block_order": ["text_CayfE3", "price_ahRCgD"]
                 },
                 "group_PihxwT": {
                   "type": "_product-card-group",
@@ -491,26 +488,16 @@
                       "blocks": {}
                     }
                   },
-                  "block_order": [
-                    "swatches_EdNBpW"
-                  ]
+                  "block_order": ["swatches_EdNBpW"]
                 }
               },
-              "block_order": [
-                "group_tEHPmM",
-                "group_PihxwT"
-              ]
+              "block_order": ["group_tEHPmM", "group_PihxwT"]
             }
           },
-          "block_order": [
-            "product_card_gallery_YYPH6q",
-            "group_396y6r"
-          ]
+          "block_order": ["product_card_gallery_YYPH6q", "group_396y6r"]
         }
       },
-      "block_order": [
-        "text_GbxcYC"
-      ],
+      "block_order": ["text_GbxcYC"],
       "name": "t:names.product_recommendations",
       "settings": {
         "product": "{{ closest.product }}",
@@ -698,9 +685,7 @@
           "blocks": {}
         }
       },
-      "block_order": [
-        "payment_icons_pmydfC"
-      ],
+      "block_order": ["payment_icons_pmydfC"],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -847,9 +832,7 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "text_WMgFEh"
-          ]
+          "block_order": ["text_WMgFEh"]
         },
         "static-collection-card": {
           "type": "_collection-card",
@@ -911,20 +894,13 @@
               "blocks": {}
             }
           },
-          "block_order": [
-            "collection_title_Q6KrTf"
-          ]
+          "block_order": ["collection_title_Q6KrTf"]
         }
       },
-      "block_order": [
-        "group_W4NQTi"
-      ],
+      "block_order": ["group_W4NQTi"],
       "name": "t:names.collections_grid",
       "settings": {
-        "collection_list": [
-          "baby-cloths",
-          "frontpage"
-        ],
+        "collection_list": ["baby-cloths", "frontpage"],
         "layout_type": "grid",
         "carousel_on_mobile": false,
         "columns": 3,
@@ -987,6 +963,21 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "product_description_tabs_tqRhX7": {
+      "type": "product-description-tabs",
+      "name": "Product Desc Tabs",
+      "settings": {
+        "description_content": "",
+        "specifications_content": "",
+        "features_content": "",
+        "how_to_use_content": "",
+        "care_content": "",
+        "materials_content": "",
+        "ideal_usages_content": "",
+        "size_guide_content": "",
+        "faq_content": ""
+      }
     }
   },
   "order": [
@@ -1000,7 +991,7 @@
     "17659686154e89d66d",
     "176603826003e86eb7",
     "collection_list_Ec6EQn",
-    "product_description_tabs_PiVm7e",
-    "17744133919d048009"
+    "177426350820ff0335",
+    "product_description_tabs_tqRhX7"
   ]
 }

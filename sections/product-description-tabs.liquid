@@ -1,24 +1,37 @@
 <style>
-  .pdt-container{max-width:1550px;margin:20px auto;color:#222;box-sizing:border-box;padding:0 15px}
-  .pdt-tabs{width:100%}
-  .pdt-tab-nav{display:flex;align-items:center;margin-bottom:0;padding:0;position:relative;gap:8px;min-height:auto}
+  /* Override theme color scheme - force white background */
+  .section-product-description-tabs,
+  .shopify-section--product-description-tabs,
+  [id*="product_description_tabs"] {
+    background: #ffffff !important;
+    --color-background: 255, 255, 255 !important;
+    --gradient-background: #ffffff !important;
+  }
+  .pdt-container{max-width:1550px;margin:20px auto;color:#222;box-sizing:border-box;padding:0 15px;background:#ffffff}
+  .pdt-tabs{width:100%;background:#ffffff}
+  .pdt-tab-nav{display:flex;align-items:center;margin-bottom:0;padding:0;position:relative;gap:8px;min-height:auto;background:#ffffff}
   .pdt-arrow{background:#f5f5f5;border:none;border-radius:50%;width:36px;height:36px;display:flex;align-items:center;justify-content:center;transition:all .2s;cursor:pointer;flex-shrink:0}
   .pdt-arrow:hover{background:#e0e0e0}
   .pdt-arrow svg{pointer-events:none}
   .pdt-tabs-scroll{flex:1;overflow-x:auto;display:flex;gap:8px;scrollbar-width:none;-ms-overflow-style:none;align-items:center}
   .pdt-tabs-scroll::-webkit-scrollbar{display:none}
   .pdt-tab-buttons{display:flex;min-width:max-content;width:100%;gap:8px;align-items:center}
-  .pdt-tab-btn{padding:8px 20px;background:#f8f9fa;border:1px solid #e9ecef;border-bottom:none;border-radius:8px 8px 0 0;margin-bottom:-1px;font-size:16px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .3s ease;color:#212529;font-family:inherit}
+  .pdt-tab-btn{padding:8px 20px;background:#f8f9fa;border:1px solid #e9ecef;border-bottom:none;border-radius:8px 8px 0 0;margin-bottom:-1px;font-size:14px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .3s ease;color:#212529;font-family:inherit}
   .pdt-tab-btn.active{background:#db1e37;color:#fff;border-color:#db1e37;box-shadow:0 -2px 8px rgba(0,0,0,.1)}
-  .pdt-tab-content{display:none;padding:10px 24px 24px;background:#fff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.08);margin-top:-1px;animation:pdtFadeIn .3s ease}
+  .pdt-tab-content{display:none;padding:31px 24px 24px;background:#ffffff;border-radius:8px;box-shadow:0 2px 12px rgba(0,0,0,.1);margin-top:2px;animation:pdtFadeIn .3s ease}
   .pdt-tab-content.active{display:block}
-  .pdt-tab-content table,.pdt-acc-content table{border-collapse:collapse;width:100%;border:1px solid #000}
+  .pdt-tab-content table,.pdt-acc-content table{border-collapse:collapse;width:auto;border:1px solid #000}
   .pdt-tab-content table th,.pdt-tab-content table td,.pdt-acc-content table th,.pdt-acc-content table td{border:1px solid #000;padding:8px 12px;text-align:left}
   .pdt-tab-content table th,.pdt-acc-content table th{background:#f8f9fa;font-weight:700}
   .pdt-tab-content ul,.pdt-tab-content ol,.pdt-acc-content ul,.pdt-acc-content ol{padding-left:20px;line-height:1.8}
   .pdt-tab-content li,.pdt-acc-content li{margin-bottom:4px}
   .pdt-tab-content p,.pdt-acc-content p{margin:0 0 12px;line-height:1.6}
   .pdt-tab-content p:last-child,.pdt-acc-content p:last-child{margin-bottom:0}
+  .pdt-tab-content h2,.pdt-tab-content h3,.pdt-tab-content h4,
+  .pdt-acc-content h2,.pdt-acc-content h3,.pdt-acc-content h4{margin:0 0 16px;color:#000;font-weight:700}
+  .pdt-tab-content h2,.pdt-acc-content h2{font-size:28px}
+  .pdt-tab-content h3,.pdt-acc-content h3{font-family:Nunito Sans,sans-serif;font-style:normal;font-weight:400;letter-spacing:-.02em;font-size:27px}
+  .pdt-tab-content h4,.pdt-acc-content h4{font-size:18px;margin-top:20px}
   @keyframes pdtFadeIn{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
   /* FAQ styles */
@@ -79,7 +92,13 @@
 {%- endcomment -%}
 
 {%- comment -%} Resolve content: metafield > section setting > product description {%- endcomment -%}
+{%- comment -%} Helper: multi_line_text_field metafields escape HTML, so we unescape entities {%- endcomment -%}
+{%- capture unescape_dummy -%}{%- endcapture -%}
+
 {%- assign pdt_description = product.metafields.custom.pdt_description.value | default: blank -%}
+{%- if pdt_description != blank -%}
+  {%- assign pdt_description = pdt_description | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_description == blank -%}
   {%- assign pdt_description = section.settings.description_content -%}
 {%- endif -%}
@@ -88,41 +107,65 @@
 {%- endif -%}
 
 {%- assign pdt_specifications = product.metafields.custom.pdt_specifications.value | default: blank -%}
+{%- if pdt_specifications != blank -%}
+  {%- assign pdt_specifications = pdt_specifications | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_specifications == blank -%}
   {%- assign pdt_specifications = section.settings.specifications_content -%}
 {%- endif -%}
 
 {%- assign pdt_features = product.metafields.custom.pdt_features.value | default: blank -%}
+{%- if pdt_features != blank -%}
+  {%- assign pdt_features = pdt_features | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_features == blank -%}
   {%- assign pdt_features = section.settings.features_content -%}
 {%- endif -%}
 
 {%- assign pdt_how_to_use = product.metafields.custom.pdt_how_to_use.value | default: blank -%}
+{%- if pdt_how_to_use != blank -%}
+  {%- assign pdt_how_to_use = pdt_how_to_use | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_how_to_use == blank -%}
   {%- assign pdt_how_to_use = section.settings.how_to_use_content -%}
 {%- endif -%}
 
 {%- assign pdt_care = product.metafields.custom.pdt_care_instructions.value | default: blank -%}
+{%- if pdt_care != blank -%}
+  {%- assign pdt_care = pdt_care | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_care == blank -%}
   {%- assign pdt_care = section.settings.care_content -%}
 {%- endif -%}
 
 {%- assign pdt_materials = product.metafields.custom.pdt_materials.value | default: blank -%}
+{%- if pdt_materials != blank -%}
+  {%- assign pdt_materials = pdt_materials | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_materials == blank -%}
   {%- assign pdt_materials = section.settings.materials_content -%}
 {%- endif -%}
 
 {%- assign pdt_ideal_usages = product.metafields.custom.pdt_ideal_usages.value | default: blank -%}
+{%- if pdt_ideal_usages != blank -%}
+  {%- assign pdt_ideal_usages = pdt_ideal_usages | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_ideal_usages == blank -%}
   {%- assign pdt_ideal_usages = section.settings.ideal_usages_content -%}
 {%- endif -%}
 
 {%- assign pdt_size_guide = product.metafields.custom.pdt_size_guide.value | default: blank -%}
+{%- if pdt_size_guide != blank -%}
+  {%- assign pdt_size_guide = pdt_size_guide | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_size_guide == blank -%}
   {%- assign pdt_size_guide = section.settings.size_guide_content -%}
 {%- endif -%}
 
 {%- assign pdt_faq = product.metafields.custom.pdt_faq.value | default: blank -%}
+{%- if pdt_faq != blank -%}
+  {%- assign pdt_faq = pdt_faq | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
+{%- endif -%}
 {%- if pdt_faq == blank -%}
   {%- assign pdt_faq = section.settings.faq_content -%}
 {%- endif -%}
