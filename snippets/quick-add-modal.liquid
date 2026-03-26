@@ -241,6 +241,7 @@
     transition: color 0.2s var(--animation-easing);
   }
 
+  .quick-add-modal .quick-add-vendor,
   .quick-add-modal__content .quick-add-vendor {
     display: block !important;
     font-size: var(--font-size--sm);
@@ -248,11 +249,13 @@
     margin-top: 4px;
   }
 
+  .quick-add-modal .quick-add-vendor a,
   .quick-add-modal__content .quick-add-vendor a {
     color: inherit;
     text-decoration: underline;
   }
 
+  .quick-add-modal .quick-add-description,
   .quick-add-modal__content .quick-add-description {
     display: block !important;
     font-size: var(--font-size--sm);
@@ -260,6 +263,30 @@
     line-height: 1.6;
     margin-top: 8px;
     opacity: 0.75;
+  }
+
+  .quick-add-modal .variant-option--dropdowns,
+  .quick-add-modal .variant-option--dropdowns *,
+  .quick-add-modal__content .variant-option--dropdowns,
+  .quick-add-modal__content .variant-option--dropdowns * {
+    display: revert !important;
+  }
+
+  .quick-add-modal .variant-option--dropdowns,
+  .quick-add-modal__content .variant-option--dropdowns {
+    display: block !important;
+    margin-top: 8px;
+  }
+
+  .quick-add-modal__content variant-picker .variant-option--dropdowns label,
+  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select-wrapper,
+  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select,
+  .quick-add-modal__content variant-picker .variant-option--dropdowns svg {
+    display: revert !important;
+  }
+
+  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select-wrapper {
+    display: flex !important;
   }
 
   .quick-add-modal__content .view-product-title {
@@ -281,6 +308,10 @@
       .quick-add-description *,
       variant-picker,
       variant-picker *,
+      .variant-option,
+      .variant-option *,
+      .variant-picker,
+      .variant-picker *,
       product-price,
       product-price *,
       product-inventory,
@@ -305,6 +336,10 @@
           .quick-add-description *,
           variant-picker,
           variant-picker *,
+          .variant-option,
+          .variant-option *,
+          .variant-picker,
+          .variant-picker *,
           product-price,
           product-price *,
           product-inventory,

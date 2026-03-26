@@ -24,7 +24,7 @@
     </div>
     {% if product.vendor != blank %}
       <div class="quick-add-vendor">
-        by <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+        <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
       </div>
     {% endif %}
     {% if product.description != blank %}
