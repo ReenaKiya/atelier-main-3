@@ -18,6 +18,74 @@
     ></div>
   </dialog>
 </quick-add-dialog>
+<script>
+  (function() {
+    var modalContent = document.getElementById('quick-add-modal-content');
+    if (!modalContent) return;
+
+    function forceShowElements() {
+      // Force show vendor
+      modalContent.querySelectorAll('.quick-add-vendor').forEach(function(el) {
+        el.style.cssText = 'display:block!important;font-size:14px;margin:4px 0;';
+      });
+      // Force show description
+      modalContent.querySelectorAll('.quick-add-description').forEach(function(el) {
+        el.style.cssText = 'display:block!important;font-size:14px;line-height:1.6;margin-top:10px;opacity:0.8;';
+      });
+      // Force show ALL variant options (dropdowns, buttons, swatches)
+      modalContent.querySelectorAll('.variant-option').forEach(function(el) {
+        if (el.style.display === 'none' || getComputedStyle(el).display === 'none') {
+          el.style.cssText = 'display:block!important;';
+        }
+      });
+      modalContent.querySelectorAll('.variant-option--dropdowns').forEach(function(el) {
+        el.style.cssText = 'display:block!important;';
+      });
+      modalContent.querySelectorAll('.variant-option--dropdowns label').forEach(function(el) {
+        el.style.cssText = 'display:block!important;font-weight:500;margin-bottom:4px;';
+      });
+      modalContent.querySelectorAll('.variant-option__select-wrapper').forEach(function(el) {
+        el.style.cssText = 'display:flex!important;position:relative;align-items:center;';
+      });
+      modalContent.querySelectorAll('.variant-option__select').forEach(function(el) {
+        el.style.cssText = 'display:block!important;width:100%;';
+      });
+      modalContent.querySelectorAll('.variant-option__select-wrapper .icon').forEach(function(el) {
+        el.style.cssText = 'display:block!important;';
+      });
+      modalContent.querySelectorAll('variant-picker').forEach(function(el) {
+        el.style.cssText = 'display:block!important;width:100%;';
+      });
+      modalContent.querySelectorAll('.variant-picker__form').forEach(function(el) {
+        el.style.cssText = 'display:flex!important;flex-direction:column;gap:12px;width:100%;';
+      });
+    }
+
+    // Watch for content being loaded into modal
+    var observer = new MutationObserver(function() {
+      forceShowElements();
+      // Run again after short delay to catch any post-morph updates
+      setTimeout(forceShowElements, 100);
+      setTimeout(forceShowElements, 500);
+    });
+    observer.observe(modalContent, { childList: true, subtree: true });
+
+    // Also run when dialog opens
+    var dialog = document.querySelector('#quick-add-dialog dialog');
+    if (dialog) {
+      var dialogObserver = new MutationObserver(function(mutations) {
+        mutations.forEach(function(m) {
+          if (m.attributeName === 'open') {
+            forceShowElements();
+            setTimeout(forceShowElements, 200);
+            setTimeout(forceShowElements, 600);
+          }
+        });
+      });
+      dialogObserver.observe(dialog, { attributes: true });
+    }
+  })();
+</script>
 
 {% stylesheet %}
   .quick-add-modal {
@@ -241,7 +309,6 @@
     transition: color 0.2s var(--animation-easing);
   }
 
-  .quick-add-modal .quick-add-vendor,
   .quick-add-modal__content .quick-add-vendor {
     display: block !important;
     font-size: var(--font-size--sm);
@@ -249,13 +316,11 @@
     margin-top: 4px;
   }
 
-  .quick-add-modal .quick-add-vendor a,
   .quick-add-modal__content .quick-add-vendor a {
     color: inherit;
     text-decoration: underline;
   }
 
-  .quick-add-modal .quick-add-description,
   .quick-add-modal__content .quick-add-description {
     display: block !important;
     font-size: var(--font-size--sm);
@@ -265,89 +330,16 @@
     opacity: 0.75;
   }
 
-  .quick-add-modal .variant-option--dropdowns,
-  .quick-add-modal .variant-option--dropdowns *,
-  .quick-add-modal__content .variant-option--dropdowns,
-  .quick-add-modal__content .variant-option--dropdowns * {
-    display: revert !important;
-  }
-
-  .quick-add-modal .variant-option--dropdowns,
-  .quick-add-modal__content .variant-option--dropdowns {
-    display: block !important;
-    margin-top: 8px;
-  }
-
-  .quick-add-modal__content variant-picker .variant-option--dropdowns label,
-  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select-wrapper,
-  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select,
-  .quick-add-modal__content variant-picker .variant-option--dropdowns svg {
-    display: revert !important;
-  }
-
-  .quick-add-modal__content variant-picker .variant-option--dropdowns .variant-option__select-wrapper {
-    display: flex !important;
-  }
-
   .quick-add-modal__content .view-product-title {
     display: flex;
   }
 
-  .quick-add-modal__content
-    .product-details
-    *:not(
-      .group-block,
-      .group-block-content,
-      .buy-buttons-block,
-      .buy-buttons-block *,
-      .view-product-title,
-      .view-product-title *,
-      .quick-add-vendor,
-      .quick-add-vendor *,
-      .quick-add-description,
-      .quick-add-description *,
-      variant-picker,
-      variant-picker *,
-      .variant-option,
-      .variant-option *,
-      .variant-picker,
-      .variant-picker *,
-      product-price,
-      product-price *,
-      product-inventory,
-      product-inventory *,
-      .view-more-details__wrapper,
-      .view-more-details__wrapper *
-    ) {
-    @media screen and (min-width: 750px) {
+  /* Hide only specific elements we don't want in the popup */
+  @media screen and (min-width: 750px) {
+    .quick-add-modal__content .delivery-date,
+    .quick-add-modal__content .group-block__media-wrapper {
       display: none !important;
     }
-  }
-
-  .quick-add-modal__content
-    .group-block:not(:has(
-          .buy-buttons-block,
-          .buy-buttons-block *,
-          .view-product-title,
-          .view-product-title *,
-          .quick-add-vendor,
-          .quick-add-vendor *,
-          .quick-add-description,
-          .quick-add-description *,
-          variant-picker,
-          variant-picker *,
-          .variant-option,
-          .variant-option *,
-          .variant-picker,
-          .variant-picker *,
-          product-price,
-          product-price *,
-          product-inventory,
-          product-inventory *,
-          .view-more-details__wrapper,
-          .view-more-details__wrapper *
-        ), .buy-buttons-block) {
-    display: none;
   }
 
   @media screen and (min-width: 750px) {
@@ -472,7 +464,6 @@
     top: 0;
   }
 
-  .quick-add-modal__content .text-block.rte:not(product-price),
   .quick-add-modal__content .view-more-details__wrapper {
     display: none;
   }

@@ -142,12 +142,18 @@ export class QuickAddComponent extends Component {
 
       if (!productFormComponent || !variantPicker || !productPrice || !productTitle) return;
 
+      // Get vendor and description before removing product details
+      const vendor = productDetails.querySelector('.quick-add-vendor');
+      const description = productDetails.querySelector('.quick-add-description');
+
       const productHeader = document.createElement('div');
       productHeader.classList.add('product-header');
 
       productHeader.appendChild(productTitle);
+      if (vendor) productHeader.appendChild(vendor);
       productHeader.appendChild(productPrice);
       productGrid.appendChild(productHeader);
+      if (description) productGrid.appendChild(description);
       productGrid.appendChild(variantPicker);
       productGrid.appendChild(productFormComponent);
       productDetails.remove();
