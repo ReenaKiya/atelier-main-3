@@ -241,6 +241,27 @@
     transition: color 0.2s var(--animation-easing);
   }
 
+  .quick-add-modal__content .quick-add-vendor {
+    display: block !important;
+    font-size: var(--font-size--sm);
+    color: var(--color-foreground);
+    margin-top: 4px;
+  }
+
+  .quick-add-modal__content .quick-add-vendor a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  .quick-add-modal__content .quick-add-description {
+    display: block !important;
+    font-size: var(--font-size--sm);
+    color: var(--color-foreground);
+    line-height: 1.6;
+    margin-top: 8px;
+    opacity: 0.75;
+  }
+
   .quick-add-modal__content .view-product-title {
     display: flex;
   }
@@ -254,6 +275,10 @@
       .buy-buttons-block *,
       .view-product-title,
       .view-product-title *,
+      .quick-add-vendor,
+      .quick-add-vendor *,
+      .quick-add-description,
+      .quick-add-description *,
       variant-picker,
       variant-picker *,
       product-price,
@@ -274,6 +299,10 @@
           .buy-buttons-block *,
           .view-product-title,
           .view-product-title *,
+          .quick-add-vendor,
+          .quick-add-vendor *,
+          .quick-add-description,
+          .quick-add-description *,
           variant-picker,
           variant-picker *,
           product-price,

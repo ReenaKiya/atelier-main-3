@@ -22,6 +22,16 @@
         {{- product.title }}
       </a>
     </div>
+    {% if product.vendor != blank %}
+      <div class="quick-add-vendor">
+        by <a href="{{ product.vendor | url_for_vendor }}">{{ product.vendor }}</a>
+      </div>
+    {% endif %}
+    {% if product.description != blank %}
+      <div class="quick-add-description">
+        {{ product.description | strip_html | truncate: 200 }}
+      </div>
+    {% endif %}
 
     
 
@@ -72,6 +82,14 @@ document.getElementById('toDate').innerHTML = toDate.toString('dddd MMMM dS');
   }
 
   .view-product-title {
+    display: none;
+  }
+
+  .quick-add-vendor {
+    display: none;
+  }
+
+  .quick-add-description {
     display: none;
   }
 
