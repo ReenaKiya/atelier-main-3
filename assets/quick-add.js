@@ -128,6 +128,52 @@ export class QuickAddComponent extends Component {
 
     if (!productGrid || !modalContent) return;
 
+    // Extract description from the product page (from description tabs or product description block)
+    let descriptionText = '';
+    // Try the description tabs section first
+    const tabContent = newHtml.querySelector('[data-pdt-panel="description"]');
+    if (tabContent) {
+      descriptionText = tabContent.textContent.trim().substring(0, 200);
+    }
+    // Fallback: try any product description block
+    if (!descriptionText) {
+      const descBlock = newHtml.querySelector('.product-description, [class*="product-description"]');
+      if (descBlock) {
+        descriptionText = descBlock.textContent.trim().substring(0, 200);
+      }
+    }
+    // Fallback: try the quick-add-description we added in Liquid
+    if (!descriptionText) {
+      const qaDesc = productGrid.querySelector('.quick-add-description');
+      if (qaDesc) {
+        descriptionText = qaDesc.textContent.trim();
+      }
+    }
+
+    // Inject description into the product details area if found
+    if (descriptionText) {
+      const productDetails = productGrid.querySelector('.product-details');
+      if (productDetails) {
+        // Check if description already exists
+        let descEl = productDetails.querySelector('.quick-add-description');
+        if (!descEl) {
+          descEl = newHtml.createElement('div');
+          descEl.className = 'quick-add-description';
+          descEl.textContent = descriptionText;
+          // Insert after buy buttons or at end of group-block-content
+          const groupContent = productDetails.querySelector('.group-block-content');
+          if (groupContent) {
+            groupContent.appendChild(descEl);
+          }
+        } else {
+          // Make sure it has content
+          if (!descEl.textContent.trim()) {
+            descEl.textContent = descriptionText;
+          }
+        }
+      }
+    }
+
     if (isMobileBreakpoint()) {
       const productDetails = productGrid.querySelector('.product-details');
       if (!productDetails) return;
