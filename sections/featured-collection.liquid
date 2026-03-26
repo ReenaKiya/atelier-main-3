@@ -901,6 +901,30 @@
   justify-content: center;
   gap: 8px;
   margin-top: 8px;
+  transition: background 0.2s;
+}
+
+.cf-quickshop__buy-now:hover {
+  background: #4926c7;
+}
+
+.cf-quickshop__buy-now:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
+}
+
+.cf-quickshop__more-payment {
+  display: block;
+  text-align: center;
+  margin-top: 8px;
+  font-size: 13px;
+  color: #5a31f4;
+  text-decoration: underline;
+  cursor: pointer;
+}
+
+.cf-quickshop__more-payment:hover {
+  color: #4926c7;
 }
 
 .cf-quickshop__description {
@@ -1299,6 +1323,10 @@
             detailsHtml += '<div class="cf-quickshop__qty"><button type="button" class="cf-qs-minus">&minus;</button><input type="number" class="cf-qs-qty-input" value="1" min="1" max="99"><button type="button" class="cf-qs-plus">&plus;</button></div>';
             detailsHtml += '<button type="button" class="cf-quickshop__atc" data-variant-id="' + variantId + '">Add to cart</button>';
             detailsHtml += '</div>';
+            detailsHtml += '<button type="button" class="cf-quickshop__buy-now" data-variant-id="' + variantId + '">';
+            detailsHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+            detailsHtml += ' Buy it now</button>';
+            detailsHtml += '<a href="#" class="cf-quickshop__more-payment" data-variant-id="' + variantId + '">More payment options</a>';
             if (descriptionText) detailsHtml += '<div class="cf-quickshop__description">' + descriptionText + '</div>';
             detailsHtml += '<a href="' + productUrl + '" class="cf-quickshop__view-full">View full details</a>';
             detailsHtml += '</div>';
@@ -1339,6 +1367,10 @@
               directVariantSelect.addEventListener("change", function () {
                 var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
                 if (atcBtn) atcBtn.setAttribute("data-variant-id", directVariantSelect.value);
+                var buyNowBtn = modalContent.querySelector(".cf-quickshop__buy-now");
+                if (buyNowBtn) buyNowBtn.setAttribute("data-variant-id", directVariantSelect.value);
+                var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
+                if (morePayLink) morePayLink.setAttribute("data-variant-id", directVariantSelect.value);
                 /* Update price from option text */
                 var selectedOpt = directVariantSelect.options[directVariantSelect.selectedIndex];
                 if (selectedOpt) {
@@ -1427,6 +1459,46 @@
                   atcBtn.textContent = "Error - try again";
                   setTimeout(function () { atcBtn.textContent = "Add to cart"; atcBtn.disabled = false; }, 2000);
                 });
+              });
+            }
+
+            /* ── Buy it now – adds to cart then redirects to checkout ── */
+            var buyNowBtn = modalContent.querySelector(".cf-quickshop__buy-now");
+            if (buyNowBtn) {
+              buyNowBtn.addEventListener("click", function () {
+                var vid = buyNowBtn.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+                buyNowBtn.disabled = true;
+                buyNowBtn.textContent = "Redirecting...";
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function () { window.location.href = "/checkout"; })
+                .catch(function () {
+                  buyNowBtn.textContent = "Error - try again";
+                  buyNowBtn.disabled = false;
+                });
+              });
+            }
+
+            /* ── More payment options – same as buy now ── */
+            var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
+            if (morePayLink) {
+              morePayLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                var vid = morePayLink.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function () { window.location.href = "/checkout"; })
+                .catch(function () { alert("Something went wrong. Please try again."); });
               });
             }
           })
