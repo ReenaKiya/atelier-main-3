@@ -903,6 +903,15 @@
   margin-top: 8px;
 }
 
+.cf-quickshop__description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #555;
+  margin-top: 16px;
+  padding-top: 12px;
+  border-top: 1px solid #eee;
+}
+
 .cf-quickshop__view-full {
   display: block;
   text-align: center;
@@ -1198,7 +1207,7 @@
                 variantId = variantInput.value;
               }
 
-              /* Extract option groups (like Color swatches) from the page */
+              /* Extract option groups (like Color swatches, dropdowns) from the page */
               var optionGroups = doc.querySelectorAll(".variant-option, .product-form__option, fieldset[class*='variant']");
               var optionHtml = "";
               optionGroups.forEach(function (group) {
@@ -1208,6 +1217,7 @@
                 /* Check if this is a color/swatch option */
                 var isColor = /colou?r/i.test(legendText);
                 var inputs = group.querySelectorAll("input[type='radio']");
+                var selectEl = group.querySelector("select");
 
                 if (inputs.length > 0) {
                   optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
@@ -1231,6 +1241,15 @@
                     optionHtml += '</select>';
                   }
                   optionHtml += '</div>';
+                } else if (selectEl) {
+                  /* Handle dropdown variant options (like Bar Thickness, Diameter) */
+                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
+                  optionHtml += '<select class="cf-quickshop__select" data-option-name="' + legendText + '">';
+                  Array.from(selectEl.options).forEach(function (opt) {
+                    var selected = opt.selected ? " selected" : "";
+                    optionHtml += '<option value="' + opt.value + '"' + selected + '>' + opt.textContent + '</option>';
+                  });
+                  optionHtml += '</select></div>';
                 }
               });
             }
@@ -1254,6 +1273,21 @@
             }
             imagesHtml += '</div>';
 
+            /* Extract product description */
+            var descriptionText = "";
+            var descTabEl = doc.querySelector('[data-pdt-panel="description"]');
+            if (descTabEl) {
+              descriptionText = descTabEl.textContent.trim().substring(0, 250);
+            }
+            if (!descriptionText) {
+              var descBlockEl = doc.querySelector('.quick-add-description');
+              if (descBlockEl) descriptionText = descBlockEl.textContent.trim();
+            }
+            if (!descriptionText) {
+              var metaDesc = doc.querySelector('meta[name="description"]');
+              if (metaDesc) descriptionText = (metaDesc.getAttribute("content") || "").substring(0, 250);
+            }
+
             var detailsHtml = '<div class="cf-quickshop__details">';
             if (vendor) detailsHtml += '<p class="cf-quickshop__vendor">by <a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '">' + vendor + '</a></p>';
             detailsHtml += '<h2 class="cf-quickshop__title">' + title + '</h2>';
@@ -1265,6 +1299,7 @@
             detailsHtml += '<div class="cf-quickshop__qty"><button type="button" class="cf-qs-minus">&minus;</button><input type="number" class="cf-qs-qty-input" value="1" min="1" max="99"><button type="button" class="cf-qs-plus">&plus;</button></div>';
             detailsHtml += '<button type="button" class="cf-quickshop__atc" data-variant-id="' + variantId + '">Add to cart</button>';
             detailsHtml += '</div>';
+            if (descriptionText) detailsHtml += '<div class="cf-quickshop__description">' + descriptionText + '</div>';
             detailsHtml += '<a href="' + productUrl + '" class="cf-quickshop__view-full">View full details</a>';
             detailsHtml += '</div>';
 
