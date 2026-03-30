@@ -553,9 +553,9 @@
             "tab_title_text_color": "#212529",
             "active_tab_title_text_color": "#212529",
             "tab_background_color": "#f8f9fa",
-            "tab_active_background_color": "#4ECDC4",
+            "tab_active_background_color": "#4ecdc4",
             "tab_border_color": "#e9ecef",
-            "classic_underline_color": "#4ECDC4",
+            "classic_underline_color": "#4ecdc4",
             "classic_underline_thickness": 3,
             "tab_content_background_color": "#ffffff",
             "accordion_title_font_size": 16,
@@ -597,6 +597,58 @@
         "padding-block-start": 0,
         "padding-block-end": 0
       }
+    },
+    "find_your_style_RUDfzG": {
+      "type": "find-your-style",
+      "blocks": {
+        "style_tab_qMkNkz": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Luxe",
+            "collection": "",
+            "style_title": "Styles",
+            "bg_color": "#fce4ec"
+          }
+        },
+        "style_tab_t6MyH9": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Amour",
+            "collection": "",
+            "style_title": "Styles",
+            "bg_color": "#fce4ec"
+          }
+        },
+        "style_tab_8wCCbG": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Mystic",
+            "collection": "",
+            "style_title": "Styles",
+            "bg_color": "#f3e5f5"
+          }
+        },
+        "style_tab_nPhUVX": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Celestial",
+            "collection": "",
+            "style_title": "Styles",
+            "bg_color": "#e8eaf6"
+          }
+        }
+      },
+      "block_order": [
+        "style_tab_qMkNkz",
+        "style_tab_t6MyH9",
+        "style_tab_8wCCbG",
+        "style_tab_nPhUVX"
+      ],
+      "name": "Find Your Style",
+      "settings": {
+        "heading": "Find Your Style",
+        "subtext": "Discover the pieces that define your look"
+      }
     }
   },
   "order": [
@@ -606,6 +658,7 @@
     "shop_by_type_afLXVP",
     "trust_icons_mhBL7W",
     "featured_collection_wwdfbm",
-    "1774263311a512530e"
+    "1774263311a512530e",
+    "find_your_style_RUDfzG"
   ]
 }
