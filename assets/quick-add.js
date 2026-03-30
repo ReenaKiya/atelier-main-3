@@ -206,6 +206,31 @@ export class QuickAddComponent extends Component {
     }
 
     morph(modalContent, productGrid);
+
+    // Reinitialize Shopify's dynamic checkout buttons (Buy with Shop Pay / More payment options)
+    // after morphing content into the modal, since Shopify's JS needs to detect new DOM elements
+    this.#reinitializePaymentButtons();
+  }
+
+  /**
+   * Reinitializes Shopify's dynamic payment buttons in the modal.
+   * This is needed because Shopify's payment button JS doesn't automatically
+   * detect elements that are dynamically inserted via DOM morphing.
+   */
+  #reinitializePaymentButtons() {
+    if (window.Shopify && window.Shopify.PaymentButton) {
+      window.Shopify.PaymentButton.init();
+    } else {
+      // If PaymentButton isn't loaded yet, wait for it
+      const checkInterval = setInterval(() => {
+        if (window.Shopify && window.Shopify.PaymentButton) {
+          window.Shopify.PaymentButton.init();
+          clearInterval(checkInterval);
+        }
+      }, 100);
+      // Stop checking after 5 seconds
+      setTimeout(() => clearInterval(checkInterval), 5000);
+    }
   }
 }
 

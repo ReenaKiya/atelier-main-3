@@ -59,6 +59,14 @@
       modalContent.querySelectorAll('.variant-picker__form').forEach(function(el) {
         el.style.cssText = 'display:flex!important;flex-direction:column;gap:12px;width:100%;';
       });
+      // Force show accelerated checkout (Buy with Shop Pay / More payment options)
+      modalContent.querySelectorAll('.accelerated-checkout-block').forEach(function(el) {
+        el.style.cssText = 'display:block!important;width:100%;';
+        el.removeAttribute('hidden');
+      });
+      modalContent.querySelectorAll('.shopify-payment-button').forEach(function(el) {
+        el.style.cssText = 'display:block!important;width:100%;';
+      });
     }
 
     // Watch for content being loaded into modal
@@ -466,6 +474,28 @@
 
   .quick-add-modal__content .view-more-details__wrapper {
     display: none;
+  }
+
+  /* Accelerated checkout (Buy with Shop Pay / More payment options) in popup */
+  .quick-add-modal__content .accelerated-checkout-block {
+    width: 100%;
+  }
+
+  .quick-add-modal__content .shopify-payment-button {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .quick-add-modal__content .shopify-payment-button__button {
+    width: 100%;
+    border-radius: var(--style-border-radius-button, 4px);
+    min-height: var(--minimum-touch-target);
+  }
+
+  .quick-add-modal__content .shopify-payment-button__more-options {
+    width: 100%;
+    text-align: center;
+    margin-top: 8px;
   }
 
   @keyframes fadeSlideIn {
