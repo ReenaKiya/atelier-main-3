@@ -637,6 +637,10 @@
         }
       },
       "block_order": ["sc_block_1", "sc_block_2", "sc_block_3", "sc_block_4"]
+    },
+    "find_your_style_RUDfzG": {
+      "type": "find-your-style",
+      "settings": {}
     }
   },
   "order": [
@@ -646,12 +650,8 @@
     "shop_by_type_afLXVP",
     "trust_icons_mhBL7W",
     "featured_collection_wwdfbm",
-<<<<<<< HEAD
+    "signature_collections_abc123",
     "1774263311a512530e",
     "find_your_style_RUDfzG"
-=======
-    "signature_collections_abc123",
-    "1774263311a512530e"
->>>>>>> cfe1a36 (signature collection)
   ]
 }
