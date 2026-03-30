@@ -649,6 +649,21 @@
     },
     "find_your_style_RUDfzG": {
       "type": "find-your-style",
+      "blocks": {
+        "style_tab_6xUiJn": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Luxe",
+            "collection": "luxe",
+            "bg_image": "shopify://shop_images/luxe_1.webp",
+            "style_title": "Styles",
+            "bg_color": "#fce4ec"
+          }
+        }
+      },
+      "block_order": [
+        "style_tab_6xUiJn"
+      ],
       "settings": {
         "heading": "Find Your Style",
         "subtext": "Discover the pieces that define your look"
