@@ -650,6 +650,16 @@
     "find_your_style_RUDfzG": {
       "type": "find-your-style",
       "blocks": {
+        "style_tab_fPmkQ6": {
+          "type": "style_tab",
+          "settings": {
+            "tab_label": "Celestial",
+            "collection": "celestial",
+            "bg_image": "shopify://shop_images/celestial.png",
+            "style_title": "Styles",
+            "bg_color": "#fce4ec"
+          }
+        },
         "style_tab_cKCYB4": {
           "type": "style_tab",
           "settings": {
@@ -681,6 +691,7 @@
         }
       },
       "block_order": [
+        "style_tab_fPmkQ6",
         "style_tab_cKCYB4",
         "style_tab_MUzar3",
         "style_tab_6xUiJn"
