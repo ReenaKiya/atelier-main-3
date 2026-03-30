@@ -538,6 +538,55 @@
         "padding_bottom": 40
       }
     },
+    "signature_collections_abc123": {
+      "type": "signature-collections",
+      "blocks": {
+        "sc_block_1": {
+          "type": "collection_item",
+          "settings": {
+            "image": "shopify://shop_images/flatback-studs.webp",
+            "title": "Flatback Studs",
+            "link": "/collections/flatback-studs"
+          }
+        },
+        "sc_block_2": {
+          "type": "collection_item",
+          "settings": {
+            "image": "shopify://shop_images/nose-studes.webp",
+            "title": "Nose Studs",
+            "link": "/collections/nose-studs"
+          }
+        },
+        "sc_block_3": {
+          "type": "collection_item",
+          "settings": {
+            "image": "shopify://shop_images/hinged.webp",
+            "title": "Hinged Segment Clicker",
+            "link": "/collections/hinged-segment-clicker"
+          }
+        },
+        "sc_block_4": {
+          "type": "collection_item",
+          "settings": {
+            "image": "shopify://shop_images/hugges.webp",
+            "title": "Huggies & Studs",
+            "link": "/collections/huggies-studs"
+          }
+        }
+      },
+      "block_order": [
+        "sc_block_1",
+        "sc_block_2",
+        "sc_block_3",
+        "sc_block_4"
+      ],
+      "settings": {
+        "heading": "Signature Collections",
+        "bg_color": "#ffffff",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "1774263311a512530e": {
       "type": "_blocks",
       "blocks": {
@@ -598,49 +647,12 @@
         "padding-block-end": 0
       }
     },
-    "signature_collections_abc123": {
-      "type": "signature-collections",
-      "settings": {
-        "heading": "Signature Collections",
-        "bg_color": "#ffffff",
-        "padding_top": 40,
-        "padding_bottom": 40
-      },
-      "blocks": {
-        "sc_block_1": {
-          "type": "collection_item",
-          "settings": {
-            "title": "Flatback Studs",
-            "link": "/collections/flatback-studs"
-          }
-        },
-        "sc_block_2": {
-          "type": "collection_item",
-          "settings": {
-            "title": "Nose Studs",
-            "link": "/collections/nose-studs"
-          }
-        },
-        "sc_block_3": {
-          "type": "collection_item",
-          "settings": {
-            "title": "Hinged Segment Clicker",
-            "link": "/collections/hinged-segment-clicker"
-          }
-        },
-        "sc_block_4": {
-          "type": "collection_item",
-          "settings": {
-            "title": "Huggies & Studs",
-            "link": "/collections/huggies-studs"
-          }
-        }
-      },
-      "block_order": ["sc_block_1", "sc_block_2", "sc_block_3", "sc_block_4"]
-    },
     "find_your_style_RUDfzG": {
       "type": "find-your-style",
-      "settings": {}
+      "settings": {
+        "heading": "Find Your Style",
+        "subtext": "Discover the pieces that define your look"
+      }
     }
   },
   "order": [
