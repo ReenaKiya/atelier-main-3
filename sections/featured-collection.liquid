@@ -196,7 +196,7 @@
                   {%- comment -%} Hover Action Buttons {%- endcomment -%}
                   <div class="cf-card__actions">
                     <button type="button" class="cf-card__btn cf-card__btn--quickshop" data-quickshop-url="{{ product.url }}">Quick Shop</button>
-                    <button type="button" class="cf-card__btn cf-card__btn--options" data-quickshop-url="{{ product.url }}">Choose Options</button>
+                    <button type="button" class="cf-card__btn cf-card__btn--options" data-quickshop-url="{{ product.url }}" data-quickshop-mode="options-only">Choose Options</button>
                   </div>
                 </div>
               </div>
@@ -209,6 +209,10 @@
             <polyline points="9 18 15 12 9 6"></polyline>
           </svg>
         </button>
+      </div>
+
+      <div class="cf-view-all-wrapper">
+        <a href="/collections/best-sellers" class="cf-view-all-btn">View All</a>
       </div>
     {% else %}
       <p style="text-align: center; color: #999;">Select a collection in the section settings.</p>
@@ -250,6 +254,29 @@
   text-align: center;
   margin: 0 0 30px;
   letter-spacing: 0.02em;
+}
+
+/* View All Button */
+.cf-view-all-wrapper {
+  text-align: center;
+  margin-top: 30px;
+}
+
+.cf-view-all-btn {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  padding: 14px 40px;
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  letter-spacing: 0.03em;
+  transition: background 0.3s, opacity 0.3s;
+}
+
+.cf-view-all-btn:hover {
+  background: #333;
+  color: #fff;
 }
 
 /* Slider */
@@ -620,6 +647,10 @@
   animation: cfModalIn 0.3s ease forwards;
 }
 
+.cf-quickshop-modal.cf-options-only-modal {
+  max-width: 520px;
+}
+
 @keyframes cfModalIn {
   from { opacity: 0; transform: translate(-50%, -48%); }
   to { opacity: 1; transform: translate(-50%, -50%); }
@@ -678,6 +709,15 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 0;
+}
+
+.cf-quickshop-modal__content.cf-loaded.cf-options-only {
+  grid-template-columns: 1fr;
+}
+
+.cf-quickshop-modal__content.cf-options-only .cf-quickshop__description,
+.cf-quickshop-modal__content.cf-options-only .cf-quickshop__view-full {
+  display: none;
 }
 
 .cf-quickshop__images {
@@ -1170,10 +1210,13 @@
 
         var productUrl = btn.getAttribute("data-quickshop-url");
         if (!productUrl) return;
+        var isOptionsOnly = btn.getAttribute("data-quickshop-mode") === "options-only";
 
         /* Reset & show modal with loading */
-        if (modalContent) { modalContent.innerHTML = ""; modalContent.classList.remove("cf-loaded"); }
+        if (modalContent) { modalContent.innerHTML = ""; modalContent.classList.remove("cf-loaded"); modalContent.classList.remove("cf-options-only"); }
+        if (modal) modal.classList.remove("cf-options-only-modal");
         if (modalLoading) modalLoading.classList.remove("cf-hidden");
+        if (isOptionsOnly && modal) modal.classList.add("cf-options-only-modal");
         openModal();
 
         /* Fetch product page */
@@ -1332,8 +1375,9 @@
             detailsHtml += '</div>';
 
             if (modalContent) {
-              modalContent.innerHTML = imagesHtml + detailsHtml;
+              modalContent.innerHTML = isOptionsOnly ? detailsHtml : (imagesHtml + detailsHtml);
               modalContent.classList.add("cf-loaded");
+              if (isOptionsOnly) modalContent.classList.add("cf-options-only");
             }
             if (modalLoading) modalLoading.classList.add("cf-hidden");
 
