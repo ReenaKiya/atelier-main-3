@@ -138,5 +138,92 @@ document.querySelectorAll('.mega-menu__child').forEach(item => {
 
 
     {% render 'newsletter-popup' %}
+
+    <!-- Global: Auto-open cart drawer on any add-to-cart -->
+    <script>
+    (function() {
+      var originalFetch = window.fetch;
+      window.fetch = function() {
+        var url = arguments[0];
+        var isCartAdd = (typeof url === 'string' && url.indexOf('/cart/add') !== -1);
+
+        var result = originalFetch.apply(this, arguments);
+
+        if (isCartAdd) {
+          result.then(function(response) {
+            // Clone so the original .then() chain still works
+            return response.clone().json();
+          }).then(function() {
+            // Fetch fresh cart and open drawer
+            return originalFetch('/cart.js').then(function(r) { return r.json(); });
+          }).then(function(cartData) {
+            openCartDrawerWithData(cartData);
+          }).catch(function() {});
+        }
+
+        return result;
+      };
+
+      function openCartDrawerWithData(cartData) {
+        var drawer = document.getElementById('custom-cart-drawer');
+        var overlay = document.getElementById('custom-cart-overlay');
+        if (!drawer || !overlay) return;
+
+        // Update cart count badges everywhere
+        document.querySelectorAll('[data-cart-count]').forEach(function(el) {
+          el.textContent = cartData.item_count;
+        });
+
+        // Update total price
+        var totalEl = document.querySelector('.custom-cart-drawer__total-price');
+        if (totalEl && typeof formatMoney === 'function') {
+          totalEl.textContent = formatMoney(cartData.total_price);
+        }
+
+        // Rebuild cart items HTML
+        var contentEl = document.querySelector('.custom-cart-drawer__content');
+        if (contentEl && cartData.items.length > 0) {
+          var itemsHtml = '<form action="/cart" method="post" id="custom-cart-form">';
+          cartData.items.forEach(function(item, index) {
+            var variantOptions = '';
+            if (item.variant_title) {
+              variantOptions = '<p class="custom-cart-drawer__item-variant">' + item.variant_title + '</p>';
+            }
+            itemsHtml += '<div class="custom-cart-drawer__item" data-line-key="' + item.key + '" data-line-index="' + (index + 1) + '">' +
+              '<div class="custom-cart-drawer__item-image">' +
+                (item.image ? '<a href="' + item.url + '"><img src="' + item.image + '" loading="lazy" width="150"></a>' : '') +
+              '</div>' +
+              '<div class="custom-cart-drawer__item-details">' +
+                '<a href="' + item.url + '" class="custom-cart-drawer__item-title">' + item.title + '</a>' +
+                variantOptions +
+                '<div class="custom-cart-drawer__item-price">' + formatMoney(item.final_price) + '</div>' +
+                '<div class="custom-cart-drawer__quantity">' +
+                  '<button type="button" class="custom-cart-drawer__qty-btn" aria-label="Decrease quantity" onclick="updateCartQty(this, -1)">−</button>' +
+                  '<span class="custom-cart-drawer__qty-value">' + item.quantity + '</span>' +
+                  '<button type="button" class="custom-cart-drawer__qty-btn" aria-label="Increase quantity" onclick="updateCartQty(this, 1)">+</button>' +
+                '</div>' +
+              '</div>' +
+              '<div class="custom-cart-drawer__item-line-price">' + formatMoney(item.final_line_price) + '</div>' +
+            '</div>';
+          });
+          itemsHtml += '</form>';
+          contentEl.innerHTML = itemsHtml;
+
+          // Show footer if it was hidden (cart was empty before)
+          var footer = document.querySelector('.custom-cart-drawer__footer');
+          if (footer) footer.style.display = '';
+          var shipping = document.querySelector('.custom-cart-drawer__shipping-banner');
+          if (shipping) shipping.style.display = '';
+
+          // Update total
+          if (totalEl) totalEl.textContent = formatMoney(cartData.total_price);
+        }
+
+        // Open the drawer
+        drawer.classList.add('is-open');
+        overlay.classList.add('is-open');
+      }
+    })();
+    </script>
   </body>
 </html>

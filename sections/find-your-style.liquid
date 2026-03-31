@@ -531,10 +531,10 @@ document.addEventListener("DOMContentLoaded", function () {
         .then(function (res) { return res.json(); })
         .then(function () {
           btn.textContent = "Added!";
+          btn.disabled = false;
           setTimeout(function () {
             btn.textContent = originalText;
-            btn.disabled = false;
-          }, 1500);
+          }, 2000);
         })
         .catch(function () {
           btn.textContent = originalText;
