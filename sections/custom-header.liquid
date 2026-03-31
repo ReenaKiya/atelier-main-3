@@ -148,7 +148,44 @@
         <div class="custom-cart-drawer__recommendations">
           <h3 class="custom-cart-drawer__rec-title">You May Also Like</h3>
           <div class="custom-cart-drawer__rec-scroll" id="cart-drawer-recommendations">
-            <!-- Populated via JS -->
+
+            {%- comment -%} Server-side rendered recommendations from collections {%- endcomment -%}
+            {%- assign rec_product_ids = '' -%}
+            {%- for item in cart.items -%}
+              {%- assign rec_product_ids = rec_product_ids | append: item.product.id | append: ',' -%}
+            {%- endfor -%}
+
+            {%- assign rec_count = 0 -%}
+            {%- for item in cart.items -%}
+              {%- if rec_count >= 6 -%}{%- break -%}{%- endif -%}
+              {%- for collection in item.product.collections -%}
+                {%- if rec_count >= 6 -%}{%- break -%}{%- endif -%}
+                {%- for product in collection.products limit: 10 -%}
+                  {%- if rec_count >= 6 -%}{%- break -%}{%- endif -%}
+                  {%- assign pid_check = product.id | append: ',' -%}
+                  {%- if rec_product_ids contains pid_check -%}{%- continue -%}{%- endif -%}
+                  {%- assign rec_product_ids = rec_product_ids | append: product.id | append: ',' -%}
+                  {%- assign rec_count = rec_count | plus: 1 -%}
+                  <div class="custom-cart-drawer__rec-card">
+                    <div class="custom-cart-drawer__rec-img">
+                      {%- if product.featured_image -%}
+                        <a href="{{ product.url }}">
+                          {{ product.featured_image | image_url: width: 200 | image_tag: loading: 'lazy' }}
+                        </a>
+                      {%- endif -%}
+                    </div>
+                    <div class="custom-cart-drawer__rec-info">
+                      <span class="custom-cart-drawer__rec-price">{{ product.price | money }}</span>
+                      <button class="custom-cart-drawer__rec-add" onclick="addRecToCart({{ product.variants.first.id }}, this)">Add</button>
+                    </div>
+                    <p class="custom-cart-drawer__rec-name">
+                      <a href="{{ product.url }}">{{ product.title }}</a>
+                    </p>
+                  </div>
+                {%- endfor -%}
+              {%- endfor -%}
+            {%- endfor -%}
+
           </div>
         </div>
       {%- endunless -%}
@@ -175,56 +212,7 @@
     document.getElementById('custom-cart-overlay').classList.add('is-open');
   });
 
-  // Load recommendations
-  function loadCartRecommendations() {
-    var container = document.getElementById('cart-drawer-recommendations');
-    if (!container) return;
-
-    {%- if cart.items.size > 0 -%}
-      var productId = {{ cart.items.first.product.id }};
-      fetch('/recommendations/products.json?product_id=' + productId + '&limit=6&intent=complementary')
-        .then(function(res) { return res.json(); })
-        .then(function(data) {
-          var products = data.products || [];
-          if (products.length === 0) {
-            fetch('/recommendations/products.json?product_id=' + productId + '&limit=6&intent=related')
-              .then(function(res) { return res.json(); })
-              .then(function(data) { renderRecommendations(data.products || []); });
-          } else {
-            renderRecommendations(products);
-          }
-        })
-        .catch(function() { container.innerHTML = ''; });
-    {%- endif -%}
-  }
-
-  function renderRecommendations(products) {
-    var container = document.getElementById('cart-drawer-recommendations');
-    if (!container || products.length === 0) {
-      var recSection = document.querySelector('.custom-cart-drawer__recommendations');
-      if (recSection) recSection.style.display = 'none';
-      return;
-    }
-
-    var html = '';
-    products.forEach(function(product) {
-      var img = product.featured_image ? product.featured_image : '';
-      var price = (product.price / 100).toFixed(2);
-      var variantId = product.variants[0].id;
-      html += '<div class="custom-cart-drawer__rec-card">' +
-        '<div class="custom-cart-drawer__rec-img">' +
-          (img ? '<img src="' + img + '" alt="' + product.title + '" loading="lazy">' : '') +
-        '</div>' +
-        '<div class="custom-cart-drawer__rec-info">' +
-          '<span class="custom-cart-drawer__rec-price">' + window.Shopify.currency.active + ' ' + price + '</span>' +
-          '<button class="custom-cart-drawer__rec-add" onclick="addRecToCart(' + variantId + ', this)">Add</button>' +
-        '</div>' +
-        '<p class="custom-cart-drawer__rec-name">' + product.title + '</p>' +
-      '</div>';
-    });
-    container.innerHTML = html;
-  }
-
+  // Add recommended product to cart
   function addRecToCart(variantId, btn) {
     btn.disabled = true;
     btn.textContent = '...';
@@ -237,11 +225,6 @@
     .then(function() { window.location.reload(); })
     .catch(function() { btn.disabled = false; btn.textContent = 'Add'; });
   }
-
-  // Load recommendations when drawer opens
-  document.querySelector('.custom-header__cart').addEventListener('click', function() {
-    setTimeout(loadCartRecommendations, 100);
-  });
 
   // Update cart quantity
   function updateCartQty(variantId, quantity) {
@@ -736,6 +719,15 @@
     -webkit-line-clamp: 2;
     -webkit-box-orient: vertical;
     overflow: hidden;
+  }
+
+  .custom-cart-drawer__rec-name a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .custom-cart-drawer__rec-name a:hover {
+    text-decoration: underline;
   }
 
   /* Footer */
