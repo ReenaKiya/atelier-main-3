@@ -111,7 +111,7 @@
         <!-- Cart Items -->
         <form action="{{ routes.cart_url }}" method="post" id="custom-cart-form">
           {%- for item in cart.items -%}
-            <div class="custom-cart-drawer__item">
+            <div class="custom-cart-drawer__item" data-variant-id="{{ item.variant.id }}">
               <div class="custom-cart-drawer__item-image">
                 {%- if item.image -%}
                   <a href="{{ item.url }}">
@@ -212,6 +212,68 @@
     document.getElementById('custom-cart-overlay').classList.add('is-open');
   });
 
+  // Refresh cart drawer content without page reload
+  function refreshCartDrawer() {
+    fetch('/cart.js', { headers: { 'Accept': 'application/json' } })
+      .then(function(res) { return res.json(); })
+      .then(function(cart) {
+        // Update total price
+        var totalEl = document.querySelector('.custom-cart-drawer__total-price');
+        if (totalEl) {
+          totalEl.textContent = formatMoney(cart.total_price);
+        }
+
+        // Update cart count badge
+        var countEls = document.querySelectorAll('[data-cart-count]');
+        countEls.forEach(function(el) { el.textContent = cart.item_count; });
+
+        // Update each item's quantity and line price
+        cart.items.forEach(function(item) {
+          var qtyEl = document.querySelector('[data-variant-id="' + item.variant_id + '"] .custom-cart-drawer__qty-value');
+          var linePriceEl = document.querySelector('[data-variant-id="' + item.variant_id + '"] .custom-cart-drawer__item-line-price');
+          var itemPriceEl = document.querySelector('[data-variant-id="' + item.variant_id + '"] .custom-cart-drawer__item-price');
+          if (qtyEl) qtyEl.textContent = item.quantity;
+          if (linePriceEl) linePriceEl.textContent = formatMoney(item.final_line_price);
+          if (itemPriceEl) itemPriceEl.textContent = formatMoney(item.final_price);
+        });
+
+        // Remove items with 0 quantity from DOM
+        document.querySelectorAll('.custom-cart-drawer__item[data-variant-id]').forEach(function(el) {
+          var vid = parseInt(el.getAttribute('data-variant-id'));
+          var found = cart.items.some(function(item) { return item.variant_id === vid; });
+          if (!found) el.remove();
+        });
+
+        // If cart is now empty, reload to show empty state
+        if (cart.item_count === 0) {
+          window.location.reload();
+        }
+      });
+  }
+
+  // Format price in cents to money string
+  function formatMoney(cents) {
+    return ({{ shop.money_format | json }}).replace(/\{\{\s*amount\s*\}\}/, (cents / 100).toFixed(2)).replace(/\{\{\s*amount_no_decimals\s*\}\}/, Math.round(cents / 100)).replace(/\{\{\s*amount_with_comma_separator\s*\}\}/, (cents / 100).toFixed(2).replace('.', ','));
+  }
+
+  // Update cart quantity
+  function updateCartQty(variantId, newQty) {
+    // Immediately update the UI for responsiveness
+    var itemEl = document.querySelector('[data-variant-id="' + variantId + '"]');
+    if (itemEl) {
+      var qtyEl = itemEl.querySelector('.custom-cart-drawer__qty-value');
+      if (qtyEl && newQty > 0) qtyEl.textContent = newQty;
+    }
+
+    fetch('/cart/change.js', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id: variantId, quantity: Math.max(newQty, 0) })
+    })
+    .then(function(res) { return res.json(); })
+    .then(function() { refreshCartDrawer(); });
+  }
+
   // Add recommended product to cart
   function addRecToCart(variantId, btn) {
     btn.disabled = true;
@@ -222,19 +284,11 @@
       body: JSON.stringify({ id: variantId, quantity: 1 })
     })
     .then(function(res) { return res.json(); })
-    .then(function() { window.location.reload(); })
-    .catch(function() { btn.disabled = false; btn.textContent = 'Add'; });
-  }
-
-  // Update cart quantity
-  function updateCartQty(variantId, quantity) {
-    fetch('/cart/change.js', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ id: variantId, quantity: quantity })
+    .then(function() {
+      btn.textContent = 'Added!';
+      refreshCartDrawer();
     })
-    .then(res => res.json())
-    .then(() => { window.location.reload(); });
+    .catch(function() { btn.disabled = false; btn.textContent = 'Add'; });
   }
 </script>
 
