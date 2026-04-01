@@ -701,6 +701,20 @@
         "heading": "Find Your Style",
         "subtext": "Discover the pieces that define your look"
       }
+    },
+    "gift_banner_hJhHdM": {
+      "type": "gift-banner",
+      "name": "Gift Banner",
+      "settings": {
+        "heading": "Piercing Jewellery Gifts for Every Occasion",
+        "subheading": "Jewellery That Loves Their Skin",
+        "description": "Give the gift of comfort with our premium selection of Solid Gold, Sterling Silver, Implant-Grade Titanium and Surgical Steel",
+        "button_label": "Shop Now",
+        "button_link": "",
+        "image_1": "shopify://shop_images/gift-banner.webp",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
     }
   },
   "order": [
@@ -712,6 +726,7 @@
     "featured_collection_wwdfbm",
     "signature_collections_abc123",
     "1774263311a512530e",
-    "find_your_style_RUDfzG"
+    "find_your_style_RUDfzG",
+    "gift_banner_hJhHdM"
   ]
 }
