@@ -25,7 +25,7 @@
           "type": "menu_column",
           "settings": {
             "heading": "Business Policy",
-            "menu": ""
+            "menu": "business-policy"
           }
         },
         "menu_column_YYkWdg": {
