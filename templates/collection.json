@@ -346,29 +346,10 @@
         "padding-block-start": 0,
         "padding-block-end": 66
       }
-    },
-    "featured_collection_ekEcVU": {
-      "type": "featured-collection",
-      "name": "Customer Favourites",
-      "settings": {
-        "heading": "Customer Favourites",
-        "collection": "flatback-studs",
-        "products_limit": 20,
-        "products_per_view": 5,
-        "show_swatches": true,
-        "swatch_option": "Color",
-        "bg_color": "#ffffff",
-        "heading_color": "#333333",
-        "title_color": "#333333",
-        "price_color": "#e53935",
-        "padding_top": 40,
-        "padding_bottom": 40
-      }
     }
   },
   "order": [
     "section",
-    "main",
-    "featured_collection_ekEcVU"
+    "main"
   ]
 }
