@@ -11,6 +11,66 @@
   "type": "footer",
   "name": "t:names.footer",
   "sections": {
+    "custom_footer_7KFMNk": {
+      "type": "custom-footer",
+      "blocks": {
+        "menu_column_8z6FTR": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Information",
+            "menu": ""
+          }
+        },
+        "menu_column_3JDhqU": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "Business Policy",
+            "menu": ""
+          }
+        },
+        "menu_column_YYkWdg": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "MP's Guide To",
+            "menu": ""
+          }
+        },
+        "menu_column_A8JY9X": {
+          "type": "menu_column",
+          "settings": {
+            "heading": "All Ears",
+            "menu": ""
+          }
+        },
+        "social_column_xY4NiH": {
+          "type": "social_column",
+          "settings": {
+            "heading": "Follow us",
+            "facebook_url": "",
+            "instagram_url": "",
+            "pinterest_url": "",
+            "tiktok_url": ""
+          }
+        }
+      },
+      "block_order": [
+        "menu_column_8z6FTR",
+        "menu_column_3JDhqU",
+        "menu_column_YYkWdg",
+        "menu_column_A8JY9X",
+        "social_column_xY4NiH"
+      ],
+      "name": "Custom Footer",
+      "settings": {
+        "bg_color": "#111111",
+        "text_color": "#cccccc",
+        "heading_color": "#ffffff",
+        "bottom_bar_border": "#333333",
+        "copyright_text": "Copyright © 2026 Monster Piercing.",
+        "show_payment_icons": true,
+        "show_back_to_top": true
+      }
+    },
     "footer": {
       "type": "footer",
       "blocks": {
@@ -386,6 +446,7 @@
     }
   },
   "order": [
+    "custom_footer_7KFMNk",
     "footer"
   ]
 }
