@@ -123,6 +123,24 @@
       </svg>
     </a>
   {% endif %}
+
+  <!-- Sticky Phone Button -->
+  {% if section.settings.show_sticky_phone and section.settings.phone_number != blank %}
+    <div class="sticky-phone-wrap">
+      <a href="tel:{{ section.settings.phone_number }}" class="sticky-phone-btn" aria-label="Call us">
+        <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"></path>
+        </svg>
+      </a>
+
+      {% if section.settings.phone_tooltip_text != blank %}
+        <div class="sticky-phone-tooltip" id="sticky-phone-tooltip">
+          {{ section.settings.phone_tooltip_text }}
+          <span class="sticky-phone-tooltip__close" id="sticky-phone-close">&times;</span>
+        </div>
+      {% endif %}
+    </div>
+  {% endif %}
 </footer>
 
 <script>
@@ -143,6 +161,15 @@
       backToTop.addEventListener('click', function (e) {
         e.preventDefault();
         window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+
+    // Sticky phone tooltip
+    var phoneTooltip = document.getElementById('sticky-phone-tooltip');
+    var phoneClose = document.getElementById('sticky-phone-close');
+    if (phoneTooltip && phoneClose) {
+      phoneClose.addEventListener('click', function () {
+        phoneTooltip.style.display = 'none';
       });
     }
   });
@@ -201,6 +228,28 @@
       "id": "show_back_to_top",
       "label": "Show back to top button",
       "default": true
+    },
+    {
+      "type": "header",
+      "content": "Sticky Phone Button"
+    },
+    {
+      "type": "checkbox",
+      "id": "show_sticky_phone",
+      "label": "Show sticky phone button",
+      "default": true
+    },
+    {
+      "type": "text",
+      "id": "phone_number",
+      "label": "Phone number",
+      "default": "+447447187755"
+    },
+    {
+      "type": "text",
+      "id": "phone_tooltip_text",
+      "label": "Tooltip text",
+      "default": "Have Queries? Contact Us"
     }
   ],
   "blocks": [
@@ -514,6 +563,68 @@
   .cf__payments {
     justify-content: center;
   }
+}
+
+/* Sticky Phone Button */
+.sticky-phone-wrap {
+  position: fixed;
+  bottom: 30px;
+  left: 20px;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.sticky-phone-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 52px;
+  height: 52px;
+  background: #e01b3c;
+  color: #fff;
+  border-radius: 50%;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  transition: background 0.3s ease, transform 0.3s ease;
+}
+
+.sticky-phone-btn:hover {
+  background: #c4162f;
+  transform: scale(1.08);
+}
+
+.sticky-phone-btn svg {
+  width: 24px;
+  height: 24px;
+}
+
+.sticky-phone-tooltip {
+  background: #fff;
+  color: #333;
+  padding: 10px 30px 10px 14px;
+  border-radius: 8px;
+  font-size: 13px;
+  font-family: 'Nunito Sans', sans-serif;
+  white-space: nowrap;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  position: relative;
+}
+
+.sticky-phone-tooltip__close {
+  position: absolute;
+  top: 4px;
+  right: 8px;
+  cursor: pointer;
+  font-size: 18px;
+  line-height: 1;
+  color: #999;
+  transition: color 0.2s ease;
+}
+
+.sticky-phone-tooltip__close:hover {
+  color: #333;
 }
 
 /* Visually hidden for accessibility */
