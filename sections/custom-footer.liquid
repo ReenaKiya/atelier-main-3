@@ -5,60 +5,89 @@
   assign bottom_bar_border = section.settings.bottom_bar_border | default: '#333333'
 -%}
 
-<footer class="cf" style="
+<footer class="cf" role="contentinfo" aria-label="Footer" style="
   --cf-bg: {{ bg_color }};
   --cf-text: {{ text_color }};
   --cf-heading: {{ heading_color }};
   --cf-border: {{ bottom_bar_border }};
 ">
-  <div class="cf__inner">
-    <div class="cf__columns">
-      {% for block in section.blocks %}
-        {% if block.type == 'menu_column' %}
-          <div class="cf__col" {{ block.shopify_attributes }}>
-            {% if block.settings.heading != blank %}
-              <h3 class="cf__heading">{{ block.settings.heading }}</h3>
-            {% endif %}
-            {% if block.settings.menu != blank %}
-              <ul class="cf__links">
-                {% for link in block.settings.menu.links %}
-                  <li><a href="{{ link.url }}" class="cf__link">{{ link.title }}</a></li>
-                {% endfor %}
-              </ul>
-            {% endif %}
-          </div>
-        {% elsif block.type == 'social_column' %}
-          <div class="cf__col cf__col--social" {{ block.shopify_attributes }}>
-            {% if block.settings.heading != blank %}
-              <h3 class="cf__heading">{{ block.settings.heading }}</h3>
-            {% endif %}
-            <div class="cf__socials">
-              {% if block.settings.facebook_url != blank %}
-                <a href="{{ block.settings.facebook_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Facebook">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2C6.477 2 2 6.477 2 12c0 4.991 3.657 9.128 8.438 9.879V14.89h-2.54V12h2.54V9.797c0-2.506 1.492-3.89 3.777-3.89 1.094 0 2.238.195 2.238.195v2.46h-1.26c-1.243 0-1.63.771-1.63 1.562V12h2.773l-.443 2.89h-2.33v6.989C18.343 21.129 22 16.99 22 12c0-5.523-4.477-10-10-10z"/></svg>
-                </a>
+  <section class="cf__wrapper">
+    <div class="cf__inner">
+      <div class="cf__columns column-count-{{ section.blocks.size }}">
+        {% for block in section.blocks %}
+          {% if block.type == 'menu_column' %}
+            <div class="cf__col cf__col--menu has-accordion" {{ block.shopify_attributes }}>
+              {% if block.settings.heading != blank %}
+                <h2 class="cf__heading" data-accordion-trigger>
+                  {{ block.settings.heading }}
+                  <span class="cf__accordion-icon">
+                    <svg aria-hidden="true" focusable="false" role="presentation" width="14" height="8" viewBox="0 0 14 8" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path class="icon-chevron-down-left" d="M7 6.75L12.5 1.25" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"></path>
+                      <path class="icon-chevron-down-right" d="M7 6.75L1.5 1.25" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"></path>
+                    </svg>
+                  </span>
+                </h2>
               {% endif %}
-              {% if block.settings.instagram_url != blank %}
-                <a href="{{ block.settings.instagram_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Instagram">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/></svg>
-                </a>
-              {% endif %}
-              {% if block.settings.pinterest_url != blank %}
-                <a href="{{ block.settings.pinterest_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="Pinterest">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.373 0 0 5.372 0 12c0 5.084 3.163 9.426 7.627 11.174-.105-.949-.2-2.405.042-3.441.218-.937 1.407-5.965 1.407-5.965s-.359-.719-.359-1.782c0-1.668.967-2.914 2.171-2.914 1.023 0 1.518.769 1.518 1.69 0 1.029-.655 2.568-.994 3.995-.283 1.194.599 2.169 1.777 2.169 2.133 0 3.772-2.249 3.772-5.495 0-2.873-2.064-4.882-5.012-4.882-3.414 0-5.418 2.561-5.418 5.207 0 1.031.397 2.138.893 2.738a.36.36 0 01.083.345l-.333 1.36c-.053.22-.174.267-.402.161-1.499-.698-2.436-2.889-2.436-4.649 0-3.785 2.75-7.262 7.929-7.262 4.163 0 7.398 2.967 7.398 6.931 0 4.136-2.607 7.464-6.227 7.464-1.216 0-2.359-.632-2.75-1.378l-.748 2.853c-.271 1.043-1.002 2.35-1.492 3.146C9.57 23.812 10.763 24 12 24c6.627 0 12-5.373 12-12 0-6.628-5.373-12-12-12z"/></svg>
-                </a>
-              {% endif %}
-              {% if block.settings.tiktok_url != blank %}
-                <a href="{{ block.settings.tiktok_url }}" class="cf__social-link" target="_blank" rel="noopener" aria-label="TikTok">
-                  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.48v-7.1a8.16 8.16 0 005.58 2.2V11.3a4.85 4.85 0 01-3.77-1.85V6.69z"/></svg>
-                </a>
-              {% endif %}
+              <div class="cf__block-content" data-accordion-content>
+                {% if block.settings.menu != blank %}
+                  <ul class="cf__links">
+                    {% for link in block.settings.menu.links %}
+                      <li class="cf__link-item">
+                        <a href="{{ link.url }}" class="cf__link">{{ link.title }}</a>
+                      </li>
+                    {% endfor %}
+                  </ul>
+                {% endif %}
+              </div>
             </div>
-          </div>
-        {% endif %}
-      {% endfor %}
+
+          {% elsif block.type == 'social_column' %}
+            <div class="cf__col cf__col--social" {{ block.shopify_attributes }}>
+              {% if block.settings.heading != blank %}
+                <h2 class="cf__heading">{{ block.settings.heading }}</h2>
+              {% endif %}
+              <div class="cf__block-content">
+                <div class="cf__socials">
+                  {% if block.settings.facebook_url != blank %}
+                    <a class="cf__social-link" title="Facebook" href="{{ block.settings.facebook_url }}" target="_blank" rel="noopener">
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M13.591 6.00441C11.5868 6.11515 9.75158 6.92966 8.34448 8.333C7.44444 9.23064 6.78641 10.2982 6.39238 11.5002C6.01229 12.6596 5.90552 13.9193 6.08439 15.1343C6.18456 15.8146 6.36736 16.4631 6.63981 17.1046C6.71166 17.2738 6.89438 17.6476 6.98704 17.815C7.22995 18.2538 7.52906 18.6904 7.84853 19.0725C8.16302 19.4486 8.56717 19.8479 8.94482 20.1556C9.6776 20.7526 10.5183 21.2186 11.4085 21.5211C11.8412 21.6681 12.259 21.7723 12.7342 21.8517L12.751 21.8545V19.0664V16.2783H11.7348H10.7186V15.1231V13.9678H11.7344H12.7503L12.7531 12.9265C12.756 11.8203 12.7553 11.845 12.7927 11.5862C12.9306 10.6339 13.3874 9.91646 14.1198 9.50212C14.4564 9.31168 14.8782 9.18341 15.331 9.13374C15.791 9.0833 16.55 9.12126 17.351 9.23478C17.4659 9.25105 17.5612 9.26437 17.5629 9.26437C17.5646 9.26437 17.566 9.70662 17.566 10.2472V11.2299L16.9679 11.233C16.3284 11.2363 16.299 11.2379 16.1298 11.2771C15.6926 11.3785 15.4015 11.6608 15.2983 12.0834C15.2566 12.2542 15.256 12.2685 15.256 13.1531V13.9678H16.3622C17.3606 13.9678 17.4685 13.9689 17.4685 13.9795C17.4685 13.9921 17.1263 16.2236 17.1191 16.2578L17.1148 16.2783H16.1854H15.256V19.0647V21.8511L15.2954 21.8459C15.4396 21.8271 15.8337 21.7432 16.0548 21.6844C16.5933 21.5411 17.079 21.3576 17.581 21.1076C19.3154 20.2441 20.6895 18.7615 21.4192 16.9663C21.7498 16.153 21.936 15.3195 21.9915 14.4052C22.0028 14.2197 22.0028 13.7268 21.9916 13.5415C21.9403 12.6947 21.7817 11.9389 21.4942 11.1712C20.8665 9.49533 19.6589 8.05123 18.1135 7.12853C17.7376 6.90413 17.2813 6.68103 16.8985 6.53456C16.1262 6.23908 15.3815 6.07432 14.5323 6.01114C14.3897 6.00053 13.7447 5.99591 13.591 6.00441Z" fill="currentColor"/>
+                      </svg>
+                      <span class="visually-hidden">Find us on Facebook</span>
+                    </a>
+                  {% endif %}
+                  {% if block.settings.instagram_url != blank %}
+                    <a class="cf__social-link" title="Instagram" href="{{ block.settings.instagram_url }}" target="_blank" rel="noopener">
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path fill-rule="evenodd" clip-rule="evenodd" d="M11.1213 6.00507C10.5981 6.02559 9.96558 6.0872 9.6431 6.14903C7.77505 6.50724 6.50522 7.77703 6.14804 9.644C6.0118 10.3562 6 10.7031 6 14.0006C6 17.298 6.0118 17.6449 6.14804 18.3572C6.50522 20.2241 7.776 21.4948 9.6431 21.852C10.3554 21.9882 10.7023 22 14 22C17.2977 22 17.6446 21.9882 18.3569 21.852C20.224 21.4948 21.4948 20.2241 21.852 18.3572C21.9882 17.6449 22 17.298 22 14.0006C22 10.7031 21.9882 10.3562 21.852 9.644C21.4935 7.77016 20.2144 6.49675 18.3396 6.14716C17.6551 6.01955 17.3874 6.00985 14.334 6.00234C12.707 5.99836 11.2612 5.99957 11.1213 6.00507ZM17.6262 7.50836C18.2783 7.59344 18.7654 7.73848 19.1427 7.95992C19.3813 8.09994 19.9011 8.61966 20.0411 8.85821C20.2728 9.253 20.4142 9.74012 20.4952 10.4223C20.5551 10.9261 20.5551 17.075 20.4952 17.5789C20.4142 18.261 20.2728 18.7482 20.0411 19.143C19.9011 19.3815 19.3813 19.9012 19.1427 20.0412C18.7479 20.2729 18.2608 20.4143 17.5785 20.4953C17.0747 20.5552 10.9253 20.5552 10.4215 20.4953C9.73923 20.4143 9.25207 20.2729 8.85726 20.0412C8.61869 19.9012 8.09893 19.3815 7.9589 19.143C7.72724 18.7482 7.58578 18.261 7.50476 17.5789C7.44493 17.075 7.44493 10.9261 7.50476 10.4223C7.56313 9.93096 7.62729 9.63856 7.74686 9.31938C7.88402 8.95319 8.02204 8.72965 8.28724 8.44428C8.87822 7.8083 9.55222 7.55184 10.8191 7.48098C11.5114 7.44227 17.2981 7.46552 17.6262 7.50836ZM17.9602 8.80646C17.7222 8.8876 17.4343 9.18659 17.358 9.43194C17.1268 10.175 17.8258 10.874 18.569 10.6429C18.8334 10.5606 19.1165 10.2776 19.1987 10.013C19.2689 9.78758 19.251 9.52441 19.1511 9.31187C19.071 9.14148 18.8248 8.90306 18.6554 8.83162C18.4699 8.75347 18.1498 8.74189 17.9602 8.80646ZM13.6183 9.8962C12.6459 9.99712 11.7694 10.4112 11.0899 11.0907C9.99978 12.1807 9.61075 13.7764 10.076 15.2492C10.4746 16.5107 11.4897 17.5257 12.7513 17.9243C13.5638 18.1809 14.4362 18.1809 15.2487 17.9243C16.5103 17.5257 17.5254 16.5107 17.924 15.2492C18.1806 14.4367 18.1806 13.5644 17.924 12.752C17.5254 11.4904 16.5103 10.4754 15.2487 10.0769C14.7428 9.91709 14.1016 9.84604 13.6183 9.8962ZM14.6362 11.4119C14.9255 11.4811 15.4416 11.7393 15.6794 11.9337C15.9731 12.1738 16.2113 12.4794 16.3856 12.8396C16.5969 13.2766 16.6509 13.5128 16.6509 14.0006C16.6509 14.4884 16.5969 14.7246 16.3856 15.1615C16.1137 15.7235 15.7253 16.1118 15.161 16.3855C14.7247 16.5972 14.4883 16.6513 14 16.6513C13.5117 16.6513 13.2753 16.5972 12.839 16.3855C12.2747 16.1118 11.8863 15.7235 11.6144 15.1615C11.5298 14.9866 11.4355 14.7433 11.4049 14.6208C11.3288 14.3169 11.3288 13.6843 11.4049 13.3803C11.482 13.0724 11.7369 12.5611 11.933 12.3213C12.3447 11.8177 12.9934 11.449 13.6224 11.3611C13.8845 11.3244 14.3734 11.3489 14.6362 11.4119Z" fill="currentColor"/>
+                      </svg>
+                      <span class="visually-hidden">Find us on Instagram</span>
+                    </a>
+                  {% endif %}
+                  {% if block.settings.pinterest_url != blank %}
+                    <a class="cf__social-link" title="Pinterest" href="{{ block.settings.pinterest_url }}" target="_blank" rel="noopener">
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M13.9997 6.01021C16.1242 6.01973 18.1595 6.86492 19.6658 8.36307C20.9047 9.6169 21.6999 11.2412 21.9305 12.9887C22.1611 14.7362 21.8143 16.5112 20.9431 18.0434C20.2428 19.2642 19.2311 20.2773 18.0112 20.9792C16.7914 21.681 15.4071 22.0466 13.9997 22.0385C13.2304 22.0438 12.4641 21.9404 11.7237 21.7312C12.127 21.0781 12.3959 20.4923 12.54 20.0025L13.1066 17.8033C13.2411 18.0722 13.5003 18.3027 13.8749 18.5044C14.259 18.6965 14.6432 18.8021 15.0657 18.8021C15.9012 18.8021 16.6503 18.562 17.3129 18.0818C17.9941 17.577 18.5252 16.8965 18.8495 16.1131C19.2205 15.2222 19.4036 14.2642 19.3873 13.2993C19.3873 12.0508 18.9071 10.9848 17.9564 10.0725C17.4691 9.61366 16.8957 9.25603 16.2693 9.0203C15.6429 8.78457 14.9759 8.67543 14.307 8.6992C13.4139 8.6992 12.5784 8.85285 11.8293 9.16017C10.8999 9.51337 10.0962 10.1345 9.52005 10.9449C8.94391 11.7552 8.62125 12.7183 8.59295 13.7122C8.59295 14.4325 8.7274 15.0663 9.0059 15.6137C9.2748 16.1515 9.67815 16.5357 10.2255 16.7662C10.3216 16.8046 10.408 16.8046 10.4752 16.7662C10.5425 16.7373 10.5905 16.6701 10.6193 16.5741L10.7922 15.921C10.8402 15.777 10.8114 15.6329 10.6865 15.4889C10.312 15.0555 10.1163 14.4959 10.1391 13.9235C10.1307 13.4044 10.2287 12.889 10.427 12.4092C10.6254 11.9294 10.9198 11.4953 11.2923 11.1336C11.6648 10.7719 12.1074 10.4903 12.5929 10.3061C13.0783 10.122 13.5963 10.0392 14.115 10.0629C15.1618 10.0629 15.9781 10.351 16.5543 10.9176C17.1401 11.4938 17.4378 12.2333 17.4378 13.1456C17.4378 13.9139 17.3321 14.6246 17.1209 15.268C16.9511 15.8502 16.645 16.3836 16.2277 16.8238C15.8436 17.2079 15.3922 17.4 14.8833 17.4C14.4703 17.4 14.1342 17.2559 13.8653 16.9486C13.606 16.6413 13.5196 16.2764 13.6156 15.8634C13.7622 15.3501 13.9127 14.8379 14.067 14.3269L14.2398 13.6258C14.2974 13.3761 14.3262 13.1744 14.3262 13.0016C14.3262 12.6558 14.2302 12.3677 14.0574 12.1469C13.8653 11.926 13.606 11.8107 13.2603 11.8107C12.8281 11.8107 12.4632 12.0028 12.1751 12.4062C11.887 12.7999 11.7333 13.2993 11.7333 13.9043C11.7381 14.2788 11.7963 14.6507 11.9062 15.0087L11.9638 15.1528C11.3876 17.6305 11.0514 19.0902 10.9266 19.5128C10.8114 20.041 10.7729 20.6652 10.8018 21.3758C9.37761 20.7455 8.16639 19.7163 7.31433 18.4127C6.46226 17.109 6.00578 15.5866 6 14.0291C6 11.8203 6.77788 9.91884 8.34326 8.36307C9.07486 7.60398 9.95418 7.00276 10.927 6.59645C11.8998 6.19014 12.9455 5.98736 13.9997 6.00061V6.01021Z" fill="currentColor"/>
+                      </svg>
+                      <span class="visually-hidden">Find us on Pinterest</span>
+                    </a>
+                  {% endif %}
+                  {% if block.settings.tiktok_url != blank %}
+                    <a class="cf__social-link" title="TikTok" href="{{ block.settings.tiktok_url }}" target="_blank" rel="noopener">
+                      <svg width="28" height="28" viewBox="0 0 28 28" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M14.4861 5H17.6354C17.6354 5 17.4557 8.79324 22 9.07128V12.0006C22 12.0006 19.5694 12.1396 17.6354 10.7494L17.6671 16.8067C17.6671 17.8913 17.3247 18.9514 16.6832 19.853C16.0418 20.7546 15.1301 21.4572 14.0635 21.8718C12.997 22.2863 11.8235 22.3943 10.6916 22.182C9.55971 21.9697 8.52029 21.4467 7.70487 20.6791C6.88946 19.9115 6.3347 18.9339 6.11081 17.87C5.88691 16.806 6.00395 15.7036 6.44709 14.7022C6.89024 13.7008 7.63959 12.8454 8.6003 12.2443C9.56101 11.6432 10.6899 11.3234 11.8441 11.3254H12.6579V14.3342C12.1269 14.1796 11.5576 14.1863 11.0309 14.3533C10.5043 14.5203 10.0471 14.8392 9.72446 15.2645C9.40182 15.6898 9.23016 16.1999 9.23391 16.7221C9.23766 17.2444 9.41662 17.7523 9.74533 18.1735C10.074 18.5946 10.5358 18.9077 11.0648 19.068C11.5938 19.2284 12.1631 19.2279 12.6918 19.0665C13.2205 18.9052 13.6816 18.5914 14.0094 18.1696C14.3372 17.7478 14.5152 17.2396 14.5178 16.7174L14.4861 5Z" fill="currentColor"/>
+                      </svg>
+                      <span class="visually-hidden">Find us on TikTok</span>
+                    </a>
+                  {% endif %}
+                </div>
+              </div>
+            </div>
+          {% endif %}
+        {% endfor %}
+      </div>
     </div>
-  </div>
+  </section>
 
   <!-- Bottom Bar -->
   <div class="cf__bottom">
@@ -66,7 +95,6 @@
       <p class="cf__copyright">{{ section.settings.copyright_text | default: 'Copyright &copy; 2026 Monster Piercing.' }}</p>
       {% if section.settings.show_payment_icons %}
         <div class="cf__payments">
-          {{ '| amazon' | payment_type_svg_tag }}
           {{ 'american_express' | payment_type_svg_tag }}
           {{ 'apple_pay' | payment_type_svg_tag }}
           {{ 'bancontact' | payment_type_svg_tag }}
@@ -84,7 +112,41 @@
       {% endif %}
     </div>
   </div>
+
+  <!-- Back to Top -->
+  {% if section.settings.show_back_to_top %}
+    <a href="#" class="cf__back-to-top" aria-label="Back to top">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M8 3L3 8" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"/>
+        <path d="M8 3L13 8" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"/>
+        <path d="M8 3V15" stroke="currentColor" stroke-width="1.75" stroke-linecap="square"/>
+      </svg>
+    </a>
+  {% endif %}
 </footer>
+
+<script>
+  document.addEventListener('DOMContentLoaded', function () {
+    var triggers = document.querySelectorAll('.cf [data-accordion-trigger]');
+    triggers.forEach(function (trigger) {
+      trigger.addEventListener('click', function () {
+        var parent = this.closest('.has-accordion');
+        if (parent) {
+          parent.classList.toggle('is-open');
+        }
+      });
+    });
+
+    // Back to top
+    var backToTop = document.querySelector('.cf__back-to-top');
+    if (backToTop) {
+      backToTop.addEventListener('click', function (e) {
+        e.preventDefault();
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      });
+    }
+  });
+</script>
 
 {% schema %}
 {
@@ -132,6 +194,12 @@
       "type": "checkbox",
       "id": "show_payment_icons",
       "label": "Show payment icons",
+      "default": true
+    },
+    {
+      "type": "checkbox",
+      "id": "show_back_to_top",
+      "label": "Show back to top button",
       "default": true
     }
   ],
@@ -208,9 +276,10 @@
   font-family: 'Nunito Sans', sans-serif;
   padding: 0;
   margin: 0;
+  position: relative;
 }
 
-.cf__inner {
+.cf__wrapper {
   max-width: 1400px;
   margin: 0 auto;
   padding: 60px 40px 40px;
@@ -234,6 +303,14 @@
   color: var(--cf-heading);
   margin: 0 0 25px;
   line-height: 1.3;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.cf__accordion-icon {
+  display: none;
+  line-height: 0;
 }
 
 .cf__links {
@@ -242,7 +319,7 @@
   padding: 0;
 }
 
-.cf__links li {
+.cf__link-item {
   margin-bottom: 12px;
 }
 
@@ -270,12 +347,18 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 36px;
-  height: 36px;
+  width: 40px;
+  height: 40px;
   border-radius: 50%;
   border: 1px solid rgba(255, 255, 255, 0.3);
   color: #fff;
   transition: all 0.3s ease;
+  text-decoration: none;
+}
+
+.cf__social-link svg {
+  width: 20px;
+  height: 20px;
 }
 
 .cf__social-link:hover {
@@ -321,7 +404,32 @@
   border-radius: 3px;
 }
 
-/* Responsive */
+/* Back to Top */
+.cf__back-to-top {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  width: 44px;
+  height: 44px;
+  background: var(--cf-bg);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  transition: all 0.3s ease;
+  z-index: 50;
+}
+
+.cf__back-to-top:hover {
+  background: #fff;
+  color: #111;
+  border-color: #fff;
+}
+
+/* Responsive - Tablet */
 @media screen and (max-width: 999px) {
   .cf__columns {
     flex-wrap: wrap;
@@ -336,20 +444,65 @@
     flex: 0 0 100%;
   }
 
-  .cf__inner {
+  .cf__wrapper {
     padding: 40px 20px 30px;
   }
 }
 
+/* Responsive - Mobile with Accordion */
 @media screen and (max-width: 600px) {
   .cf__columns {
     flex-direction: column;
-    gap: 30px;
+    gap: 0;
   }
 
   .cf__col {
     flex: none;
     width: 100%;
+    border-bottom: 1px solid var(--cf-border);
+    padding: 15px 0;
+  }
+
+  .cf__col:last-child {
+    border-bottom: none;
+  }
+
+  .cf__heading {
+    font-size: 16px;
+    margin-bottom: 0;
+    cursor: pointer;
+  }
+
+  .cf__accordion-icon {
+    display: inline-flex;
+    transition: transform 0.3s ease;
+  }
+
+  .cf__col--menu .cf__block-content {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease;
+  }
+
+  .cf__col--menu.is-open .cf__block-content {
+    max-height: 500px;
+  }
+
+  .cf__col--menu.is-open .cf__accordion-icon {
+    transform: rotate(180deg);
+  }
+
+  .cf__col--menu.is-open .cf__heading {
+    margin-bottom: 15px;
+  }
+
+  .cf__col--social .cf__heading {
+    cursor: default;
+    margin-bottom: 15px;
+  }
+
+  .cf__col--social .cf__accordion-icon {
+    display: none;
   }
 
   .cf__bottom-inner {
@@ -361,10 +514,18 @@
   .cf__payments {
     justify-content: center;
   }
+}
 
-  .cf__heading {
-    font-size: 16px;
-    margin-bottom: 15px;
-  }
+/* Visually hidden for accessibility */
+.cf .visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 </style>
