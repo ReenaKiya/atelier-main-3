@@ -219,11 +219,57 @@ class PriceFacetComponent extends Component {
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('keydown', this.#onKeyDown);
+    this.#initRangeSlider();
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this.#onKeyDown);
+  }
+
+  /**
+   * Initializes the range slider and syncs it with text inputs
+   */
+  #initRangeSlider() {
+    const { rangeMin, rangeMax, rangeFill, minInput, maxInput } = this.refs;
+    if (!rangeMin || !rangeMax) return;
+
+    this.#updateRangeFill();
+
+    rangeMin.addEventListener('input', () => {
+      const minVal = parseInt(rangeMin.value);
+      const maxVal = parseInt(rangeMax.value);
+      if (minVal > maxVal) rangeMin.value = rangeMax.value;
+      if (minInput) minInput.value = rangeMin.value === '0' ? '' : rangeMin.value;
+      this.#updateRangeFill();
+    });
+
+    rangeMax.addEventListener('input', () => {
+      const minVal = parseInt(rangeMin.value);
+      const maxVal = parseInt(rangeMax.value);
+      if (maxVal < minVal) rangeMax.value = rangeMin.value;
+      const rangeMaxAttr = rangeMax.getAttribute('max') || '0';
+      if (maxInput) maxInput.value = rangeMax.value === rangeMaxAttr ? '' : rangeMax.value;
+      this.#updateRangeFill();
+    });
+
+    rangeMin.addEventListener('change', () => this.updatePriceFilterAndResults());
+    rangeMax.addEventListener('change', () => this.updatePriceFilterAndResults());
+  }
+
+  /**
+   * Updates the range fill bar between the two handles
+   */
+  #updateRangeFill() {
+    const { rangeMin, rangeMax, rangeFill } = this.refs;
+    if (!rangeMin || !rangeMax || !rangeFill) return;
+
+    const max = parseInt(rangeMax.getAttribute('max') || '100');
+    const minPercent = (parseInt(rangeMin.value) / max) * 100;
+    const maxPercent = (parseInt(rangeMax.value) / max) * 100;
+
+    rangeFill.style.left = minPercent + '%';
+    rangeFill.style.width = (maxPercent - minPercent) + '%';
   }
 
   /**
@@ -245,6 +291,7 @@ class PriceFacetComponent extends Component {
 
     this.#adjustToValidValues(minInput);
     this.#adjustToValidValues(maxInput);
+    this.#syncRangeFromInputs();
 
     const facetsForm = this.closest('facets-form-component');
     if (!(facetsForm instanceof FacetsFormComponent)) return;
@@ -252,6 +299,22 @@ class PriceFacetComponent extends Component {
     facetsForm.updateFilters();
     this.#setMinAndMaxValues();
     this.#updateSummary();
+  }
+
+  /**
+   * Syncs range slider handles from text input values
+   */
+  #syncRangeFromInputs() {
+    const { minInput, maxInput, rangeMin, rangeMax } = this.refs;
+    if (!rangeMin || !rangeMax) return;
+
+    const rangeMaxAttr = rangeMax.getAttribute('max') || '0';
+    if (minInput && minInput.value) rangeMin.value = minInput.value;
+    else if (minInput) rangeMin.value = '0';
+    if (maxInput && maxInput.value) rangeMax.value = maxInput.value;
+    else if (maxInput) rangeMax.value = rangeMaxAttr;
+
+    this.#updateRangeFill();
   }
 
   /**
