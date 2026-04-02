@@ -216,10 +216,13 @@ if (!customElements.get('facet-inputs-component')) {
  * @extends {Component<PriceFacetRefs>}
  */
 class PriceFacetComponent extends Component {
+  #rangeInitialized = false;
+
   connectedCallback() {
     super.connectedCallback();
     this.addEventListener('keydown', this.#onKeyDown);
-    this.#initRangeSlider();
+    // Defer init to ensure refs are populated after DOM is fully parsed
+    requestAnimationFrame(() => this.#initRangeSlider());
   }
 
   disconnectedCallback() {
@@ -228,33 +231,53 @@ class PriceFacetComponent extends Component {
   }
 
   /**
+   * Parses a money string to a number, stripping commas and spaces
+   * @param {string} value
+   * @returns {number}
+   */
+  #parseMoney(value) {
+    return parseFloat(String(value).replace(/[^0-9.\-]/g, '')) || 0;
+  }
+
+  /**
    * Initializes the range slider and syncs it with text inputs
    */
   #initRangeSlider() {
+    if (this.#rangeInitialized) return;
     const { rangeMin, rangeMax, rangeFill, minInput, maxInput } = this.refs;
     if (!rangeMin || !rangeMax) return;
+    this.#rangeInitialized = true;
 
     this.#updateRangeFill();
 
-    rangeMin.addEventListener('input', () => {
-      const minVal = parseInt(rangeMin.value);
-      const maxVal = parseInt(rangeMax.value);
+    rangeMin.addEventListener('input', (e) => {
+      e.stopPropagation();
+      const minVal = this.#parseMoney(rangeMin.value);
+      const maxVal = this.#parseMoney(rangeMax.value);
       if (minVal > maxVal) rangeMin.value = rangeMax.value;
       if (minInput) minInput.value = rangeMin.value === '0' ? '' : rangeMin.value;
       this.#updateRangeFill();
     });
 
-    rangeMax.addEventListener('input', () => {
-      const minVal = parseInt(rangeMin.value);
-      const maxVal = parseInt(rangeMax.value);
+    rangeMax.addEventListener('input', (e) => {
+      e.stopPropagation();
+      const minVal = this.#parseMoney(rangeMin.value);
+      const maxVal = this.#parseMoney(rangeMax.value);
       if (maxVal < minVal) rangeMax.value = rangeMin.value;
       const rangeMaxAttr = rangeMax.getAttribute('max') || '0';
       if (maxInput) maxInput.value = rangeMax.value === rangeMaxAttr ? '' : rangeMax.value;
       this.#updateRangeFill();
     });
 
-    rangeMin.addEventListener('change', () => this.updatePriceFilterAndResults());
-    rangeMax.addEventListener('change', () => this.updatePriceFilterAndResults());
+    // On change (release), trigger filter update
+    rangeMin.addEventListener('change', (e) => {
+      e.stopPropagation();
+      this.updatePriceFilterAndResults();
+    });
+    rangeMax.addEventListener('change', (e) => {
+      e.stopPropagation();
+      this.updatePriceFilterAndResults();
+    });
   }
 
   /**
@@ -264,9 +287,10 @@ class PriceFacetComponent extends Component {
     const { rangeMin, rangeMax, rangeFill } = this.refs;
     if (!rangeMin || !rangeMax || !rangeFill) return;
 
-    const max = parseInt(rangeMax.getAttribute('max') || '100');
-    const minPercent = (parseInt(rangeMin.value) / max) * 100;
-    const maxPercent = (parseInt(rangeMax.value) / max) * 100;
+    const max = this.#parseMoney(rangeMax.getAttribute('max') || '100');
+    if (max === 0) return;
+    const minPercent = (this.#parseMoney(rangeMin.value) / max) * 100;
+    const maxPercent = (this.#parseMoney(rangeMax.value) / max) * 100;
 
     rangeFill.style.left = minPercent + '%';
     rangeFill.style.width = (maxPercent - minPercent) + '%';
@@ -309,9 +333,9 @@ class PriceFacetComponent extends Component {
     if (!rangeMin || !rangeMax) return;
 
     const rangeMaxAttr = rangeMax.getAttribute('max') || '0';
-    if (minInput && minInput.value) rangeMin.value = minInput.value;
+    if (minInput && minInput.value) rangeMin.value = String(this.#parseMoney(minInput.value));
     else if (minInput) rangeMin.value = '0';
-    if (maxInput && maxInput.value) rangeMax.value = maxInput.value;
+    if (maxInput && maxInput.value) rangeMax.value = String(this.#parseMoney(maxInput.value));
     else if (maxInput) rangeMax.value = rangeMaxAttr;
 
     this.#updateRangeFill();

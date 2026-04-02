@@ -77,13 +77,54 @@
         {%- assign range_max_cents = filter.range_max -%}
         {%- assign min_value_cents = filter.min_value.value | default: 0 -%}
         {%- assign max_value_cents = filter.max_value.value | default: range_max_cents -%}
-        {%- assign range_max_display = range_max_cents | money_without_currency -%}
-        {%- assign min_value_display = min_value_cents | money_without_currency -%}
-        {%- assign max_value_display = max_value_cents | money_without_currency -%}
+        {%- assign range_max_display = range_max_cents | money_without_currency | replace: ',', '' -%}
+        {%- assign min_value_display = min_value_cents | money_without_currency | replace: ',', '' -%}
+        {%- assign max_value_display = max_value_cents | money_without_currency | replace: ',', '' -%}
 
-        <div class="price-facet__range-slider" data-range-max="{{ range_max_display }}">
-          <div class="price-facet__range-track">
-            <div class="price-facet__range-fill" ref="rangeFill"></div>
+        <style>
+          .price-facet__range-input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+          }
+          .price-facet__range-input::-moz-range-thumb {
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #000;
+            border: 2px solid #fff;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.2);
+            cursor: pointer;
+            pointer-events: auto;
+            position: relative;
+            z-index: 2;
+          }
+          .price-facet__range-input:focus { outline: none; }
+          .price-facet__range-input:focus::-webkit-slider-thumb {
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+          }
+          .price-facet__range-input:focus::-moz-range-thumb {
+            box-shadow: 0 0 0 3px rgba(0,0,0,0.2);
+          }
+          .price-facet__range-input::-webkit-slider-runnable-track {
+            background: transparent;
+          }
+          .price-facet__range-input::-moz-range-track {
+            background: transparent;
+          }
+        </style>
+        <div class="price-facet__range-slider" data-range-max="{{ range_max_display }}" style="position:relative;width:100%;height:40px;display:flex;align-items:center;padding:0 2px;">
+          <div class="price-facet__range-track" style="position:absolute;width:100%;height:4px;background:rgba(0,0,0,0.15);border-radius:2px;top:50%;transform:translateY(-50%);">
+            <div class="price-facet__range-fill" ref="rangeFill" style="position:absolute;height:100%;background:#000;border-radius:2px;"></div>
           </div>
           <input
             type="range"
@@ -91,9 +132,10 @@
             min="0"
             max="{{ range_max_display }}"
             value="{{ min_value_display }}"
-            step="1"
+            step="any"
             ref="rangeMin"
             aria-label="Minimum price"
+            style="position:absolute;width:100%;height:4px;top:50%;transform:translateY(-50%);-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;margin:0;padding:0;z-index:2;"
           >
           <input
             type="range"
@@ -101,9 +143,10 @@
             min="0"
             max="{{ range_max_display }}"
             value="{{ max_value_display }}"
-            step="1"
+            step="any"
             ref="rangeMax"
             aria-label="Maximum price"
+            style="position:absolute;width:100%;height:4px;top:50%;transform:translateY(-50%);-webkit-appearance:none;appearance:none;background:transparent;pointer-events:none;margin:0;padding:0;z-index:2;"
           >
         </div>
 
