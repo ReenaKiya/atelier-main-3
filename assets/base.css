@@ -19,6 +19,128 @@
   font-weight: 600 !important;
 }
 
+/* ===== Custom Filter Sidebar Styles (Monster Piercing style) ===== */
+
+/* Round checkboxes for filters */
+.facets .checkbox {
+  --checkbox-border-radius: 50%;
+  --checkbox-size: 18px;
+  padding: 4px 0;
+}
+
+@media screen and (min-width: 750px) {
+  .facets .checkbox {
+    --checkbox-size: 16px;
+  }
+}
+
+.facets .checkbox .icon-checkmark {
+  border-radius: 50%;
+  border-width: 1.5px;
+}
+
+.facets .checkbox__input:checked + .checkbox__label .icon-checkmark {
+  background-color: var(--color-foreground);
+  border-color: var(--color-foreground);
+}
+
+/* Filter count styling */
+.facets .checkbox__label-text {
+  font-size: 0.9rem;
+  color: rgb(var(--color-foreground-rgb) / 0.8);
+  white-space: normal;
+  line-height: 1.4;
+}
+
+.facets .checkbox:has(.checkbox__input:checked) .checkbox__label-text {
+  color: var(--color-foreground);
+  font-weight: 600;
+}
+
+/* Bold Filters title */
+.facets--filters-title {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  letter-spacing: -0.01em;
+  padding-bottom: 8px;
+}
+
+/* Vertical filter item spacing */
+.facets--vertical .facets__item {
+  padding: 4px 0;
+}
+
+/* Filter section label styling */
+.facets--vertical .facets__summary {
+  padding: 12px 0;
+  font-weight: 600;
+  font-size: 0.95rem;
+}
+
+.facets--vertical .facets__label {
+  font-weight: 600;
+  font-size: 0.95rem;
+  letter-spacing: 0.01em;
+}
+
+/* Cleaner dividers between filter sections */
+.facets--vertical .facets__item::before {
+  border-top-color: rgb(var(--color-foreground-rgb) / 0.12) !important;
+}
+
+/* Inputs wrapper spacing */
+.facets--vertical .facets__inputs-wrapper {
+  padding-top: 4px;
+}
+
+.facets--vertical .facets__inputs-wrapper .facets__inputs-list {
+  gap: 2px !important;
+}
+
+/* Products count in vertical mode */
+.facets-controls-wrapper .products-count-wrapper {
+  font-size: 0.85rem;
+  color: rgb(var(--color-foreground-rgb) / 0.6);
+}
+
+/* Price filter styling refinements */
+.facets--vertical .price-facet {
+  padding: 8px 0;
+}
+
+.facets--vertical .price-facet__highest-price {
+  font-size: 0.85rem;
+  color: rgb(var(--color-foreground-rgb) / 0.6);
+}
+
+/* Show more button styling */
+.facets--vertical .show-more__button {
+  font-size: 0.85rem;
+  color: rgb(var(--color-foreground-rgb) / 0.7);
+  padding: 6px 0;
+}
+
+.facets--vertical .show-more__button:hover {
+  color: var(--color-foreground);
+}
+
+/* Caret icon in vertical filters */
+.facets--vertical .facets__summary .icon-caret {
+  transition: transform 0.2s ease, color 0.2s ease;
+}
+
+.facets--vertical .facets__panel[open] > .facets__summary .icon-caret {
+  transform: rotate(180deg);
+}
+
+/* Disabled filter values */
+.facets .checkbox:has(.checkbox__input:disabled) .checkbox__label-text {
+  opacity: 0.4;
+  text-decoration: line-through;
+}
+
+/* ===== End Custom Filter Sidebar Styles ===== */
+
 .layout-panel-flex--row>.group-block--width-custom {
   /* flex-basis: var(--size-style-width); */
   width: 100%
