@@ -124,9 +124,29 @@ class FacetInputsComponent extends Component {
   }
 
   /**
-   * Updates filters and the selected facet summary
+   * Enforces single-select behavior: unchecks all other checkboxes in the same filter group
+   * @param {HTMLInputElement} activeInput - The input that was just checked
    */
-  updateFilters() {
+  #enforceSingleSelect(activeInput) {
+    if (!this.refs.facetInputs || !activeInput.checked) return;
+    this.refs.facetInputs.forEach((input) => {
+      if (input !== activeInput && input.checked) {
+        input.checked = false;
+      }
+    });
+  }
+
+  /**
+   * Updates filters and the selected facet summary
+   * @param {Event} [event] - The change event from the input
+   */
+  updateFilters(event) {
+    // Single-select: when a checkbox is checked, uncheck all others in this filter group
+    const changedInput = event?.target instanceof HTMLInputElement ? event.target : null;
+    if (changedInput && changedInput.type === 'checkbox') {
+      this.#enforceSingleSelect(changedInput);
+    }
+
     const facetsForm = this.closest('facets-form-component');
 
     if (!(facetsForm instanceof FacetsFormComponent)) return;
@@ -148,6 +168,7 @@ class FacetInputsComponent extends Component {
     if (event.key === 'Enter' || event.key === ' ') {
       event.preventDefault();
       closestInput.checked = !closestInput.checked;
+      this.#enforceSingleSelect(closestInput);
       this.updateFilters();
     }
   }
