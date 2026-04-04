@@ -125,15 +125,8 @@ class FacetInputsComponent extends Component {
 
   connectedCallback() {
     super.connectedCallback();
-    // Capture phase ensures single-select runs BEFORE the framework collects form data
-    this.addEventListener('change', this.#enforceSingleSelectOnChange, true);
     // Enforce single-select on page load in case multiple filters were already active in the URL
     requestAnimationFrame(() => this.#enforceSingleSelectOnInit());
-  }
-
-  disconnectedCallback() {
-    super.disconnectedCallback();
-    this.removeEventListener('change', this.#enforceSingleSelectOnChange, true);
   }
 
   /**
@@ -155,23 +148,33 @@ class FacetInputsComponent extends Component {
   }
 
   /**
-   * Capture-phase handler: when a checkbox is checked, uncheck all others in this filter group
-   * @param {Event} event
+   * Unchecks all other checkboxes in this filter group, keeping only the given one
+   * @param {HTMLInputElement} checkedInput - The input to keep checked
    */
-  #enforceSingleSelectOnChange = (event) => {
-    if (!(event.target instanceof HTMLInputElement) || event.target.type !== 'checkbox' || !event.target.checked) return;
+  #enforceSingleSelect(checkedInput) {
     if (!this.refs.facetInputs) return;
     this.refs.facetInputs.forEach((input) => {
-      if (input !== event.target && input.checked) {
+      if (input !== checkedInput && input.checked) {
         input.checked = false;
       }
     });
-  };
+  }
 
   /**
-   * Updates filters and the selected facet summary
+   * Updates filters and the selected facet summary.
+   * Called by the framework via on:change attribute — the event is passed as the argument.
+   * Single-select is enforced here BEFORE form data is collected.
+   * @param {Event} [event]
    */
-  updateFilters() {
+  updateFilters(event) {
+    // Enforce single-select: uncheck all others when a new checkbox is checked
+    if (event instanceof Event) {
+      const realTarget = event.composedPath?.()?.[0];
+      if (realTarget instanceof HTMLInputElement && realTarget.type === 'checkbox' && realTarget.checked) {
+        this.#enforceSingleSelect(realTarget);
+      }
+    }
+
     const facetsForm = this.closest('facets-form-component');
 
     if (!(facetsForm instanceof FacetsFormComponent)) return;
