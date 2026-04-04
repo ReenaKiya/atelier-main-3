@@ -72,9 +72,9 @@
         {%- assign range_max_cents = filter.range_max -%}
         {%- assign min_value_cents = filter.min_value.value | default: 0 -%}
         {%- assign max_value_cents = filter.max_value.value | default: range_max_cents -%}
-        {%- assign range_max_display = range_max_cents | money_without_currency | replace: ',', '' -%}
-        {%- assign min_value_display = min_value_cents | money_without_currency | replace: ',', '' -%}
-        {%- assign max_value_display = max_value_cents | money_without_currency | replace: ',', '' -%}
+        {%- assign range_max_display = range_max_cents | divided_by: 100 -%}
+        {%- assign min_value_display = min_value_cents | divided_by: 100 -%}
+        {%- assign max_value_display = max_value_cents | divided_by: 100 -%}
 
         <style>
           .price-facet__range-input::-webkit-slider-thumb {
@@ -152,13 +152,13 @@
               name="{{ filter.min_value.param_name }}"
               id="{{ filter.label | escape }}-GTE"
               {%- if filter.min_value.value -%}
-                value="{{ filter.min_value.value | money_without_currency }}"
+                value="{{ filter.min_value.value | divided_by: 100 }}"
               {%- endif -%}
               type="text"
-              inputmode="decimal"
+              inputmode="numeric"
               placeholder="0"
               data-min="0"
-              data-max="{{ min_input_max_value | money_without_currency }}"
+              data-max="{{ min_input_max_value | divided_by: 100 }}"
               ref="minInput"
               autocomplete="off"
               {% if autofocus %}
@@ -181,13 +181,13 @@
               name="{{ filter.max_value.param_name }}"
               id="{{ filter.label | escape }}-LTE"
               {%- if filter.max_value.value -%}
-                value="{{ filter.max_value.value | money_without_currency }}"
+                value="{{ filter.max_value.value | divided_by: 100 }}"
               {%- endif -%}
               type="text"
-              inputmode="decimal"
-              placeholder="{{ filter.range_max | money_without_currency }}"
-              data-min="{{ max_input_min_value | money_without_currency }}"
-              data-max="{{ filter.range_max | money_without_currency }}"
+              inputmode="numeric"
+              placeholder="{{ filter.range_max | divided_by: 100 }}"
+              data-min="{{ max_input_min_value | divided_by: 100 }}"
+              data-max="{{ filter.range_max | divided_by: 100 }}"
               ref="maxInput"
               autocomplete="off"
               {% if autofocus %}
@@ -204,7 +204,7 @@
         </div>
 
         <div class="price-facet__highest-price">
-          {%- assign formatted_highest_price = filter.range_max | money -%}
+          {%- assign formatted_highest_price = filter.range_max | divided_by: 100 | prepend: '$' -%}
           {{ 'content.price_filter_html' | t: price: formatted_highest_price }}
         </div>
 
