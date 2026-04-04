@@ -10,62 +10,57 @@
   {% render 'price-filter', filter: filter, filter_style: 'vertical' %}
 {%- enddoc -%}
 
-<accordion-custom
-  class="facets__item"
-  {% if filter_style == 'horizontal' %}
+{% if filter_style == 'vertical' %}
+  <div class="facets__item facets__item--no-accordion">
+    <div class="facets__filter-title">{{ filter.label }}</div>
+    <div class="facets__panel-content-open">
+{% else %}
+  <accordion-custom
+    class="facets__item"
     data-disable-animation-on-desktop="true"
     data-close-with-escape="true"
-  {% endif %}
-
-  open-by-default-on-mobile
-  {% if filter_style == 'vertical' %}
-    open
-    open-by-default-on-desktop
-  {% endif %}
->
-  <details
-    class="facets__panel"
-    {% if filter_style == 'horizontal' %}
-      data-auto-close-details="desktop"
-    {% endif %}
+    open-by-default-on-mobile
   >
-    <summary class="facets__summary">
-      <span class="facets__label">{{ filter.label }}</span>
-      <facet-status-component class="facets__status">
-        <template ref="moneyFormat">{{ shop.money_format }}</template>
-
-        <span
-          class="hide-when-empty"
-          ref="facetStatus"
-          data-currency="{{ localization.country.currency.iso_code }}"
-          data-range-max="{{ filter.range_max }}"
-        >
-          {%- if filter.min_value.value != null or filter.max_value.value != null %}
-            {%- if filter.min_value.value != null and filter.max_value.value != null %}
-              {{- filter.min_value.value | money | strip_html -}}
-              –
-              {{- filter.max_value.value | money | strip_html -}}
-            {%- elsif filter.min_value.value != null -%}
-              {{ filter.min_value.value | money | strip_html }}–{{ filter.range_max | money | strip_html }}
-
-            {%- elsif filter.max_value.value != null -%}
-              {{- 0 | money | strip_html -}}
-              –
-              {{- filter.max_value.value | money | strip_html -}}
-            {%- endif -%}
-          {%- endif -%}
-        </span>
-      </facet-status-component>
-      <span class="svg-wrapper icon-caret icon-animated">
-        {{- 'icon-caret.svg' | inline_asset_content -}}
-      </span>
-    </summary>
-    <floating-panel-component
-      {% unless filter_style == 'vertical' %}
-        data-close-on-resize
-      {% endunless %}
-      class="facets__panel-content details-content{% if filter_style == 'horizontal' %} color-{{ settings.popover_color_scheme }}{% endif %}"
+    <details
+      class="facets__panel"
+      data-auto-close-details="desktop"
     >
+      <summary class="facets__summary">
+        <span class="facets__label">{{ filter.label }}</span>
+        <facet-status-component class="facets__status">
+          <template ref="moneyFormat">{{ shop.money_format }}</template>
+
+          <span
+            class="hide-when-empty"
+            ref="facetStatus"
+            data-currency="{{ localization.country.currency.iso_code }}"
+            data-range-max="{{ filter.range_max }}"
+          >
+            {%- if filter.min_value.value != null or filter.max_value.value != null %}
+              {%- if filter.min_value.value != null and filter.max_value.value != null %}
+                {{- filter.min_value.value | money | strip_html -}}
+                –
+                {{- filter.max_value.value | money | strip_html -}}
+              {%- elsif filter.min_value.value != null -%}
+                {{ filter.min_value.value | money | strip_html }}–{{ filter.range_max | money | strip_html }}
+
+              {%- elsif filter.max_value.value != null -%}
+                {{- 0 | money | strip_html -}}
+                –
+                {{- filter.max_value.value | money | strip_html -}}
+              {%- endif -%}
+            {%- endif -%}
+          </span>
+        </facet-status-component>
+        <span class="svg-wrapper icon-caret icon-animated">
+          {{- 'icon-caret.svg' | inline_asset_content -}}
+        </span>
+      </summary>
+      <floating-panel-component
+        data-close-on-resize
+        class="facets__panel-content details-content color-{{ settings.popover_color_scheme }}"
+      >
+{% endif %}
       {% assign min_input_max_value = filter.max_value.value | default: filter.range_max %}
       {% assign max_input_min_value = filter.min_value.value | default: 0 %}
 
@@ -233,9 +228,14 @@
           </facet-clear-component>
         {% endif %}
       </price-facet-component>
+{% if filter_style == 'vertical' %}
+    </div>
+  </div>
+{% else %}
     </floating-panel-component>
   </details>
 </accordion-custom>
+{% endif %}
 
 {% stylesheet %}
   /* Price range slider */
