@@ -127,11 +127,31 @@ class FacetInputsComponent extends Component {
     super.connectedCallback();
     // Capture phase ensures single-select runs BEFORE the framework collects form data
     this.addEventListener('change', this.#enforceSingleSelectOnChange, true);
+    // Enforce single-select on page load in case multiple filters were already active in the URL
+    requestAnimationFrame(() => this.#enforceSingleSelectOnInit());
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('change', this.#enforceSingleSelectOnChange, true);
+  }
+
+  /**
+   * On init: if multiple checkboxes are checked, keep only the last one and update the URL/filters
+   */
+  #enforceSingleSelectOnInit() {
+    if (!this.refs.facetInputs) return;
+    const checked = this.refs.facetInputs.filter((input) => input.checked);
+    if (checked.length <= 1) return;
+
+    // Keep only the last checked item (most recently added to URL)
+    const keep = checked[checked.length - 1];
+    checked.forEach((input) => {
+      if (input !== keep) input.checked = false;
+    });
+
+    // Update filters to sync URL and re-render with single selection
+    this.updateFilters();
   }
 
   /**
