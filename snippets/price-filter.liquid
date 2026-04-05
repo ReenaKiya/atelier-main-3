@@ -76,30 +76,17 @@
         {%- assign min_value_display = min_value_cents | divided_by: 100 -%}
         {%- assign max_value_display = max_value_cents | divided_by: 100 -%}
 
-        <div class="price-facet__range-container">
-          <div class="price-facet__range-track"></div>
-          <div class="price-facet__range-fill" ref="rangeFill"></div>
-          <input
-            type="range"
-            class="price-facet__range-input price-facet__range-input--min"
-            min="0"
-            max="{{ range_max_display }}"
-            value="{{ min_value_display }}"
-            step="1"
-            ref="rangeMin"
-            aria-label="Minimum price"
-          >
-          <input
-            type="range"
-            class="price-facet__range-input price-facet__range-input--max"
-            min="0"
-            max="{{ range_max_display }}"
-            value="{{ max_value_display }}"
-            step="1"
-            ref="rangeMax"
-            aria-label="Maximum price"
-          >
-        </div>
+        <input
+          type="range"
+          class="price-facet__range-input"
+          min="4"
+          max="790"
+          value="{{ max_value_display | default: 790 }}"
+          step="1"
+          ref="rangeMax"
+          aria-label="Maximum price"
+          style="width: 100%;"
+        >
 
         <div class="price-filter-inputs" style="display: flex; justify-content: space-between; margin-top: 10px;">
           <div style="position: relative; width: 45%;">
@@ -108,10 +95,10 @@
               class="price-facet__input"
               name="{{ filter.min_value.param_name }}"
               id="{{ filter.label | escape }}-GTE"
-              value="{{ min_value_display }}"
+              value="{{ min_value_display | default: 4 }}"
               placeholder="Min"
-              data-min="0"
-              data-max="{{ min_input_max_value | divided_by: 100 }}"
+              data-min="4"
+              data-max="{{ min_input_max_value | divided_by: 100 | default: 790 }}"
               ref="minInput"
               autocomplete="off"
               style="width: 100%; border: 1px solid #ccc; padding: 5px; border-radius: 4px;"
@@ -127,10 +114,10 @@
               class="price-facet__input"
               name="{{ filter.max_value.param_name }}"
               id="{{ filter.label | escape }}-LTE"
-              value="{{ max_value_display }}"
+              value="{{ max_value_display | default: 790 }}"
               placeholder="Max"
-              data-min="{{ max_input_min_value | divided_by: 100 }}"
-              data-max="{{ filter.range_max | divided_by: 100 }}"
+              data-min="{{ max_input_min_value | divided_by: 100 | default: 4 }}"
+              data-max="790"
               ref="maxInput"
               autocomplete="off"
               style="width: 100%; border: 1px solid #ccc; padding: 5px; border-radius: 4px;"
@@ -180,45 +167,15 @@
     flex-direction: column;
   }
 
-  .price-facet__range-container {
-    position: relative;
-    width: 100%;
-    height: 30px;
-    margin: 10px 0;
-  }
-
-  .price-facet__range-track {
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 6px;
-    background: #ddd;
-    border-radius: 3px;
-    transform: translateY(-50%);
-  }
-
-  .price-facet__range-fill {
-    position: absolute;
-    top: 50%;
-    height: 6px;
-    background: #000;
-    border-radius: 3px;
-    transform: translateY(-50%);
-  }
-
   .price-facet__range-input {
     -webkit-appearance: none;
     appearance: none;
-    position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
-    height: 100%;
-    background: transparent;
+    height: 6px;
+    border-radius: 3px;
     outline: none;
-    pointer-events: none;
-    margin: 0;
+    margin: 10px 0;
+    background: linear-gradient(to right, #db1e37 0%, #db1e37 100%, #ddd 100%, #ddd 100%);
   }
 
   .price-facet__range-input::-webkit-slider-thumb {
@@ -231,7 +188,6 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    pointer-events: all;
   }
 
   .price-facet__range-input::-moz-range-thumb {
@@ -242,17 +198,6 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
-    pointer-events: all;
-  }
-
-  .price-facet__range-input::-webkit-slider-runnable-track {
-    -webkit-appearance: none;
-    appearance: none;
-    background: transparent;
-  }
-
-  .price-facet__range-input::-moz-range-track {
-    background: transparent;
   }
 
   .price-facet__range-input:focus {
