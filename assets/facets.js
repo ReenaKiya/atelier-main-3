@@ -278,7 +278,10 @@ class PriceFacetComponent extends Component {
     super.connectedCallback();
     this.addEventListener('keydown', this.#onKeyDown);
     // Defer init to ensure refs are populated after DOM is fully parsed
-    requestAnimationFrame(() => this.#initRangeSlider());
+    requestAnimationFrame(() => {
+      this.#initRangeSlider();
+      this.#updateRangeFill();
+    });
   }
 
   disconnectedCallback() {
