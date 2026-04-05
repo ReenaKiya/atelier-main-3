@@ -76,17 +76,30 @@
         {%- assign min_value_display = min_value_cents | divided_by: 100 -%}
         {%- assign max_value_display = max_value_cents | divided_by: 100 -%}
 
-        <input
-          type="range"
-          class="price-facet__range-input"
-          min="{{ min_value_display }}"
-          max="{{ range_max_display }}"
-          value="{{ max_value_display }}"
-          step="1"
-          ref="rangeMax"
-          aria-label="Maximum price"
-          style="width: 100%;"
-        >
+        <div class="price-facet__range-container">
+          <div class="price-facet__range-track"></div>
+          <div class="price-facet__range-fill" ref="rangeFill"></div>
+          <input
+            type="range"
+            class="price-facet__range-input price-facet__range-input--min"
+            min="0"
+            max="{{ range_max_display }}"
+            value="{{ min_value_display }}"
+            step="1"
+            ref="rangeMin"
+            aria-label="Minimum price"
+          >
+          <input
+            type="range"
+            class="price-facet__range-input price-facet__range-input--max"
+            min="0"
+            max="{{ range_max_display }}"
+            value="{{ max_value_display }}"
+            step="1"
+            ref="rangeMax"
+            aria-label="Maximum price"
+          >
+        </div>
 
         <div class="price-filter-inputs" style="display: flex; justify-content: space-between; margin-top: 10px;">
           <div style="position: relative; width: 45%;">
@@ -167,15 +180,45 @@
     flex-direction: column;
   }
 
+  .price-facet__range-container {
+    position: relative;
+    width: 100%;
+    height: 30px;
+    margin: 10px 0;
+  }
+
+  .price-facet__range-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 6px;
+    background: #ddd;
+    border-radius: 3px;
+    transform: translateY(-50%);
+  }
+
+  .price-facet__range-fill {
+    position: absolute;
+    top: 50%;
+    height: 6px;
+    background: #000;
+    border-radius: 3px;
+    transform: translateY(-50%);
+  }
+
   .price-facet__range-input {
     -webkit-appearance: none;
     appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
-    background: #ddd;
+    height: 100%;
+    background: transparent;
     outline: none;
-    margin: 10px 0;
+    pointer-events: none;
+    margin: 0;
   }
 
   .price-facet__range-input::-webkit-slider-thumb {
@@ -188,6 +231,7 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    pointer-events: all;
   }
 
   .price-facet__range-input::-moz-range-thumb {
@@ -198,6 +242,17 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    pointer-events: all;
+  }
+
+  .price-facet__range-input::-webkit-slider-runnable-track {
+    -webkit-appearance: none;
+    appearance: none;
+    background: transparent;
+  }
+
+  .price-facet__range-input::-moz-range-track {
+    background: transparent;
   }
 
   .price-facet__range-input:focus {
