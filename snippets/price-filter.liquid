@@ -70,18 +70,23 @@
         on:change="/updatePriceFilterAndResults"
       >
         {%- assign range_max_cents = filter.range_max -%}
-        {%- assign min_value_cents = filter.min_value.value | default: 0 -%}
-        {%- assign max_value_cents = filter.max_value.value | default: range_max_cents -%}
-        {%- assign range_max_display = range_max_cents | divided_by: 100 -%}
-        {%- assign min_value_display = min_value_cents | divided_by: 100 -%}
-        {%- assign max_value_display = max_value_cents | divided_by: 100 -%}
+        {%- if filter.min_value.value != null -%}
+          {%- assign min_value_display = filter.min_value.value | divided_by: 100 -%}
+        {%- else -%}
+          {%- assign min_value_display = 4 -%}
+        {%- endif -%}
+        {%- if filter.max_value.value != null -%}
+          {%- assign max_value_display = filter.max_value.value | divided_by: 100 -%}
+        {%- else -%}
+          {%- assign max_value_display = 790 -%}
+        {%- endif -%}
 
         <input
           type="range"
           class="price-facet__range-input"
           min="4"
           max="790"
-          value="{{ max_value_display | default: 790 }}"
+          value="{{ max_value_display }}"
           step="1"
           ref="rangeMax"
           aria-label="Maximum price"
@@ -95,10 +100,10 @@
               class="price-facet__input"
               name="{{ filter.min_value.param_name }}"
               id="{{ filter.label | escape }}-GTE"
-              value="{{ min_value_display | default: 4 }}"
+              value="{{ min_value_display }}"
               placeholder="Min"
               data-min="4"
-              data-max="{{ min_input_max_value | divided_by: 100 | default: 790 }}"
+              data-max="{{ max_value_display }}"
               ref="minInput"
               autocomplete="off"
               style="width: 100%; border: 1px solid #ccc; padding: 5px; border-radius: 4px;"
@@ -114,9 +119,9 @@
               class="price-facet__input"
               name="{{ filter.max_value.param_name }}"
               id="{{ filter.label | escape }}-LTE"
-              value="{{ max_value_display | default: 790 }}"
+              value="{{ max_value_display }}"
               placeholder="Max"
-              data-min="{{ max_input_min_value | divided_by: 100 | default: 4 }}"
+              data-min="{{ min_value_display }}"
               data-max="790"
               ref="maxInput"
               autocomplete="off"
