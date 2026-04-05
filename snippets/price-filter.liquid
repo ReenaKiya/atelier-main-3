@@ -154,8 +154,7 @@
               {%- if filter.min_value.value -%}
                 value="{{ filter.min_value.value | divided_by: 100 }}"
               {%- endif -%}
-              type="text"
-              inputmode="numeric"
+              type="number"
               placeholder="0"
               data-min="0"
               data-max="{{ min_input_max_value | divided_by: 100 }}"
@@ -183,8 +182,7 @@
               {%- if filter.max_value.value -%}
                 value="{{ filter.max_value.value | divided_by: 100 }}"
               {%- endif -%}
-              type="text"
-              inputmode="numeric"
+              type="number"
               placeholder="{{ filter.range_max | divided_by: 100 }}"
               data-min="{{ max_input_min_value | divided_by: 100 }}"
               data-max="{{ filter.range_max | divided_by: 100 }}"
@@ -203,10 +201,6 @@
           </div>
         </div>
 
-        <div class="price-facet__highest-price">
-          {%- assign formatted_highest_price = filter.range_max | divided_by: 100 | prepend: '$' -%}
-          {{ 'content.price_filter_html' | t: price: formatted_highest_price }}
-        </div>
 
         {% if filter.min_value.value != null or filter.max_value.value != null %}
           {% assign has_active_values = true %}
