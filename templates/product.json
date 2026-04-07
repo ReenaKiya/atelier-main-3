@@ -1025,7 +1025,7 @@
           "type": "pill",
           "settings": {
             "label": "G23 Titanium Tri Ball Design Thread-less Push-Fit Flatback Stud",
-            "link": "{{ product.url }}"
+            "link": "shopify://products/g23-titanium-tri-ball-design-thread-less-push-fit-flatback-stud"
           }
         }
       },
