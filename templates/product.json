@@ -1020,6 +1020,18 @@
     },
     "people_also_searched_kCMH3U": {
       "type": "people-also-searched",
+      "blocks": {
+        "pill_GTA7Kb": {
+          "type": "pill",
+          "settings": {
+            "label": "G23 Titanium Tri Ball Design Thread-less Push-Fit Flatback Stud",
+            "link": "{{ product.url }}"
+          }
+        }
+      },
+      "block_order": [
+        "pill_GTA7Kb"
+      ],
       "name": "People Also Searched",
       "settings": {
         "title": "People Also Searched For",
