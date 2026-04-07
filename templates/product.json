@@ -1017,6 +1017,98 @@
         "size_guide_content": "<div class=\"tab-content active\" id=\"gauge-size-guide\">\n                  <!-- BEGIN app snippet: tab-content -->\n\n\n  <table border=\"1\" cellpadding=\"10\" cellspacing=\"0\" style=\"width: 100%; border-collapse: collapse; border-spacing: 0px; border: 1px solid rgb(0, 0, 0);\">\n<tbody>\n<tr style=\"background-color: #f5f5f5;\">\n<th style=\"border-color: rgb(0, 0, 0);\">Gauge</th>\n<th style=\"border-color: rgb(0, 0, 0);\">Millimetres (mm)</th>\n<th style=\"border-color: rgb(0, 0, 0);\">Inches</th>\n<th style=\"border-color: rgb(0, 0, 0);\">Best For</th>\n<th style=\"border-color: rgb(0, 0, 0);\">Available Inner Diameters</th>\n</tr>\n<tr>\n<td style=\"border-color: rgb(0, 0, 0);\"><strong>16G</strong></td>\n<td style=\"border-color: rgb(0, 0, 0);\">1.2mm</td>\n<td style=\"border-color: rgb(0, 0, 0);\">0.048\"</td>\n<td style=\"border-color: rgb(0, 0, 0);\">Thicker cartilage, tragus, standard ear lobes (non-stretched)</td>\n<td style=\"border-color: rgb(0, 0, 0);\">6mm, 7mm, 8mm, 9mm, 10mm, 11mm, 12mm</td>\n</tr>\n<tr>\n<td style=\"border-color: rgb(0, 0, 0);\"><strong>18G</strong></td>\n<td style=\"border-color: rgb(0, 0, 0);\">1.0mm</td>\n<td style=\"border-color: rgb(0, 0, 0);\">0.040\"</td>\n<td style=\"border-color: rgb(0, 0, 0);\">Standard helix, septum, nostril, and most ear piercings</td>\n<td style=\"border-color: rgb(0, 0, 0);\">6mm, 7mm, 8mm, 9mm, 10mm, 11mm, 12mm</td>\n</tr>\n<tr>\n<td style=\"border-color: rgb(0, 0, 0);\"><strong>20G</strong></td>\n<td style=\"border-color: rgb(0, 0, 0);\">0.8mm</td>\n<td style=\"border-color: rgb(0, 0, 0);\">0.032\"</td>\n<td style=\"border-color: rgb(0, 0, 0);\">Delicate ear piercings, nostril, stretched lobes (small gauge)</td>\n<td style=\"border-color: rgb(0, 0, 0);\">6mm, 7mm, 8mm, 9mm, 10mm, 11mm, 12mm</td>\n</tr>\n</tbody>\n</table>\n<p style=\"margin-top: 15px;\"><strong>How to Measure Inner Diameter:</strong> Measure the distance across the ring opening (from one side of the inner curve to the opposite side). Place a ruler or calliper against the inside of an existing ring that fits comfortably. If unsure, consult with your piercing professional—they can measure your piercing and recommend the exact gauge and diameter.</p>\n<p><strong>Important:</strong> Gauge and inner diameter are independent measurements. Always verify both before purchasing. A ring that is the correct gauge but wrong diameter will not fit properly.</p>\n\n<!-- END app snippet -->\n                </div>",
         "faq_content": "<div class=\"pdt-faq-list\">\n  <div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n  <!-- more items... -->\n</div>"
       }
+    },
+    "people_also_searched_kCMH3U": {
+      "type": "people-also-searched",
+      "blocks": {
+        "pill_EEMtta": {
+          "type": "pill",
+          "settings": {
+            "label": "14K Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_LKtEXH": {
+          "type": "pill",
+          "settings": {
+            "label": "14K/Bioflex Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_FnAPYr": {
+          "type": "pill",
+          "settings": {
+            "label": "9K Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_MMjUam": {
+          "type": "pill",
+          "settings": {
+            "label": "Sterling Silver Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_bRRwej": {
+          "type": "pill",
+          "settings": {
+            "label": "SterlingSilver/Bioflex Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_7ihgxQ": {
+          "type": "pill",
+          "settings": {
+            "label": "Surgical Steel Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_jhhQJP": {
+          "type": "pill",
+          "settings": {
+            "label": "Titanium Flatback Studs",
+            "link": ""
+          }
+        },
+        "pill_VnEfbM": {
+          "type": "pill",
+          "settings": {
+            "label": "Flatback Studs External",
+            "link": ""
+          }
+        },
+        "pill_eAjnVF": {
+          "type": "pill",
+          "settings": {
+            "label": "Flatback Studs Internal",
+            "link": ""
+          }
+        }
+      },
+      "block_order": [
+        "pill_EEMtta",
+        "pill_LKtEXH",
+        "pill_FnAPYr",
+        "pill_MMjUam",
+        "pill_bRRwej",
+        "pill_7ihgxQ",
+        "pill_jhhQJP",
+        "pill_VnEfbM",
+        "pill_eAjnVF"
+      ],
+      "name": "People Also Searched",
+      "settings": {
+        "title": "People Also Searched For",
+        "background_color": "#ffffff",
+        "title_color": "#333333",
+        "pill_background": "#efefef",
+        "pill_color": "#333333",
+        "title_size": 22,
+        "pill_font_size": 14,
+        "pill_radius": 20,
+        "padding_top": 30,
+        "padding_bottom": 30
+      }
     }
   },
   "order": [
@@ -1031,6 +1123,7 @@
     "176603826003e86eb7",
     "collection_list_Ec6EQn",
     "177426350820ff0335",
-    "product_description_tabs_tqRhX7"
+    "product_description_tabs_tqRhX7",
+    "people_also_searched_kCMH3U"
   ]
 }
