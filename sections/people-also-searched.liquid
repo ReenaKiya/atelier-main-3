@@ -1,0 +1,243 @@
+{%- liquid
+  assign bg_color = section.settings.background_color
+  assign title_color = section.settings.title_color
+  assign title_size = section.settings.title_size
+  assign pill_bg = section.settings.pill_background
+  assign pill_color = section.settings.pill_color
+  assign pill_size = section.settings.pill_font_size
+  assign pill_radius = section.settings.pill_radius
+  assign padding_top = section.settings.padding_top
+  assign padding_bottom = section.settings.padding_bottom
+-%}
+
+<div
+  class="related-searches-pills"
+  style="
+    background-color: {{ bg_color }};
+    padding-top: {{ padding_top }}px;
+    padding-bottom: {{ padding_bottom }}px;
+  "
+>
+  <div class="related-searches-pills__container page-width">
+    {%- if section.settings.title != blank -%}
+      <h3
+        class="related-searches-pills__title"
+        style="
+          color: {{ title_color }};
+          font-size: {{ title_size }}px;
+        "
+      >
+        {{ section.settings.title }}
+      </h3>
+    {%- endif -%}
+
+    {%- if section.blocks.size > 0 -%}
+      <div class="related-searches-pills__tags">
+        {%- for block in section.blocks -%}
+          {%- if block.type == 'pill' and block.settings.label != blank -%}
+            <a
+              href="{{ block.settings.link | default: '#' }}"
+              class="related-searches-pills__tag"
+              style="
+                background-color: {{ pill_bg }};
+                color: {{ pill_color }};
+                font-size: {{ pill_size }}px;
+                border-radius: {{ pill_radius }}px;
+              "
+              {{ block.shopify_attributes }}
+            >
+              {{ block.settings.label }}
+            </a>
+          {%- endif -%}
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+  </div>
+</div>
+
+{% stylesheet %}
+  .related-searches-pills__container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding-left: 20px;
+    padding-right: 20px;
+  }
+
+  .related-searches-pills__title {
+    font-weight: 600;
+    margin: 0 0 18px;
+    line-height: 1.3;
+  }
+
+  .related-searches-pills__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .related-searches-pills__tag {
+    display: inline-block;
+    padding: 10px 22px;
+    text-decoration: none;
+    line-height: 1.2;
+    transition: background-color 0.2s ease, color 0.2s ease;
+    white-space: nowrap;
+  }
+
+  .related-searches-pills__tag:hover {
+    background-color: #c41e3a !important;
+    color: #ffffff !important;
+  }
+
+  @media screen and (max-width: 749px) {
+    .related-searches-pills__tag {
+      padding: 8px 16px;
+      font-size: 13px !important;
+    }
+
+    .related-searches-pills__title {
+      font-size: 18px !important;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "People Also Searched",
+  "tag": "section",
+  "class": "section-related-searches",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Heading",
+      "default": "People Also Searched For"
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "background_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#333333"
+    },
+    {
+      "type": "color",
+      "id": "pill_background",
+      "label": "Pill background color",
+      "default": "#efefef"
+    },
+    {
+      "type": "color",
+      "id": "pill_color",
+      "label": "Pill text color",
+      "default": "#333333"
+    },
+    {
+      "type": "header",
+      "content": "Typography & Sizing"
+    },
+    {
+      "type": "range",
+      "id": "title_size",
+      "label": "Title font size",
+      "min": 14,
+      "max": 36,
+      "step": 1,
+      "unit": "px",
+      "default": 22
+    },
+    {
+      "type": "range",
+      "id": "pill_font_size",
+      "label": "Pill font size",
+      "min": 11,
+      "max": 20,
+      "step": 1,
+      "unit": "px",
+      "default": 14
+    },
+    {
+      "type": "range",
+      "id": "pill_radius",
+      "label": "Pill corner radius",
+      "min": 0,
+      "max": 40,
+      "step": 1,
+      "unit": "px",
+      "default": 20
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 100,
+      "step": 2,
+      "unit": "px",
+      "default": 30
+    }
+  ],
+  "blocks": [
+    {
+      "type": "pill",
+      "name": "Pill",
+      "settings": [
+        {
+          "type": "text",
+          "id": "label",
+          "label": "Label",
+          "default": "Search term"
+        },
+        {
+          "type": "url",
+          "id": "link",
+          "label": "Link"
+        }
+      ]
+    }
+  ],
+  "presets": [
+    {
+      "name": "People Also Searched",
+      "category": "Custom",
+      "blocks": [
+        { "type": "pill", "settings": { "label": "14K Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "14K/Bioflex Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "9K Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "Sterling Silver Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "SterlingSilver/Bioflex Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "Surgical Steel Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "Titanium Flatback Studs" } },
+        { "type": "pill", "settings": { "label": "Flatback Studs External" } },
+        { "type": "pill", "settings": { "label": "Flatback Studs Internal" } }
+      ]
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product", "collection"]
+  }
+}
+{% endschema %}
