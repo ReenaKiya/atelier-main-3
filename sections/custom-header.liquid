@@ -13,7 +13,7 @@
 >
   <div class="custom-header__inner page-width">
     <!-- Search -->
-    <div class="custom-header__search">
+    <div class="custom-header__search" data-ch-search>
       <form action="/search" method="get" class="custom-header__search-form">
         <input
           type="search"
@@ -21,6 +21,7 @@
           class="custom-header__search-input"
           placeholder="{{ search_placeholder }}"
           autocomplete="off"
+          data-ch-search-input
         >
         <button type="submit" class="custom-header__search-btn" aria-label="Search">
           <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -29,6 +30,12 @@
           </svg>
         </button>
       </form>
+
+      <!-- Predictive Search Dropdown -->
+      <div class="ch-search-results" data-ch-search-results hidden>
+        <div class="ch-search-loading" data-ch-search-loading hidden>Searching...</div>
+        <div class="ch-search-content" data-ch-search-content></div>
+      </div>
     </div>
 
     <!-- Logo -->
@@ -206,6 +213,238 @@
 </div>
 
 <script>
+  // ===================== //
+  // PREDICTIVE SEARCH     //
+  // ===================== //
+  (function() {
+    var searchEl = document.querySelector('[data-ch-search]');
+    if (!searchEl) return;
+    var input = searchEl.querySelector('[data-ch-search-input]');
+    var resultsEl = searchEl.querySelector('[data-ch-search-results]');
+    var contentEl = searchEl.querySelector('[data-ch-search-content]');
+    var loadingEl = searchEl.querySelector('[data-ch-search-loading]');
+    var debounceTimer = null;
+    var moneyFormat = {{ shop.money_format | json }};
+
+    function formatMoney(cents) {
+      var amount = (cents / 100).toFixed(2);
+      var amountNoDecimals = Math.round(cents / 100);
+      var amountWithComma = amount.replace('.', ',');
+      return moneyFormat
+        .replace(/\{\{\s*amount_with_comma_separator\s*\}\}/g, amountWithComma)
+        .replace(/\{\{\s*amount_no_decimals\s*\}\}/g, amountNoDecimals)
+        .replace(/\{\{\s*amount\s*\}\}/g, amount);
+    }
+
+    function escapeHtml(str) {
+      if (str == null) return '';
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#39;');
+    }
+
+    function getRecentQueries() {
+      try {
+        var raw = localStorage.getItem('ch_recent_queries');
+        return raw ? JSON.parse(raw) : [];
+      } catch(e) { return []; }
+    }
+
+    function addRecentQuery(q) {
+      if (!q) return;
+      var list = getRecentQueries();
+      list = list.filter(function(x) { return x !== q; });
+      list.unshift(q);
+      list = list.slice(0, 6);
+      try { localStorage.setItem('ch_recent_queries', JSON.stringify(list)); } catch(e) {}
+    }
+
+    function removeRecentQuery(q) {
+      var list = getRecentQueries().filter(function(x) { return x !== q; });
+      try { localStorage.setItem('ch_recent_queries', JSON.stringify(list)); } catch(e) {}
+    }
+
+    function showResults() { resultsEl.hidden = false; }
+    function hideResults() { resultsEl.hidden = true; }
+
+    function renderLeftColumn(query, collections) {
+      var html = '';
+      var recent = getRecentQueries();
+      if (recent.length) {
+        html += '<div class="ch-search-section">';
+        html += '<div class="ch-search-section-title">Your Search Queries</div>';
+        html += '<ul class="ch-search-list">';
+        recent.forEach(function(q) {
+          html += '<li class="ch-search-recent-item">' +
+                  '<a href="/search?q=' + encodeURIComponent(q) + '">' + escapeHtml(q) + '</a>' +
+                  '<button type="button" class="ch-search-recent-remove" data-recent-remove="' + escapeHtml(q) + '" aria-label="Remove">&times;</button>' +
+                  '</li>';
+        });
+        html += '</ul></div>';
+      }
+
+      if (collections && collections.length) {
+        html += '<div class="ch-search-section">';
+        html += '<div class="ch-search-section-title">Categories</div>';
+        html += '<ul class="ch-search-list">';
+        collections.slice(0, 6).forEach(function(c) {
+          html += '<li><a href="' + c.url + '">' + escapeHtml(c.title) + '</a></li>';
+        });
+        html += '</ul></div>';
+      }
+
+      return html;
+    }
+
+    function renderPopularProducts(products) {
+      if (!products || !products.length) return '';
+      var html = '<div class="ch-search-section">';
+      html += '<div class="ch-search-section-title">Popular Products</div>';
+      html += '<ul class="ch-search-list">';
+      products.slice(0, 4).forEach(function(p) {
+        html += '<li><a href="' + p.url + '">' + escapeHtml(p.title) + '</a></li>';
+      });
+      html += '</ul></div>';
+      return html;
+    }
+
+    function renderRightColumn(query, products, queries) {
+      var html = '<div class="ch-search-section">';
+      html += '<div class="ch-search-section-title">Pages</div>';
+      html += '<div class="ch-search-info">Showing <strong>' + products.length + '</strong> results for <strong>' + escapeHtml(query) + '</strong>.';
+      if (queries && queries.length) html += ' Did you mean: ';
+      html += '</div>';
+      if (queries && queries.length) {
+        html += '<div class="ch-search-suggestions-row">';
+        queries.slice(0, 4).forEach(function(q) {
+          var text = q.text || q;
+          html += '<a href="/search?q=' + encodeURIComponent(text) + '">' + escapeHtml(text) + '</a>';
+        });
+        html += '</div>';
+      }
+      html += '</div>';
+
+      html += '<div class="ch-search-section">';
+      html += '<div class="ch-search-section-title">Products</div>';
+      if (products.length) {
+        html += '<div class="ch-search-products-grid">';
+        products.slice(0, 4).forEach(function(p) {
+          var img = p.featured_image && p.featured_image.url ? p.featured_image.url : (p.image || '');
+          var price = (p.price !== undefined) ? formatMoney(p.price) : '';
+          html += '<a href="' + p.url + '" class="ch-search-product-card">' +
+                  '<div class="ch-search-product-card__image">' +
+                  (img ? '<img src="' + img + '" alt="' + escapeHtml(p.title) + '" loading="lazy">' : '') +
+                  '</div>' +
+                  '<div class="ch-search-product-card__vendor">' + escapeHtml(p.vendor || '') + '</div>' +
+                  '<div class="ch-search-product-card__title">' + escapeHtml(p.title) + '</div>' +
+                  '<div class="ch-search-product-card__price">' + price + '</div>' +
+                  '<div class="ch-search-product-card__rating">★★★★★</div>' +
+                  '</a>';
+        });
+        html += '</div>';
+      } else {
+        html += '<div class="ch-search-empty">No products found.</div>';
+      }
+      html += '</div>';
+
+      return html;
+    }
+
+    function render(query, data) {
+      var products = (data.resources && data.resources.results && data.resources.results.products) || [];
+      var collections = (data.resources && data.resources.results && data.resources.results.collections) || [];
+      var queries = (data.resources && data.resources.results && data.resources.results.queries) || [];
+
+      var html = '<div class="ch-search-wrapper">';
+      html += '<div class="ch-search-left">' + renderLeftColumn(query, collections) + renderPopularProducts(products) + '</div>';
+      html += '<div class="ch-search-right">' + renderRightColumn(query, products, queries) + '</div>';
+      html += '</div>';
+      html += '<div class="ch-search-all"><a href="/search?q=' + encodeURIComponent(query) + '">View All Results for "' + escapeHtml(query) + '"</a></div>';
+
+      contentEl.innerHTML = html;
+    }
+
+    function renderEmpty() {
+      var recent = getRecentQueries();
+      if (!recent.length) {
+        contentEl.innerHTML = '<div class="ch-search-empty">Start typing to search...</div>';
+        return;
+      }
+      var html = '<div class="ch-search-wrapper">';
+      html += '<div class="ch-search-left">' + renderLeftColumn('', []) + '</div>';
+      html += '<div class="ch-search-right"><div class="ch-search-empty">Start typing to see results.</div></div>';
+      html += '</div>';
+      contentEl.innerHTML = html;
+    }
+
+    function fetchPredictive(query) {
+      loadingEl.hidden = false;
+      var url = '/search/suggest.json?q=' + encodeURIComponent(query) +
+                '&resources[type]=product,collection,query' +
+                '&resources[limit]=6&resources[options][unavailable_products]=last';
+      fetch(url)
+        .then(function(r) { return r.json(); })
+        .then(function(data) {
+          loadingEl.hidden = true;
+          render(query, data);
+          showResults();
+        })
+        .catch(function() {
+          loadingEl.hidden = true;
+        });
+    }
+
+    input.addEventListener('focus', function() {
+      if (input.value.trim().length >= 2) {
+        fetchPredictive(input.value.trim());
+      } else {
+        renderEmpty();
+        showResults();
+      }
+    });
+
+    input.addEventListener('input', function() {
+      var q = input.value.trim();
+      clearTimeout(debounceTimer);
+      if (q.length < 2) {
+        renderEmpty();
+        showResults();
+        return;
+      }
+      debounceTimer = setTimeout(function() { fetchPredictive(q); }, 250);
+    });
+
+    // Save query on submit
+    searchEl.querySelector('form').addEventListener('submit', function() {
+      addRecentQuery(input.value.trim());
+    });
+
+    // Remove recent query button
+    contentEl.addEventListener('click', function(e) {
+      var btn = e.target.closest('[data-recent-remove]');
+      if (btn) {
+        e.preventDefault();
+        e.stopPropagation();
+        removeRecentQuery(btn.getAttribute('data-recent-remove'));
+        var q = input.value.trim();
+        if (q.length >= 2) fetchPredictive(q); else renderEmpty();
+      }
+    });
+
+    // Close on outside click
+    document.addEventListener('click', function(e) {
+      if (!searchEl.contains(e.target)) hideResults();
+    });
+
+    // Close on Escape
+    input.addEventListener('keydown', function(e) {
+      if (e.key === 'Escape') { hideResults(); input.blur(); }
+    });
+  })();
+
   // Auto-open cart drawer when item is added
   document.addEventListener('cart:add', function() {
     document.getElementById('custom-cart-drawer').classList.add('is-open');
@@ -331,6 +570,238 @@
   /* Search */
   .custom-header__search {
     justify-self: start;
+    position: relative;
+  }
+
+  /* ===================== */
+  /* PREDICTIVE SEARCH     */
+  /* ===================== */
+  .ch-search-results {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 880px;
+    max-width: 92vw;
+    background: #fff;
+    border: 1px solid #eee;
+    border-radius: 4px;
+    box-shadow: 0 12px 40px rgba(0,0,0,0.12);
+    z-index: 9999;
+    max-height: 80vh;
+    overflow-y: auto;
+  }
+
+  .ch-search-results[hidden] {
+    display: none;
+  }
+
+  .ch-search-loading {
+    padding: 20px;
+    text-align: center;
+    font-size: 13px;
+    color: #888;
+  }
+
+  .ch-search-wrapper {
+    display: grid;
+    grid-template-columns: 240px 1fr;
+  }
+
+  .ch-search-left {
+    border-right: 1px solid #f0f0f0;
+    padding: 18px 18px 8px;
+    background: #fafafa;
+  }
+
+  .ch-search-right {
+    padding: 18px 22px 8px;
+  }
+
+  .ch-search-section {
+    margin-bottom: 18px;
+  }
+
+  .ch-search-section-title {
+    font-size: 11px;
+    font-weight: 700;
+    color: #888;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    margin-bottom: 10px;
+  }
+
+  .ch-search-list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+  }
+
+  .ch-search-list li {
+    margin: 0 0 6px;
+  }
+
+  .ch-search-list a {
+    color: #222;
+    text-decoration: none;
+    font-size: 13px;
+    display: block;
+    padding: 3px 0;
+  }
+
+  .ch-search-list a:hover {
+    color: #c41e3a;
+  }
+
+  .ch-search-recent-item {
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .ch-search-recent-remove {
+    background: none;
+    border: none;
+    color: #aaa;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    padding: 2px 4px;
+  }
+
+  .ch-search-recent-remove:hover {
+    color: #c41e3a;
+  }
+
+  .ch-search-info {
+    font-size: 13px;
+    color: #555;
+    margin-bottom: 10px;
+  }
+
+  .ch-search-suggestions-row {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 6px;
+  }
+
+  .ch-search-suggestions-row a {
+    background: #f3f3f3;
+    color: #333;
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-size: 12px;
+    text-decoration: none;
+    transition: background 0.15s ease;
+  }
+
+  .ch-search-suggestions-row a:hover {
+    background: #e6e6e6;
+  }
+
+  .ch-search-products-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-top: 6px;
+  }
+
+  .ch-search-product-card {
+    text-decoration: none;
+    color: #222;
+    display: block;
+  }
+
+  .ch-search-product-card__image {
+    width: 100%;
+    aspect-ratio: 1;
+    background: #f8f8f8;
+    border-radius: 4px;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+  }
+
+  .ch-search-product-card__image img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .ch-search-product-card__vendor {
+    font-size: 10px;
+    text-transform: uppercase;
+    color: #888;
+    letter-spacing: 0.05em;
+    margin-bottom: 4px;
+  }
+
+  .ch-search-product-card__title {
+    font-size: 13px;
+    font-weight: 600;
+    color: #222;
+    line-height: 1.3;
+    margin-bottom: 6px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .ch-search-product-card__price {
+    font-size: 13px;
+    font-weight: 700;
+    color: #000;
+    margin-bottom: 4px;
+  }
+
+  .ch-search-product-card__rating {
+    color: #f5a623;
+    font-size: 12px;
+  }
+
+  .ch-search-all {
+    padding: 14px 20px 18px;
+    text-align: center;
+    border-top: 1px solid #f0f0f0;
+  }
+
+  .ch-search-all a {
+    display: inline-block;
+    background: #c41e3a;
+    color: #fff;
+    padding: 12px 32px;
+    border-radius: 30px;
+    text-decoration: none;
+    font-size: 13px;
+    font-weight: 600;
+  }
+
+  .ch-search-all a:hover {
+    background: #a8182f;
+  }
+
+  .ch-search-empty {
+    padding: 30px 20px;
+    text-align: center;
+    color: #888;
+    font-size: 13px;
+  }
+
+  @media screen and (max-width: 900px) {
+    .ch-search-results {
+      width: 92vw;
+    }
+    .ch-search-wrapper {
+      grid-template-columns: 1fr;
+    }
+    .ch-search-left {
+      border-right: none;
+      border-bottom: 1px solid #f0f0f0;
+    }
   }
 
   .custom-header__search-form {
