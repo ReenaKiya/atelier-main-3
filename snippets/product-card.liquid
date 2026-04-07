@@ -101,24 +101,116 @@
       {% if block.settings.padding-block-end > 0 %}--zoom-out-padding-block-end: min(var(--padding-xs), {{ block.settings.padding-block-end | times: 0.7}}px);{% endif %}
     "
   >
-    {{ children }}
-    
-    {% if block.settings.show_product_button %}
-    <a
-  href="{{ product.url }}"
-  class="button button--primary product-card__custom-button"
-  style="margin-top: 10px; display: inline-block;"
->
-  {{ block.settings.product_button_text }}
-</a>
-    {% endif %}
+    {%- comment -%} Custom product card layout (Monster Piercing style) {%- endcomment -%}
+    {%- liquid
+      assign on_sale = false
+      if product.compare_at_price > product.price
+        assign on_sale = true
+        assign discount = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round
+      endif
 
+      assign is_best_seller = false
+      if product.tags contains 'best-seller' or product.tags contains 'Best Seller' or product.tags contains 'bestseller'
+        assign is_best_seller = true
+      endif
 
-    {% if block.settings.show_product_button %}
-  <a href="{{ product.url }}" class="product-card__button">
-    {{ block.settings.product_button_text }}
-  </a>
-{% endif %}
+      assign color_option = null
+      for option in product.options_with_values
+        assign downcased = option.name | downcase
+        if downcased contains 'color' or downcased contains 'colour'
+          assign color_option = option
+          break
+        endif
+      endfor
+    -%}
+
+    <div class="mp-card">
+      <a href="{{ product.url }}" class="mp-card__media-link" aria-label="{{ product.title | escape }}">
+        <div class="mp-card__media">
+          {%- if product.featured_media != blank -%}
+            <img
+              src="{{ product.featured_media | image_url: width: 600 }}"
+              srcset="{{ product.featured_media | image_url: width: 300 }} 300w, {{ product.featured_media | image_url: width: 600 }} 600w, {{ product.featured_media | image_url: width: 900 }} 900w"
+              sizes="(min-width: 990px) 20vw, (min-width: 750px) 33vw, 50vw"
+              alt="{{ product.featured_media.alt | escape }}"
+              width="{{ product.featured_media.width }}"
+              height="{{ product.featured_media.height }}"
+              loading="lazy"
+              class="mp-card__image mp-card__image--primary"
+            >
+            {%- if product.media[1] != blank -%}
+              <img
+                src="{{ product.media[1] | image_url: width: 600 }}"
+                alt="{{ product.media[1].alt | escape }}"
+                width="{{ product.media[1].width }}"
+                height="{{ product.media[1].height }}"
+                loading="lazy"
+                class="mp-card__image mp-card__image--secondary"
+              >
+            {%- endif -%}
+          {%- else -%}
+            {{ 'product-1' | placeholder_svg_tag: 'mp-card__image mp-card__placeholder' }}
+          {%- endif -%}
+
+          {%- if is_best_seller -%}
+            <span class="mp-card__badge mp-card__badge--best-seller">Best Seller</span>
+          {%- endif -%}
+
+          {%- unless product.available -%}
+            <span class="mp-card__badge mp-card__badge--soldout">Sold Out</span>
+          {%- endunless -%}
+
+          {%- if on_sale -%}
+            <span class="mp-card__sale-strip">FLAT {{ discount }}% OFF</span>
+          {%- endif -%}
+        </div>
+      </a>
+
+      {%- if color_option and color_option.values.size > 1 -%}
+        <div class="mp-card__swatches">
+          {%- for value in color_option.values limit: 6 -%}
+            {%- assign swatch_color = value | handle -%}
+            <span
+              class="mp-card__swatch"
+              title="{{ value }}"
+              style="background: {{ value | downcase | replace: ' ', '' }};"
+            ></span>
+          {%- endfor -%}
+          {%- if color_option.values.size > 6 -%}
+            <span class="mp-card__swatch-more">+{{ color_option.values.size | minus: 6 }}</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+
+      <a href="{{ product.url }}" class="mp-card__title-link">
+        <h3 class="mp-card__title">{{ product.title }}</h3>
+      </a>
+
+      <div class="mp-card__price">
+        {%- if product.price_varies -%}
+          <span class="mp-card__price-amount">{{ product.price_min | money }} - {{ product.price_max | money }}</span>
+        {%- else -%}
+          <span class="mp-card__price-amount">{{ product.price | money }}</span>
+        {%- endif -%}
+        {%- if on_sale -%}
+          <s class="mp-card__price-compare">{{ product.compare_at_price | money }}</s>
+        {%- endif -%}
+      </div>
+
+      {%- if product.metafields.reviews.rating.value != blank -%}
+        {%- assign rating = product.metafields.reviews.rating.value.rating | times: 1.0 -%}
+        {%- assign rating_count = product.metafields.reviews.rating_count | default: 0 -%}
+        <div class="mp-card__rating" aria-label="Rating {{ rating }} out of 5">
+          <span class="mp-card__stars" style="--rating: {{ rating }};">
+            <span class="mp-card__stars-bg">★★★★★</span>
+            <span class="mp-card__stars-fg" style="width: {{ rating | divided_by: 5.0 | times: 100 }}%;">★★★★★</span>
+          </span>
+          {%- if rating_count != 0 -%}
+            <span class="mp-card__rating-count">{{ rating_count }} Reviews</span>
+          {%- endif -%}
+        </div>
+      {%- endif -%}
+    </div>
 
   </div>
 </product-card>
@@ -129,6 +221,174 @@
 {% stylesheet %}
   product-card-link {
     width: 100%;
+  }
+
+  /* ===== Monster Piercing style product card ===== */
+  .mp-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    width: 100%;
+    font-family: var(--font-body--family);
+  }
+
+  .mp-card__media-link {
+    display: block;
+    text-decoration: none;
+  }
+
+  .mp-card__media {
+    position: relative;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    background: #f7f7f7;
+    border-radius: 4px;
+  }
+
+  .mp-card__image {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: opacity 0.35s ease;
+  }
+
+  .mp-card__image--secondary {
+    opacity: 0;
+  }
+
+  .mp-card__media:hover .mp-card__image--primary {
+    opacity: 0;
+  }
+
+  .mp-card__media:hover .mp-card__image--secondary {
+    opacity: 1;
+  }
+
+  .mp-card__badge {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    padding: 4px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #fff;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-radius: 2px;
+    z-index: 2;
+  }
+
+  .mp-card__badge--best-seller {
+    background: #e02020;
+  }
+
+  .mp-card__badge--soldout {
+    top: auto;
+    bottom: 8px;
+    left: 8px;
+    background: #333;
+  }
+
+  .mp-card__sale-strip {
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    padding: 6px 8px;
+    background: rgba(255, 255, 255, 0.85);
+    color: #111;
+    font-size: 12px;
+    font-weight: 700;
+    text-align: center;
+    letter-spacing: 0.5px;
+    z-index: 1;
+  }
+
+  .mp-card__swatches {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .mp-card__swatch {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    display: inline-block;
+  }
+
+  .mp-card__swatch-more {
+    font-size: 11px;
+    color: #555;
+    line-height: 16px;
+  }
+
+  .mp-card__title-link {
+    text-decoration: none;
+    color: inherit;
+  }
+
+  .mp-card__title {
+    font-size: 14px;
+    font-weight: 500;
+    line-height: 1.35;
+    margin: 4px 0 0;
+    color: #111;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .mp-card__price {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e02020;
+  }
+
+  .mp-card__price-compare {
+    color: #999;
+    font-weight: 400;
+  }
+
+  .mp-card__rating {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 12px;
+    color: #555;
+  }
+
+  .mp-card__stars {
+    position: relative;
+    display: inline-block;
+    font-size: 14px;
+    line-height: 1;
+    color: #ddd;
+  }
+
+  .mp-card__stars-fg {
+    position: absolute;
+    top: 0;
+    left: 0;
+    overflow: hidden;
+    color: #f5a623;
+    white-space: nowrap;
+  }
+
+  /* Hide the default Horizon block children to avoid duplication */
+  .product-card .mp-card ~ .group-block,
+  .product-card .mp-card ~ .buy-buttons-block,
+  .product-card .mp-card ~ .rating-wrapper,
+  .product-card .mp-card ~ .product-grid-view-zoom-out--details {
+    display: none;
   }
 
   .product-card__placeholder-image svg {

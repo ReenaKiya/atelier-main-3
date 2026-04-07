@@ -65,27 +65,6 @@
               -%}
             </span>
           </facet-status-component>
-        {% else %}
-          <facet-status-component
-            class="facets__status"
-            facet-type="list"
-          >
-            <span
-              {% if active_value_count > 1 %}
-                class="bubble facets__bubble"
-              {% endif %}
-              hide-when-empty
-              ref="facetStatus"
-            >
-              {%- liquid
-                if active_value_count == 1
-                  echo filter.active_values[0].label
-                elsif active_value_count > 1
-                  echo active_value_count
-                endif
-              -%}
-            </span>
-          </facet-status-component>
         {% endif %}
         <span class="svg-wrapper icon-caret icon-animated">
           {{- 'icon-caret.svg' | inline_asset_content -}}
