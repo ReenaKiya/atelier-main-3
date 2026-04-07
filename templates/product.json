@@ -1021,6 +1021,13 @@
     "people_also_searched_kCMH3U": {
       "type": "people-also-searched",
       "blocks": {
+        "pill_PeLBTJ": {
+          "type": "pill",
+          "settings": {
+            "label": "Search term",
+            "link": ""
+          }
+        },
         "pill_EEMtta": {
           "type": "pill",
           "settings": {
@@ -1086,6 +1093,7 @@
         }
       },
       "block_order": [
+        "pill_PeLBTJ",
         "pill_EEMtta",
         "pill_LKtEXH",
         "pill_FnAPYr",
