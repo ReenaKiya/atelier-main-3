@@ -17,7 +17,7 @@
       type="button"
       class="custom-header__hamburger"
       aria-label="Open menu"
-      onclick="document.getElementById('custom-mobile-menu').classList.add('is-open'); document.getElementById('custom-mobile-menu-overlay').classList.add('is-open');"
+      onclick="window.openCustomMobileMenu && window.openCustomMobileMenu();"
     >
       <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
         <line x1="3" y1="6" x2="21" y2="6"></line>
@@ -120,6 +120,10 @@
       </svg>
     </button>
   </div>
+  <div class="custom-mobile-menu__nav" aria-label="Main" data-mobile-menu-body>
+    {% comment %} Content is injected from #site-header-nav (header-navigation section) on hamburger click {% endcomment %}
+  </div>
+  {% comment %}
   <nav class="custom-mobile-menu__nav" aria-label="Main">
     <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Hierarchy" style="display:flex;align-items:center;height:auto;margin:0;">
 
@@ -288,6 +292,7 @@
 
     </ul>
   </nav>
+  {% endcomment %}
 </div>
 
 <script>
@@ -302,6 +307,32 @@
       });
     });
   })();
+
+  // Open mobile drawer with header-navigation content cloned in
+  window.openCustomMobileMenu = function() {
+    var drawer = document.getElementById('custom-mobile-menu');
+    var overlay = document.getElementById('custom-mobile-menu-overlay');
+    var body = drawer && drawer.querySelector('[data-mobile-menu-body]');
+    var source = document.getElementById('site-header-nav');
+
+    if (body && source && !body.dataset.populated) {
+      // Clone the header-navigation markup so the live desktop nav stays intact
+      var clone = source.cloneNode(true);
+      clone.removeAttribute('id');
+      // Force inner nav/menus to be visible inside the drawer regardless of desktop CSS
+      clone.querySelectorAll('[style]').forEach(function(el) {
+        if (el.style.display === 'none') el.style.display = '';
+        if (el.style.visibility === 'hidden') el.style.visibility = '';
+        if (el.style.opacity === '0') el.style.opacity = '';
+      });
+      body.innerHTML = '';
+      body.appendChild(clone);
+      body.dataset.populated = '1';
+    }
+
+    if (drawer) drawer.classList.add('is-open');
+    if (overlay) overlay.classList.add('is-open');
+  };
 </script>
 
 <!-- Cart Drawer Overlay -->
