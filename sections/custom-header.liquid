@@ -325,6 +325,42 @@
         if (el.style.visibility === 'hidden') el.style.visibility = '';
         if (el.style.opacity === '0') el.style.opacity = '';
       });
+
+      // Restructure each mega menu for mobile: nest each submenu panel inside
+      // its matching category item, and drop the desktop-only featured column.
+      clone.querySelectorAll('.navmenu-meganav-multi-column').forEach(function(meganav) {
+        var categoryItems = meganav.querySelectorAll('.multi-col-category-item');
+        var submenuPanels = meganav.querySelectorAll('.multi-col-submenu-panel');
+        categoryItems.forEach(function(item, i) {
+          var panel = submenuPanels[i];
+          if (panel) {
+            panel.classList.remove('active');
+            item.appendChild(panel);
+          }
+          // Strip the desktop "active" highlight; mobile uses click-to-open instead
+          var link = item.querySelector('.multi-col-category-link');
+          if (link) link.classList.remove('active');
+        });
+        var featured = meganav.querySelector('.multi-col-featured');
+        if (featured) featured.remove();
+        var submenusWrap = meganav.querySelector('.multi-col-submenus');
+        if (submenusWrap) submenusWrap.remove();
+        var catTitle = meganav.querySelector('.multi-col-categories-title');
+        if (catTitle) catTitle.remove();
+      });
+
+      // Click on a level-2 category toggles its nested submenu panel
+      clone.querySelectorAll('.multi-col-category-link').forEach(function(link) {
+        link.addEventListener('click', function(e) {
+          var item = this.closest('.multi-col-category-item');
+          // Only intercept if there's a nested submenu to toggle
+          if (item && item.querySelector('.multi-col-submenu-panel')) {
+            e.preventDefault();
+            item.classList.toggle('is-open');
+          }
+        });
+      });
+
       body.innerHTML = '';
       body.appendChild(clone);
       body.dataset.populated = '1';
@@ -1791,6 +1827,194 @@
 
   body.mobile-menu-open {
     overflow: hidden;
+  }
+
+  /* =====================================================
+     Mobile drawer: override cloned desktop nav styles so
+     header-navigation content stacks vertically as an
+     accordion (matches the mobile menu reference design).
+     ===================================================== */
+  .custom-mobile-menu__nav .site-header,
+  .custom-mobile-menu__nav .site-navigation-wrapper,
+  .custom-mobile-menu__nav .site-navigation {
+    all: unset;
+    display: block;
+    width: 100%;
+  }
+
+  .custom-mobile-menu__nav .navmenu,
+  .custom-mobile-menu__nav .navmenu-depth-1 {
+    display: block !important;
+    flex-direction: column;
+    align-items: stretch !important;
+    width: 100%;
+    margin: 0 !important;
+    padding: 0 !important;
+    list-style: none;
+    height: auto !important;
+  }
+
+  .custom-mobile-menu__nav .navmenu-item,
+  .custom-mobile-menu__nav .navmenu-item-parent,
+  .custom-mobile-menu__nav .navmenu-basic__item {
+    display: block !important;
+    width: 100%;
+    border-bottom: 1px solid #f2f2f2;
+    position: static !important;
+    height: auto !important;
+    padding: 0 !important;
+  }
+
+  .custom-mobile-menu__nav details[data-navmenu-details] {
+    display: block;
+    width: 100%;
+    position: static;
+  }
+
+  .custom-mobile-menu__nav .navmenu-link,
+  .custom-mobile-menu__nav summary.navmenu-link {
+    display: flex !important;
+    width: 100%;
+    justify-content: space-between;
+    align-items: center;
+    padding: 18px 0 !important;
+    font-size: 16px !important;
+    font-weight: 600;
+    text-transform: none !important;
+    letter-spacing: 0 !important;
+    color: #000 !important;
+    white-space: normal !important;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .custom-mobile-menu__nav summary.navmenu-link::-webkit-details-marker {
+    display: none;
+  }
+
+  .custom-mobile-menu__nav details[open] > summary.navmenu-link {
+    color: #c41e3a !important;
+  }
+
+  .custom-mobile-menu__nav .navmenu-icon {
+    margin-left: auto;
+  }
+
+  .custom-mobile-menu__nav .navmenu-icon svg {
+    width: 12px;
+    height: 8px;
+    transition: transform 0.2s ease;
+  }
+
+  .custom-mobile-menu__nav details[open] > summary .navmenu-icon svg {
+    transform: rotate(180deg);
+  }
+
+  /* Mega menu container — flatten to inline block */
+  .custom-mobile-menu__nav .navmenu-meganav,
+  .custom-mobile-menu__nav .navmenu-meganav-multi-column,
+  .custom-mobile-menu__nav .navmenu-meganav--desktop {
+    position: static !important;
+    display: block !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    transform: none !important;
+    box-shadow: none !important;
+    background: #f8f8f8 !important;
+    padding: 0 !important;
+    margin: 0 0 8px !important;
+    opacity: 1 !important;
+    visibility: visible !important;
+    top: auto !important;
+    left: auto !important;
+  }
+
+  .custom-mobile-menu__nav .multi-col-wrapper {
+    display: block !important;
+    grid-template-columns: none !important;
+    min-height: 0 !important;
+    width: 100%;
+  }
+
+  .custom-mobile-menu__nav .multi-col-categories {
+    background: transparent !important;
+    border: none !important;
+    padding: 0 !important;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-item {
+    border-bottom: 1px solid #ececec;
+    position: static;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-item:last-child {
+    border-bottom: none;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-link {
+    display: flex !important;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px !important;
+    font-size: 15px !important;
+    font-weight: 500 !important;
+    color: #000 !important;
+    background: transparent !important;
+    border: none !important;
+    text-decoration: none;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-item.is-open > .multi-col-category-link {
+    color: #c41e3a !important;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-arrow {
+    width: 14px !important;
+    height: 14px !important;
+    color: #999 !important;
+    transition: transform 0.2s ease;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-item.is-open > .multi-col-category-link .multi-col-category-arrow {
+    transform: rotate(90deg);
+    color: #c41e3a !important;
+  }
+
+  /* Submenu panels: hidden by default, shown when their category is open */
+  .custom-mobile-menu__nav .multi-col-submenu-panel {
+    display: none !important;
+    background: #fff;
+    padding: 6px 18px 14px 30px;
+  }
+
+  .custom-mobile-menu__nav .multi-col-category-item.is-open > .multi-col-submenu-panel {
+    display: block !important;
+  }
+
+  .custom-mobile-menu__nav .multi-col-submenu-grid {
+    display: block !important;
+    grid-template-columns: none !important;
+    gap: 0 !important;
+  }
+
+  .custom-mobile-menu__nav .multi-col-submenu-link {
+    display: block;
+    padding: 10px 0;
+    font-size: 14px;
+    color: #333;
+    text-decoration: none;
+  }
+
+  .custom-mobile-menu__nav .multi-col-submenu-link--view-all {
+    margin-top: 8px;
+    font-weight: 600;
+    color: #c41e3a;
   }
 {% endstylesheet %}
 
