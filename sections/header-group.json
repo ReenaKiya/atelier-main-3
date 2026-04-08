@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_gBL646": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Earrings",
+            "product": "925-sterling-silver-rhodium-plated-cz-cluster-clover-stud-earrings"
+          }
+        },
         "featured_product_Ef88Q4": {
           "type": "featured_product",
           "settings": {
@@ -102,6 +110,7 @@
         }
       },
       "block_order": [
+        "featured_product_gBL646",
         "featured_product_Ef88Q4",
         "featured_product_G8PMiD",
         "featured_product_tpFdQ4",
