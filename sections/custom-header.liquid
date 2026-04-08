@@ -12,6 +12,20 @@
   "
 >
   <div class="custom-header__inner page-width">
+    <!-- Hamburger (mobile only) -->
+    <button
+      type="button"
+      class="custom-header__hamburger"
+      aria-label="Open menu"
+      onclick="document.getElementById('custom-mobile-menu').classList.add('is-open'); document.getElementById('custom-mobile-menu-overlay').classList.add('is-open');"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="3" y1="6" x2="21" y2="6"></line>
+        <line x1="3" y1="12" x2="21" y2="12"></line>
+        <line x1="3" y1="18" x2="21" y2="18"></line>
+      </svg>
+    </button>
+
     <!-- Search -->
     <div class="custom-header__search" data-ch-search>
       <form action="/search" method="get" class="custom-header__search-form">
@@ -82,6 +96,47 @@
     </div>
   </div>
 </header>
+
+<!-- Mobile Menu Overlay -->
+<div
+  id="custom-mobile-menu-overlay"
+  class="custom-mobile-menu-overlay"
+  onclick="document.getElementById('custom-mobile-menu').classList.remove('is-open'); this.classList.remove('is-open');"
+></div>
+
+<!-- Mobile Menu Drawer -->
+<div id="custom-mobile-menu" class="custom-mobile-menu">
+  <div class="custom-mobile-menu__header">
+    <span class="custom-mobile-menu__title">Menu</span>
+    <button
+      type="button"
+      class="custom-mobile-menu__close"
+      aria-label="Close menu"
+      onclick="document.getElementById('custom-mobile-menu').classList.remove('is-open'); document.getElementById('custom-mobile-menu-overlay').classList.remove('is-open');"
+    >
+      <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <line x1="18" y1="6" x2="6" y2="18"></line>
+        <line x1="6" y1="6" x2="18" y2="18"></line>
+      </svg>
+    </button>
+  </div>
+  <nav class="custom-mobile-menu__nav">
+    <ul class="custom-mobile-menu__list">
+      {%- for link in linklists[section.settings.mobile_menu].links -%}
+        <li class="custom-mobile-menu__item">
+          <a href="{{ link.url }}" class="custom-mobile-menu__link">{{ link.title }}</a>
+          {%- if link.links.size > 0 -%}
+            <ul class="custom-mobile-menu__sublist">
+              {%- for child in link.links -%}
+                <li><a href="{{ child.url }}" class="custom-mobile-menu__sublink">{{ child.title }}</a></li>
+              {%- endfor -%}
+            </ul>
+          {%- endif -%}
+        </li>
+      {%- endfor -%}
+    </ul>
+  </nav>
+</div>
 
 <!-- Cart Drawer Overlay -->
 <div id="custom-cart-overlay" class="custom-cart-overlay" onclick="document.getElementById('custom-cart-drawer').classList.remove('is-open'); this.classList.remove('is-open');"></div>
@@ -567,6 +622,18 @@
     gap: 20px;
   }
 
+  /* Hamburger — hidden on desktop */
+  .custom-header__hamburger {
+    display: none;
+    background: none;
+    border: none;
+    padding: 4px;
+    cursor: pointer;
+    color: var(--ch-text);
+    align-items: center;
+    justify-content: center;
+  }
+
   /* Search */
   .custom-header__search {
     justify-self: start;
@@ -932,17 +999,60 @@
     display: none;
   }
 
-  /* Responsive */
-  @media screen and (max-width: 749px) {
+  /* Responsive — tablet & mobile: hamburger | logo | icons, with search on a full-width second row */
+  @media screen and (max-width: 989px) {
     .custom-header__inner {
-      grid-template-columns: auto 1fr auto;
-      gap: 12px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 12px 16px;
+    }
+
+    .custom-header__hamburger {
+      display: inline-flex;
+      order: 1;
+    }
+
+    .custom-header__logo {
+      order: 2;
+      flex: 1 1 auto;
+      justify-self: center;
+      text-align: center;
+    }
+
+    .custom-header__icons {
+      order: 3;
+      gap: 16px;
+    }
+
+    /* Hide wishlist on tablet/mobile to match the reference */
+    .custom-header__icons a[aria-label="Wishlist"] {
+      display: none;
+    }
+
+    .custom-header__search {
+      order: 4;
+      flex: 1 1 100%;
+      width: 100%;
     }
 
     .custom-header__search-form {
-      width: 160px;
+      width: 100%;
+      background: #f3f3f3;
+      border-color: #e6e6e6;
     }
 
+    .custom-header__search-input {
+      padding: 12px 18px;
+      font-size: 14px;
+    }
+
+    .custom-header__logo-img {
+      max-height: 42px;
+    }
+  }
+
+  @media screen and (max-width: 480px) {
     .custom-header__logo-img {
       max-height: 36px;
     }
@@ -950,16 +1060,10 @@
     .custom-header__icons {
       gap: 14px;
     }
-  }
-
-  @media screen and (max-width: 480px) {
-    .custom-header__search-form {
-      width: 120px;
-    }
 
     .custom-header__search-input {
-      padding: 8px 12px;
-      font-size: 12px;
+      padding: 10px 14px;
+      font-size: 13px;
     }
   }
 
