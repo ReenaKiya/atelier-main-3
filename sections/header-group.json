@@ -39,8 +39,8 @@
         "featured_product_TKjXPG": {
           "type": "featured_product",
           "settings": {
-            "parent_menu_title": "'Solid Gold', 'By Jewellery Type'",
-            "category_title": "",
+            "parent_menu_title": "Solid Gold",
+            "category_title": "By Jewellery",
             "product": "14k-gold"
           }
         }
