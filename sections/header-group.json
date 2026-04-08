@@ -27,6 +27,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_exPJK9": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "'Solid Gold', 'By Jewellery Type'",
+            "category_title": "",
+            "product": "9k-gold-classic"
+          }
+        },
         "featured_product_TKjXPG": {
           "type": "featured_product",
           "settings": {
@@ -37,6 +45,7 @@
         }
       },
       "block_order": [
+        "featured_product_exPJK9",
         "featured_product_TKjXPG"
       ],
       "settings": {
