@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_d7qKxT": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Labrets",
+            "product": "316l-surgical-steel-internal-threaded-cartilage-helix-tragus-piercing-stud"
+          }
+        },
         "featured_product_8ALhJQ": {
           "type": "featured_product",
           "settings": {
@@ -62,6 +70,7 @@
         }
       },
       "block_order": [
+        "featured_product_d7qKxT",
         "featured_product_8ALhJQ",
         "featured_product_qywYtD",
         "featured_product_exPJK9",
