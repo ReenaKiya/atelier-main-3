@@ -1038,6 +1038,45 @@
         "padding_top": 30,
         "padding_bottom": 30
       }
+    },
+    "1775656111a0866560": {
+      "type": "_blocks",
+      "blocks": {
+        "essential_upsell_app_block_Ktpr3U": {
+          "type": "shopify://apps/essential-upsell/blocks/app-block/50627fd9-24fd-4250-8614-accc12826d80",
+          "settings": {}
+        }
+      },
+      "block_order": [
+        "essential_upsell_app_block_Ktpr3U"
+      ],
+      "settings": {
+        "content_direction": "column",
+        "vertical_on_mobile": true,
+        "horizontal_alignment": "flex-start",
+        "vertical_alignment": "center",
+        "align_baseline": false,
+        "horizontal_alignment_flex_direction_column": "flex-start",
+        "vertical_alignment_flex_direction_column": "center",
+        "gap": 12,
+        "section_width": "page-width",
+        "section_height": "",
+        "section_height_custom": 50,
+        "color_scheme": "",
+        "background_media": "none",
+        "video_position": "cover",
+        "background_image_position": "cover",
+        "border": "none",
+        "border_width": 1,
+        "border_opacity": 100,
+        "border_radius": 0,
+        "toggle_overlay": false,
+        "overlay_color": "#00000026",
+        "overlay_style": "solid",
+        "gradient_direction": "to top",
+        "padding-block-start": 0,
+        "padding-block-end": 0
+      }
     }
   },
   "order": [
@@ -1053,6 +1092,7 @@
     "collection_list_Ec6EQn",
     "177426350820ff0335",
     "product_description_tabs_tqRhX7",
-    "people_also_searched_Mw6Qg7"
+    "people_also_searched_Mw6Qg7",
+    "1775656111a0866560"
   ]
 }
