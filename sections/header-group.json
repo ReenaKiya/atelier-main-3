@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_8ALhJQ": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "Solid Gold",
+            "category_title": "By Material/Stone",
+            "product": "9k-gold-classic"
+          }
+        },
         "featured_product_qywYtD": {
           "type": "featured_product",
           "settings": {
@@ -54,6 +62,7 @@
         }
       },
       "block_order": [
+        "featured_product_8ALhJQ",
         "featured_product_qywYtD",
         "featured_product_exPJK9",
         "featured_product_TKjXPG"
