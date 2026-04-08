@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_tpFdQ4": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Hoops & Rings",
+            "product": "14k-gold"
+          }
+        },
         "featured_product_pGmakt": {
           "type": "featured_product",
           "settings": {
@@ -78,6 +86,7 @@
         }
       },
       "block_order": [
+        "featured_product_tpFdQ4",
         "featured_product_pGmakt",
         "featured_product_d7qKxT",
         "featured_product_8ALhJQ",
