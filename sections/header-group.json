@@ -1,3 +1,12 @@
+/*
+ * ------------------------------------------------------------
+ * IMPORTANT: The contents of this file are auto-generated.
+ *
+ * This file may be updated by the Shopify admin theme editor
+ * or related systems. Please exercise caution as any changes
+ * made to this file may be overwritten.
+ * ------------------------------------------------------------
+ */
 {
   "type": "header",
   "name": "Header",
@@ -17,6 +26,19 @@
     },
     "header_nav": {
       "type": "header-navigation",
+      "blocks": {
+        "featured_product_TKjXPG": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "Solid Gold By Jewellery",
+            "category_title": "",
+            "product": "14k-gold"
+          }
+        }
+      },
+      "block_order": [
+        "featured_product_TKjXPG"
+      ],
       "settings": {
         "menu": "monsterheader"
       }
