@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_G8PMiD": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "",
+            "product": ""
+          }
+        },
         "featured_product_tpFdQ4": {
           "type": "featured_product",
           "settings": {
@@ -86,6 +94,7 @@
         }
       },
       "block_order": [
+        "featured_product_G8PMiD",
         "featured_product_tpFdQ4",
         "featured_product_pGmakt",
         "featured_product_d7qKxT",
