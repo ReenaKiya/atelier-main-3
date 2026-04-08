@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_pGmakt": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Hoops & Rings",
+            "product": "g23-titanium-classic-hinged-segment-clicker-ring-2"
+          }
+        },
         "featured_product_d7qKxT": {
           "type": "featured_product",
           "settings": {
@@ -70,6 +78,7 @@
         }
       },
       "block_order": [
+        "featured_product_pGmakt",
         "featured_product_d7qKxT",
         "featured_product_8ALhJQ",
         "featured_product_qywYtD",
