@@ -628,6 +628,12 @@
       padding: 10px 10px;
       font-size: 11px;
     }
+
+    /* Hide the desktop bottom nav row on mobile (the cloned copy in the
+       mobile drawer has its id removed, so this only hides the original). */
+    #site-header-nav {
+      display: none !important;
+    }
   }
 
   /* Header height variable for page offset */
