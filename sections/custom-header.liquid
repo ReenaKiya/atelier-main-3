@@ -120,22 +120,172 @@
       </svg>
     </button>
   </div>
-  <nav class="custom-mobile-menu__nav">
-    <ul class="custom-mobile-menu__list">
-      {%- for link in linklists[section.settings.mobile_menu].links -%}
-        <li class="custom-mobile-menu__item{% if link.links.size > 0 %} has-children{% endif %}">
-          {%- if link.links.size > 0 -%}
-            <a href="{{ link.url }}" class="custom-mobile-menu__link" data-mobile-menu-toggle>{{ link.title }}</a>
-            <ul class="custom-mobile-menu__sublist">
-              {%- for child in link.links -%}
-                <li><a href="{{ child.url }}" class="custom-mobile-menu__sublink">{{ child.title }}</a></li>
-              {%- endfor -%}
-            </ul>
-          {%- else -%}
-            <a href="{{ link.url }}" class="custom-mobile-menu__link">{{ link.title }}</a>
-          {%- endif -%}
-        </li>
-      {%- endfor -%}
+  <nav class="custom-mobile-menu__nav" aria-label="Main">
+    <ul class="navmenu navmenu-depth-1" data-navmenu="" aria-label="Menu Hierarchy" style="display:flex;align-items:center;height:auto;margin:0;">
+
+      {% for link in linklists[section.settings.mobile_menu].links %}
+        {% assign link_handle = link.title | handleize %}
+
+        {% if link.links.size > 0 %}
+          {% comment %} ========== MEGA MENU ITEM ========== {% endcomment %}
+          {% assign meganav_id = 'meganav_mobile_' | append: section.id | append: '_' | append: forloop.index %}
+
+          <li class="navmenu-item navmenu-item-parent navmenu-meganav__item-parent navmenu-id-{{ link_handle }}"
+              data-navmenu-meganav-trigger=""
+              data-navmenu-meganav-type="multi-column-menu"
+              data-navmenu-parent=""
+              style="display:flex;align-items:center;padding-top:0;height:auto;--menu-closed-height:0;">
+            <details data-navmenu-details="">
+              <summary class="navmenu-link navmenu-link-depth-1 navmenu-link-parent"
+                       aria-haspopup="true"
+                       aria-expanded="false"
+                       data-href="{{ link.url }}">
+                {{ link.title }}
+                <span class="navmenu-icon navmenu-icon-depth-1" data-navmenu-trigger="">
+                  <svg aria-hidden="true" focusable="false" role="presentation" width="8" height="6" viewBox="0 0 8 6" fill="none" xmlns="http://www.w3.org/2000/svg" class="icon-chevron-down" style="animation:none;">
+                    <path class="icon-chevron-down-left" d="M4 4.5L7 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                    <path class="icon-chevron-down-right" d="M4 4.5L1 1.5" stroke="currentColor" stroke-width="1.25" stroke-linecap="square"></path>
+                  </svg>
+                </span>
+              </summary>
+
+              <div class="navmenu-meganav navmenu-meganav--desktop navmenu-meganav-multi-column"
+                   data-navmenu-submenu=""
+                   data-meganav-menu=""
+                   data-meganav-id="{{ meganav_id }}"
+                   data-meganav-multi-column=""
+                   style="display:none;opacity:0;visibility:hidden;">
+                <div class="multi-col-wrapper">
+
+                  {% comment %} Left Column: Categories (Level 2 links) {% endcomment %}
+                  <div class="multi-col-categories">
+                    <p class="multi-col-categories-title">Browse by category</p>
+                    <ul class="multi-col-category-list">
+                      {% for child_link in link.links %}
+                        <li class="multi-col-category-item">
+                          <a href="{{ child_link.url }}"
+                             class="multi-col-category-link{% if forloop.first %} active{% endif %}"
+                             data-category-index="{{ forloop.index }}">
+                            <span class="multi-col-category-text">{{ child_link.title }}</span>
+                            <svg class="multi-col-category-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="animation:none;">
+                              <polyline points="9 18 15 12 9 6"></polyline>
+                            </svg>
+                          </a>
+                        </li>
+                      {% endfor %}
+                    </ul>
+                  </div>
+
+                  {% comment %} Middle Column: Submenus (Level 3 links) {% endcomment %}
+                  <div class="multi-col-submenus">
+                    {% for child_link in link.links %}
+                      <div class="multi-col-submenu-panel{% if forloop.first %} active{% endif %}" data-submenu-panel="{{ forloop.index }}">
+                        <div class="multi-col-submenu-grid">
+                          {% for grandchild_link in child_link.links %}
+                            <a href="{{ grandchild_link.url }}" class="multi-col-submenu-link">{{ grandchild_link.title }}</a>
+                          {% endfor %}
+                          <a href="{{ child_link.url }}" class="multi-col-submenu-link multi-col-submenu-link--view-all">View All {{ child_link.title }} &rarr;</a>
+                        </div>
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                  {% comment %} Right Column: Featured (images + products per category) {% endcomment %}
+                  <div class="multi-col-featured">
+                    <p class="multi-col-featured-title">Featured</p>
+
+                    {% for child_link in link.links %}
+                      {% assign child_handle = child_link.title | handleize %}
+                      <div class="multi-col-featured-panel{% if forloop.first %} active{% endif %}" data-featured-panel="{{ forloop.index }}">
+
+                        {% comment %} Featured Images for this category {% endcomment %}
+                        {% for block in section.blocks %}
+                          {% if block.type == 'featured_image' %}
+                            {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                            {% assign block_category_handle = block.settings.category_title | handleize %}
+                            {% if block_parent_handle == link_handle and block_category_handle == child_handle and block.settings.image != blank %}
+                              <a href="{{ block.settings.link | default: child_link.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                <div class="multi-col-featured-image-wrapper">
+                                  <img src="{{ block.settings.image | image_url: width: 200 }}"
+                                       alt="{{ block.settings.image.alt | default: block.settings.heading | escape }}"
+                                       class="multi-col-featured-image"
+                                       loading="lazy">
+                                  <div class="multi-col-featured-content">
+                                    {% if block.settings.heading != blank %}
+                                      <p class="multi-col-featured-item-title">{{ block.settings.heading }}</p>
+                                    {% endif %}
+                                    {% if block.settings.subtext != blank %}
+                                      <span class="multi-col-featured-subtext">{{ block.settings.subtext }}</span>
+                                    {% endif %}
+                                    <span class="multi-col-featured-cta">
+                                      {{ block.settings.cta_text | default: 'Shop Now' }}
+                                      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                        <polyline points="9 18 15 12 9 6"></polyline>
+                                      </svg>
+                                    </span>
+                                  </div>
+                                </div>
+                              </a>
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+
+                        {% comment %} Featured Products for this category {% endcomment %}
+                        {% for block in section.blocks %}
+                          {% if block.type == 'featured_product' %}
+                            {% assign block_parent_handle = block.settings.parent_menu_title | handleize %}
+                            {% assign block_category_handle = block.settings.category_title | handleize %}
+                            {% if block_parent_handle == link_handle and block.settings.product != blank %}
+                              {% assign show_product = false %}
+                              {% if block.settings.category_title == blank %}
+                                {% assign show_product = true %}
+                              {% elsif block_category_handle == child_handle %}
+                                {% assign show_product = true %}
+                              {% endif %}
+                              {% if show_product %}
+                                {% assign feat_product = block.settings.product %}
+                                <a href="{{ feat_product.url }}" class="multi-col-featured-item" {{ block.shopify_attributes }}>
+                                  <div class="multi-col-featured-image-wrapper">
+                                    {% if feat_product.featured_image %}
+                                      <img src="{{ feat_product.featured_image | image_url: width: 200 }}"
+                                           alt="{{ feat_product.featured_image.alt | escape }}"
+                                           class="multi-col-featured-image"
+                                           loading="lazy">
+                                    {% endif %}
+                                    <div class="multi-col-featured-content">
+                                      <p class="multi-col-featured-item-title">{{ feat_product.title | truncate: 45 }}</p>
+                                      <span class="multi-col-featured-price">{{ feat_product.price | money }}</span>
+                                      <span class="multi-col-featured-cta">
+                                        Shop Now
+                                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="animation:none;">
+                                          <polyline points="9 18 15 12 9 6"></polyline>
+                                        </svg>
+                                      </span>
+                                    </div>
+                                  </div>
+                                </a>
+                              {% endif %}
+                            {% endif %}
+                          {% endif %}
+                        {% endfor %}
+
+                      </div>
+                    {% endfor %}
+                  </div>
+
+                </div>
+              </div>
+            </details>
+          </li>
+
+        {% else %}
+          {% comment %} ========== SIMPLE LINK ========== {% endcomment %}
+          <li class="navmenu-item navmenu-basic__item navmenu-id-{{ link_handle }}" style="display:flex;align-items:center;padding-top:0;height:auto;">
+            <a class="navmenu-link navmenu-link-depth-1" href="{{ link.url }}">{{ link.title }}</a>
+          </li>
+        {% endif %}
+      {% endfor %}
+
     </ul>
   </nav>
 </div>
