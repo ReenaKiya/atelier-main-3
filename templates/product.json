@@ -193,6 +193,10 @@
               },
               "block_order": []
             },
+            "essential_upsell_app_block_UyjHwk": {
+              "type": "shopify://apps/essential-upsell/blocks/app-block/50627fd9-24fd-4250-8614-accc12826d80",
+              "settings": {}
+            },
             "product_description_gYXQyD": {
               "type": "product-description",
               "name": "t:names.product_description",
@@ -227,6 +231,7 @@
             "product_inventory_cf9Nct",
             "variant_picker_R3rGDr",
             "buy_buttons_9MVfWi",
+            "essential_upsell_app_block_UyjHwk",
             "product_description_gYXQyD"
           ]
         }
@@ -1041,15 +1046,6 @@
     },
     "1775656111a0866560": {
       "type": "_blocks",
-      "blocks": {
-        "essential_upsell_app_block_Ktpr3U": {
-          "type": "shopify://apps/essential-upsell/blocks/app-block/50627fd9-24fd-4250-8614-accc12826d80",
-          "settings": {}
-        }
-      },
-      "block_order": [
-        "essential_upsell_app_block_Ktpr3U"
-      ],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
