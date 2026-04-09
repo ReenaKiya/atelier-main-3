@@ -1,0 +1,381 @@
+{%- liquid
+  assign current_product = closest.product
+  assign source_collection = section.settings.collection
+  assign products_per_view = section.settings.products_per_view | default: 1
+  assign visible_products = section.settings.visible_products | default: 4
+-%}
+
+<div
+  class="bundle-up-save-big color-{{ section.settings.color_scheme }}"
+  id="BundleUpSaveBig-{{ section.id }}"
+  data-section-id="{{ section.id }}"
+  style="--bundle-title-color: {{ section.settings.title_color }}; --bundle-price-color: {{ section.settings.price_color }}; --bundle-btn-bg: {{ section.settings.button_bg }}; --bundle-btn-border: {{ section.settings.button_border }}; --bundle-btn-color: {{ section.settings.button_color }};"
+>
+  <div class="bundle-up-save-big__header">
+    <h3 class="bundle-up-save-big__title">{{ section.settings.title }}</h3>
+    <div class="bundle-up-save-big__controls">
+      <button type="button" class="bundle-arrow bundle-arrow--prev" aria-label="Previous">
+        <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+          <path fill-rule="evenodd" d="M11.764 5.204a.75.75 0 0 1 .032 1.06l-3.516 3.736 3.516 3.736a.75.75 0 1 1-1.092 1.028l-4-4.25a.75.75 0 0 1 0-1.028l4-4.25a.75.75 0 0 1 1.06-.032Z"/>
+        </svg>
+      </button>
+      <button type="button" class="bundle-arrow bundle-arrow--next" aria-label="Next">
+        <svg viewBox="0 0 20 20" focusable="false" aria-hidden="true">
+          <path fill-rule="evenodd" d="M7.72 14.53a.75.75 0 0 1 0-1.06l3.47-3.47-3.47-3.47a.75.75 0 0 1 1.06-1.06l4 4a.75.75 0 0 1 0 1.06l-4 4a.75.75 0 0 1-1.06 0Z"/>
+        </svg>
+      </button>
+    </div>
+  </div>
+
+  {%- if section.settings.subtitle != blank -%}
+    <p class="bundle-up-save-big__subtitle">{{ section.settings.subtitle }}</p>
+  {%- endif -%}
+
+  <div class="bundle-up-save-big__viewport">
+    <ul class="bundle-up-save-big__list" role="list">
+      {%- assign rendered = 0 -%}
+      {%- if source_collection != blank and source_collection.products.size > 0 -%}
+        {%- for product in source_collection.products limit: visible_products -%}
+          {%- if product.id == current_product.id -%}{%- continue -%}{%- endif -%}
+          {%- assign rendered = rendered | plus: 1 -%}
+          {%- render 'bundle-up-product-card', product: product -%}
+        {%- endfor -%}
+      {%- endif -%}
+
+      {%- if rendered == 0 -%}
+        {%- for product in current_product.collections.first.products limit: visible_products -%}
+          {%- if product.id == current_product.id -%}{%- continue -%}{%- endif -%}
+          {%- render 'bundle-up-product-card', product: product -%}
+        {%- endfor -%}
+      {%- endif -%}
+    </ul>
+  </div>
+</div>
+
+{% stylesheet %}
+  .bundle-up-save-big {
+    width: 100%;
+    margin-block: 16px;
+    font-family: inherit;
+  }
+
+  .bundle-up-save-big__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 6px;
+  }
+
+  .bundle-up-save-big__title {
+    color: var(--bundle-title-color, #ae0000);
+    font-size: 14px;
+    font-weight: 600;
+    margin: 0;
+    letter-spacing: 0;
+  }
+
+  .bundle-up-save-big__subtitle {
+    color: #767474;
+    font-size: 13px;
+    text-align: center;
+    margin: 0 0 6px;
+  }
+
+  .bundle-up-save-big__controls {
+    display: flex;
+    gap: 8px;
+  }
+
+  .bundle-arrow {
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    border: 1px solid #d9d9d9;
+    background: #f3f3f3;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.2s;
+  }
+
+  .bundle-arrow:hover {
+    background: #e7e7e7;
+  }
+
+  .bundle-arrow svg {
+    width: 16px;
+    height: 16px;
+    fill: #555;
+  }
+
+  .bundle-up-save-big__viewport {
+    overflow: hidden;
+    border: 1px solid #c5c8d1;
+    border-radius: 6px;
+    background: #fff;
+  }
+
+  .bundle-up-save-big__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .bundle-up-card {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 0;
+    border-bottom: 1px solid #ececec;
+  }
+
+  .bundle-up-card:last-child {
+    border-bottom: none;
+  }
+
+  .bundle-up-card__image {
+    width: 120px;
+    min-width: 50px;
+    flex-shrink: 0;
+  }
+
+  .bundle-up-card__image img {
+    width: 100%;
+    height: auto;
+    display: block;
+    border-radius: 3px 0 0 3px;
+  }
+
+  .bundle-up-card__body {
+    flex: 1;
+    padding: 10px 10px 10px 0;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    min-width: 0;
+  }
+
+  .bundle-up-card__title {
+    color: #000;
+    font-size: 15px;
+    font-weight: 500;
+    line-height: 1.3;
+    margin: 0;
+    text-decoration: none;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .bundle-up-card__title:hover {
+    text-decoration: underline;
+  }
+
+  .bundle-up-card__row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: nowrap;
+  }
+
+  .bundle-up-card__price {
+    color: var(--bundle-price-color, #740000);
+    font-size: 16px;
+    font-weight: 500;
+    margin: 0;
+  }
+
+  .bundle-up-card__btn {
+    cursor: pointer;
+    color: var(--bundle-btn-color, #000);
+    font-size: 14px;
+    font-weight: 600;
+    padding: 5px 15px 5px 12px;
+    border-radius: 6px;
+    border: 1px solid var(--bundle-btn-border, #970000);
+    background: var(--bundle-btn-bg, #fcecec);
+    white-space: nowrap;
+    transition: opacity 0.2s;
+  }
+
+  .bundle-up-card__btn:hover {
+    opacity: 0.85;
+  }
+
+  .bundle-up-card__btn[aria-busy='true'] {
+    opacity: 0.6;
+    cursor: wait;
+  }
+
+  .bundle-up-card__btn.is-added {
+    background: #1f8a3a;
+    color: #fff;
+    border-color: #1f8a3a;
+  }
+
+  @media (max-width: 600px) {
+    .bundle-up-card__image { width: 90px; }
+    .bundle-up-card__title { font-size: 14px; }
+    .bundle-up-card__price { font-size: 15px; }
+    .bundle-up-card__btn { font-size: 13px; padding: 5px 10px; }
+  }
+{% endstylesheet %}
+
+<script>
+  (function () {
+    var root = document.getElementById('BundleUpSaveBig-{{ section.id }}');
+    if (!root) return;
+
+    var list = root.querySelector('.bundle-up-save-big__list');
+    var items = list ? Array.prototype.slice.call(list.children) : [];
+    var perView = {{ products_per_view | json }};
+    var index = 0;
+
+    function update() {
+      items.forEach(function (el, i) {
+        el.style.display = i >= index && i < index + perView ? '' : 'none';
+      });
+    }
+
+    root.querySelector('.bundle-arrow--prev').addEventListener('click', function () {
+      index = Math.max(0, index - perView);
+      update();
+    });
+    root.querySelector('.bundle-arrow--next').addEventListener('click', function () {
+      if (index + perView < items.length) {
+        index += perView;
+        update();
+      }
+    });
+
+    update();
+
+    root.addEventListener('click', function (e) {
+      var btn = e.target.closest('.bundle-up-card__btn');
+      if (!btn) return;
+      e.preventDefault();
+      var variantId = btn.getAttribute('data-variant-id');
+      if (!variantId) return;
+      btn.setAttribute('aria-busy', 'true');
+
+      fetch('{{ routes.cart_add_url }}.js', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify({ items: [{ id: variantId, quantity: 1 }] })
+      })
+        .then(function (r) { return r.json(); })
+        .then(function () {
+          btn.removeAttribute('aria-busy');
+          btn.classList.add('is-added');
+          btn.querySelector('.btn-label').textContent = 'Added!';
+          document.dispatchEvent(new CustomEvent('cart:refresh'));
+          setTimeout(function () {
+            btn.classList.remove('is-added');
+            btn.querySelector('.btn-label').textContent = '🛒 + Add';
+          }, 2000);
+        })
+        .catch(function () {
+          btn.removeAttribute('aria-busy');
+        });
+    });
+  })();
+</script>
+
+{% schema %}
+{
+  "name": "Bundle Up & Save",
+  "tag": "section",
+  "class": "section-bundle-up-save-big",
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "Bundle Up & Save Big"
+    },
+    {
+      "type": "text",
+      "id": "subtitle",
+      "label": "Subtitle"
+    },
+    {
+      "type": "collection",
+      "id": "collection",
+      "label": "Products from collection",
+      "info": "If empty, falls back to the current product's first collection."
+    },
+    {
+      "type": "range",
+      "id": "visible_products",
+      "label": "Max products to load",
+      "min": 2,
+      "max": 20,
+      "step": 1,
+      "default": 10
+    },
+    {
+      "type": "range",
+      "id": "products_per_view",
+      "label": "Products visible at once",
+      "min": 1,
+      "max": 4,
+      "step": 1,
+      "default": 1
+    },
+    {
+      "type": "header",
+      "content": "Colors"
+    },
+    {
+      "type": "color",
+      "id": "title_color",
+      "label": "Title color",
+      "default": "#ae0000"
+    },
+    {
+      "type": "color",
+      "id": "price_color",
+      "label": "Price color",
+      "default": "#740000"
+    },
+    {
+      "type": "color",
+      "id": "button_bg",
+      "label": "Button background",
+      "default": "#fcecec"
+    },
+    {
+      "type": "color",
+      "id": "button_border",
+      "label": "Button border",
+      "default": "#970000"
+    },
+    {
+      "type": "color",
+      "id": "button_color",
+      "label": "Button text",
+      "default": "#000000"
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Bundle Up & Save"
+    }
+  ],
+  "enabled_on": {
+    "templates": ["product"]
+  }
+}
+{% endschema %}

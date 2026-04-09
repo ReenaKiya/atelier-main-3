@@ -1,0 +1,36 @@
+{%- liquid
+  assign variant = product.selected_or_first_available_variant
+-%}
+<li class="bundle-up-card">
+  <a href="{{ product.url }}" class="bundle-up-card__image" aria-label="{{ product.title | escape }}">
+    {%- if product.featured_image != blank -%}
+      <img
+        src="{{ product.featured_image | image_url: width: 240 }}"
+        alt="{{ product.featured_image.alt | default: product.title | escape }}"
+        loading="lazy"
+        width="120"
+        height="120"
+      >
+    {%- endif -%}
+  </a>
+  <div class="bundle-up-card__body">
+    <a href="{{ product.url }}" class="bundle-up-card__title">{{ product.title }}</a>
+    <div class="bundle-up-card__row">
+      <p class="bundle-up-card__price">{{ product.price | money }}</p>
+      {%- if variant and variant.available -%}
+        <button
+          type="button"
+          class="bundle-up-card__btn"
+          data-variant-id="{{ variant.id }}"
+          aria-label="Add {{ product.title | escape }} to cart"
+        >
+          <span class="btn-label">🛒 + Add</span>
+        </button>
+      {%- else -%}
+        <button type="button" class="bundle-up-card__btn" disabled>
+          <span class="btn-label">Sold out</span>
+        </button>
+      {%- endif -%}
+    </div>
+  </div>
+</li>

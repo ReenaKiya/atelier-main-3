@@ -347,6 +347,10 @@
         if (submenusWrap) submenusWrap.remove();
         var catTitle = meganav.querySelector('.multi-col-categories-title');
         if (catTitle) catTitle.remove();
+        // Remove "View All" links inside the mobile menu
+        meganav.querySelectorAll('.multi-col-submenu-link--view-all').forEach(function(el) {
+          el.remove();
+        });
       });
 
       // Click on a level-2 category toggles its nested submenu panel
