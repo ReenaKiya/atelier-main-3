@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_GPFw9n": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "'By Jewellery Type'",
+            "category_title": "Barbells",
+            "product": "g23-titanium-captive-bead-ring"
+          }
+        },
         "featured_product_TPNLBM": {
           "type": "featured_product",
           "settings": {
@@ -118,6 +126,7 @@
         }
       },
       "block_order": [
+        "featured_product_GPFw9n",
         "featured_product_TPNLBM",
         "featured_product_gBL646",
         "featured_product_Ef88Q4",
