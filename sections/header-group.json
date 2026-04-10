@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_d6AEAE": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Belly Rings",
+            "product": "316l-surgical-steel-classic-jewelled-curved-clicker-belly-ring"
+          }
+        },
         "featured_product_E744nm": {
           "type": "featured_product",
           "settings": {
@@ -134,6 +142,7 @@
         }
       },
       "block_order": [
+        "featured_product_d6AEAE",
         "featured_product_E744nm",
         "featured_product_GPFw9n",
         "featured_product_TPNLBM",
