@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_E744nm": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Belly Rings",
+            "product": "g23-titanium-double-cz-jewelled-non-dangling-banana-belly-ring"
+          }
+        },
         "featured_product_GPFw9n": {
           "type": "featured_product",
           "settings": {
@@ -126,6 +134,7 @@
         }
       },
       "block_order": [
+        "featured_product_E744nm",
         "featured_product_GPFw9n",
         "featured_product_TPNLBM",
         "featured_product_gBL646",
