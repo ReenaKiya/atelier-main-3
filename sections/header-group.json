@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_jRVc7m": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Nipple Rings",
+            "product": "g23-titanium-captive-bead-ring"
+          }
+        },
         "featured_product_JdWiHK": {
           "type": "featured_product",
           "settings": {
@@ -158,6 +166,7 @@
         }
       },
       "block_order": [
+        "featured_product_jRVc7m",
         "featured_product_JdWiHK",
         "featured_product_xGzRG7",
         "featured_product_d6AEAE",
