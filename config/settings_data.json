@@ -72,11 +72,6 @@
         "disabled": false,
         "settings": {}
       },
-      "7147999719060634790": {
-        "type": "shopify://apps/gsc-countdown-timer/blocks/countdown-bar/58dc5b1b-43d2-4209-b1f3-52aff31643ed",
-        "disabled": false,
-        "settings": {}
-      },
       "144831480468751239": {
         "type": "shopify://apps/essential-upsell/blocks/app-embed/50627fd9-24fd-4250-8614-accc12826d80",
         "disabled": false,
@@ -85,6 +80,11 @@
       "14724428607702905366": {
         "type": "shopify://apps/webrex-ai-seo-optimizer/blocks/webrexSeoEmbed/b26797ad-bb4d-48f5-8ef3-7c561521049c",
         "disabled": false,
+        "settings": {}
+      },
+      "7147999719060634790": {
+        "type": "shopify://apps/gsc-countdown-timer/blocks/countdown-bar/58dc5b1b-43d2-4209-b1f3-52aff31643ed",
+        "disabled": true,
         "settings": {}
       }
     },
