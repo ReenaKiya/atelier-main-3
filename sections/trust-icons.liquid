@@ -18,6 +18,10 @@
     {% endif %}
   }
 
+  .{{ section_scope }} .trust-icons__marquee {
+    width: 100%;
+  }
+
   .{{ section_scope }} .trust-icons__list {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
@@ -34,6 +38,10 @@
     display: flex;
     justify-content: center;
     transition: transform 0.3s ease;
+  }
+
+  .{{ section_scope }} .trust-icons__item--clone {
+    display: none;
   }
 
   .{{ section_scope }} .trust-icons__item svg {
@@ -82,9 +90,43 @@
   }
 
   @media screen and (max-width: 749px) {
+    .{{ section_scope }} .trust-icons__marquee {
+      overflow: hidden;
+      -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+              mask-image: linear-gradient(90deg, transparent 0, #000 8%, #000 92%, transparent 100%);
+    }
+
     .{{ section_scope }} .trust-icons__list {
-      grid-template-columns: repeat(2, minmax(0, 1fr));
-      gap: calc(var(--trust-icons-gap) * 0.75);
+      display: flex;
+      flex-wrap: nowrap;
+      width: max-content;
+      gap: 0;
+      animation: trust-icons-scroll-{{ section.id }} 25s linear infinite;
+    }
+
+    .{{ section_scope }} .trust-icons__marquee:hover .trust-icons__list {
+      animation-play-state: paused;
+    }
+
+    .{{ section_scope }} .trust-icons__item {
+      flex: 0 0 auto;
+      width: auto;
+      padding-inline: calc(var(--trust-icons-gap) * 0.75 / 2);
+    }
+
+    .{{ section_scope }} .trust-icons__item--clone {
+      display: flex;
+    }
+  }
+
+  @keyframes trust-icons-scroll-{{ section.id }} {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .{{ section_scope }} .trust-icons__list {
+      animation: none;
     }
   }
 {% endstyle %}
@@ -95,36 +137,57 @@
   style="{% render 'spacing-padding', settings: section.settings %}"
 >
   <div class="trust-icons__wrap">
-    <ul class="trust-icons__list" role="list">
-      {%- for block in section.blocks -%}
-        <li class="trust-icons__item" {{ block.shopify_attributes }}>
-          {%- if block.settings.link != blank -%}
-            <a class="trust-icons__link" href="{{ block.settings.link }}">
-          {%- else -%}
-            <div class="trust-icons__link">
-          {%- endif -%}
-
-            <div class="trust-icons__icon-wrap">
-              {%- render 'icon-or-image',
-                icon: block.settings.icon,
-                image_upload: block.settings.image_upload,
-                width: block.settings.icon_size,
-                class_name: 'trust-icons__icon'
-              -%}
-            </div>
-
-            {%- if block.settings.text != blank -%}
-              <div class="trust-icons__text">{{ block.settings.text | escape }}</div>
+    <div class="trust-icons__marquee">
+      <ul class="trust-icons__list" role="list">
+        {%- for block in section.blocks -%}
+          <li class="trust-icons__item" {{ block.shopify_attributes }}>
+            {%- if block.settings.link != blank -%}
+              <a class="trust-icons__link" href="{{ block.settings.link }}">
+            {%- else -%}
+              <div class="trust-icons__link">
             {%- endif -%}
 
-          {%- if block.settings.link != blank -%}
-            </a>
-          {%- else -%}
+              <div class="trust-icons__icon-wrap">
+                {%- render 'icon-or-image',
+                  icon: block.settings.icon,
+                  image_upload: block.settings.image_upload,
+                  width: block.settings.icon_size,
+                  class_name: 'trust-icons__icon'
+                -%}
+              </div>
+
+              {%- if block.settings.text != blank -%}
+                <div class="trust-icons__text">{{ block.settings.text | escape }}</div>
+              {%- endif -%}
+
+            {%- if block.settings.link != blank -%}
+              </a>
+            {%- else -%}
+              </div>
+            {%- endif -%}
+          </li>
+        {%- endfor -%}
+
+        {%- comment -%} Duplicate set for seamless mobile marquee loop {%- endcomment -%}
+        {%- for block in section.blocks -%}
+          <li class="trust-icons__item trust-icons__item--clone" aria-hidden="true">
+            <div class="trust-icons__link">
+              <div class="trust-icons__icon-wrap">
+                {%- render 'icon-or-image',
+                  icon: block.settings.icon,
+                  image_upload: block.settings.image_upload,
+                  width: block.settings.icon_size,
+                  class_name: 'trust-icons__icon'
+                -%}
+              </div>
+              {%- if block.settings.text != blank -%}
+                <div class="trust-icons__text">{{ block.settings.text | escape }}</div>
+              {%- endif -%}
             </div>
-          {%- endif -%}
-        </li>
-      {%- endfor -%}
-    </ul>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </div>
   </div>
 </div>
 

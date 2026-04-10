@@ -392,18 +392,24 @@
   .sbt__image-col {
     flex: none;
     max-width: 100%;
-    width: 100%;
+    width: auto;
+    margin: 12px;
+    height: auto;
     position: relative;
-    height: 400px;
   }
 
   .sbt__image {
-    position: absolute;
-    top: 0;
-    left: 0;
+    position: static;
     width: 100%;
-    height: 100%;
+    height: auto;
+    max-height: 360px;
     object-fit: cover;
+    border-radius: 12px;
+  }
+
+  .sbt__image-placeholder {
+    min-height: 280px;
+    border-radius: 12px;
   }
 
   .sbt__content-col {
@@ -412,13 +418,57 @@
 }
 
 @media screen and (max-width: 600px) {
-  .sbt__grid {
-    grid-template-columns: repeat(2, 1fr);
-    gap: 10px;
+  .sbt__image-col {
+    margin: 10px;
+  }
+
+  .sbt__image {
+    max-height: 240px;
+    border-radius: 10px;
+  }
+
+  .sbt__image-placeholder {
+    min-height: 200px;
+    border-radius: 10px;
+  }
+
+  .sbt__content-col {
+    padding: 20px 14px;
+  }
+
+  /* Carousel: turn grid into horizontal scroll-snap on mobile */
+  .sbt__panel--active .sbt__grid {
+    display: flex;
+    grid-template-columns: none;
+    gap: 12px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scroll-padding-inline: 14px;
+    padding-bottom: 10px;
+    margin-inline: -14px;
+    padding-inline: 14px;
+    scrollbar-width: none;
+  }
+
+  .sbt__panel--active .sbt__grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  .sbt__panel--active .sbt__grid > .sbt__card {
+    flex: 0 0 65%;
+    max-width: 65%;
+    scroll-snap-align: start;
   }
 
   .sbt__heading {
     font-size: 22px;
+  }
+
+  .sbt__tabs {
+    flex-wrap: wrap;
+    gap: 8px;
   }
 
   .sbt__tab {
@@ -428,6 +478,12 @@
 
   .sbt__card-img {
     height: 110px;
+  }
+}
+
+@media screen and (max-width: 380px) {
+  .sbt__image {
+    max-height: 200px;
   }
 }
 </style>

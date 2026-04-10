@@ -86,6 +86,26 @@
               </div>
 
               <button class="fys__arrow fys__arrow--next" data-panel="{{ forloop.index0 }}">&#10095;</button>
+
+              {%- assign visible_count = 3 -%}
+              {%- if collection != blank -%}
+                {%- assign extra_count = collection.products.size | minus: visible_count -%}
+                <button
+                  type="button"
+                  class="fys__view-all-mobile"
+                  data-fys-open-drawer="{{ forloop.index0 }}"
+                >
+                  {%- if extra_count > 0 -%}
+                    <span class="fys__view-all-count">+{{ extra_count }}</span>
+                  {%- endif -%}
+                  <span class="fys__view-all-text">View all</span>
+                </button>
+              {%- else -%}
+                <button type="button" class="fys__view-all-mobile" data-fys-open-drawer="{{ forloop.index0 }}">
+                  <span class="fys__view-all-count">+3</span>
+                  <span class="fys__view-all-text">View all</span>
+                </button>
+              {%- endif -%}
             </div>
           </div>
 
@@ -93,6 +113,65 @@
       </div>
     {% endfor %}
   </div>
+
+  <!-- Mobile "View all" Drawers -->
+  {% for block in section.blocks %}
+    {% assign drawer_collection = block.settings.collection %}
+    <div class="fys-drawer" data-fys-drawer="{{ forloop.index0 }}" aria-hidden="true">
+      <div class="fys-drawer__overlay" data-fys-close-drawer></div>
+      <div class="fys-drawer__panel" role="dialog" aria-modal="true">
+        <div class="fys-drawer__header">
+          <div class="fys-drawer__header-left">
+            {% if block.settings.bg_image != blank %}
+              <span class="fys-drawer__thumb" style="background-image: url({{ block.settings.bg_image | image_url: width: 200 }});"></span>
+            {% else %}
+              <span class="fys-drawer__thumb" style="background-color: {{ block.settings.bg_color | default: '#fce4ec' }};"></span>
+            {% endif %}
+            <h3 class="fys-drawer__title">{{ block.settings.tab_label | upcase }}</h3>
+          </div>
+          <button type="button" class="fys-drawer__close" data-fys-close-drawer aria-label="Close">&times;</button>
+        </div>
+
+        {% if drawer_collection != blank %}
+          <p class="fys-drawer__count">
+            {{ drawer_collection.products_count }} available {% if drawer_collection.products_count == 1 %}product{% else %}products{% endif %}
+          </p>
+        {% endif %}
+
+        <div class="fys-drawer__grid">
+          {% if drawer_collection != blank %}
+            {% for product in drawer_collection.products %}
+              <div class="fys-drawer__card">
+                <a href="{{ product.url }}" class="fys-drawer__card-link">
+                  {% if product.featured_image != blank %}
+                    <img
+                      src="{{ product.featured_image | image_url: width: 400 }}"
+                      alt="{{ product.title | escape }}"
+                      class="fys-drawer__img"
+                      loading="lazy"
+                    >
+                  {% else %}
+                    <div class="fys-drawer__img fys-drawer__img--placeholder"></div>
+                  {% endif %}
+                </a>
+                <div class="fys-drawer__info">
+                  <span class="fys-drawer__name">{{ product.title }}</span>
+                  <span class="fys-drawer__price">{{ product.price | money }}</span>
+                </div>
+                <button
+                  type="button"
+                  class="fys-drawer__add fys__product-atc"
+                  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                >
+                  Add
+                </button>
+              </div>
+            {% endfor %}
+          {% endif %}
+        </div>
+      </div>
+    </div>
+  {% endfor %}
 </section>
 
 {% schema %}
@@ -249,159 +328,153 @@
   to { opacity: 1; transform: translateY(0); }
 }
 
-/* Panel Inner - Full BG Image */
+/* Panel Inner - Full BG Image with bottom pill */
 .fys__panel-inner {
   position: relative;
   background-size: cover;
-  background-position: left center;
+  background-position: center;
   border-radius: 16px;
   overflow: hidden;
   min-height: 440px;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  align-items: flex-end;
-  padding: 30px 30px 30px 0;
+  justify-content: flex-end;
+  align-items: stretch;
+  padding: 0;
 }
 
-/* Right Content Area */
+/* Right Content Area becomes the bottom pill container */
 .fys__right-content {
-  width: 55%;
+  width: 100%;
   display: flex;
   flex-direction: column;
 }
 
-/* Style Title */
+/* Style Title hidden in pill layout */
 .fys__style-title {
-  font-family: 'Nunito Sans', sans-serif;
-  font-size: 36px;
-  color: #ffffff;
-  font-weight: 400;
-  text-align: left;
-  margin: 0px 52px 15px;
+  display: none;
 }
 
-/* Carousel Wrap */
+/* Carousel Wrap = the white pill */
 .fys__carousel-wrap {
   position: relative;
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: 14px;
+  margin: 18px;
+  background: #ffffff;
+  border-radius: 999px;
+  padding: 10px 22px 10px 12px;
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
 }
 
-/* Arrows */
+/* Arrows hidden in pill layout */
 .fys__arrow {
-  width: 40px;
-  height: 40px;
-  border-radius: 50%;
-  border: none;
-  background: #fff;
-  color: #333;
-  font-size: 18px;
-  cursor: pointer;
-  flex-shrink: 0;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.15);
-  transition: all 0.3s ease;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 5;
-}
-
-.fys__arrow:hover {
-  background: #333;
-  color: #fff;
+  display: none;
 }
 
 /* Carousel */
 .fys__carousel {
   overflow: hidden;
-  flex: 1;
+  flex: 0 0 auto;
 }
 
 .fys__carousel-track {
   display: flex;
-  gap: 15px;
-  transition: transform 0.4s ease;
+  gap: 8px;
+  align-items: center;
+  transform: none !important;
 }
 
-/* Product Card */
+/* Product Card -> circular thumbnail */
 .fys__product-card {
-  min-width: calc(30% - 12px);
-  max-width: calc(30% - 12px);
-  background: #fff;
-  border-radius: 12px;
-  overflow: hidden;
+  min-width: 48px;
+  max-width: 48px;
+  background: transparent;
+  border-radius: 50%;
+  overflow: visible;
   flex-shrink: 0;
 }
 
-.fys__product-link {
-  display: block;
-  padding: 10px;
-  text-decoration: none;
+/* Only show first 3 thumbs in the pill */
+.fys__product-card:nth-child(n + 4) {
+  display: none;
 }
 
-.fys__product-img {
-  width: 100%;
-  height: 160px;
+.fys__product-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  width: 48px;
+  height: 48px;
+  border-radius: 50%;
+  background: #fff;
+  border: 1px solid #eee;
+  text-decoration: none;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.fys__product-img,
+.fys__product-img-placeholder {
+  width: 38px;
+  height: 38px;
+  border-radius: 50%;
   object-fit: contain;
+  padding: 2px;
   display: block;
 }
 
 .fys__product-img-placeholder {
-  width: 100%;
-  height: 160px;
   background: #f0f0f0;
-  border-radius: 6px;
 }
 
-/* Product Info */
+/* Product info hidden in pill */
 .fys__product-info {
-  padding: 0 12px 12px;
-  display: flex;
-  flex-direction: column;
+  display: none;
 }
 
-.fys__product-title {
-  font-size: 12px;
-  font-weight: 600;
-  color: #333;
-  line-height: 1.3;
-  margin-bottom: 2px;
-  display: -webkit-box;
-  -webkit-line-clamp: 1;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
+.fys__product-title,
+.fys__product-vendor,
+.fys__product-price,
+.fys__product-atc {
+  display: none;
 }
 
-.fys__product-vendor {
-  font-size: 11px;
-  color: #999;
-  margin-bottom: 4px;
-}
-
-.fys__product-price {
+/* "+3 View all" inside the pill */
+.fys__view-all-mobile {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: auto;
+  padding: 0;
+  background: transparent;
+  border: none;
   font-size: 15px;
   font-weight: 700;
-  color: #111;
-  margin-bottom: 8px;
-}
-
-.fys__product-atc {
-  width: 100%;
-  padding: 9px;
-  background: #222;
-  color: #fff;
-  border: none;
-  border-radius: 6px;
-  font-size: 12px;
-  font-weight: 700;
+  color: #1a1a1a;
+  text-decoration: none;
+  white-space: nowrap;
   cursor: pointer;
-  transition: background 0.3s ease;
+  transition: opacity 0.2s ease;
 }
 
-.fys__product-atc:hover {
-  background: #000;
+.fys__view-all-mobile:hover {
+  opacity: 0.7;
+}
+
+.fys__view-all-count {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
+  font-weight: 700;
+  color: #1a1a1a;
+}
+
+.fys__view-all-text {
+  font-weight: 700;
+  color: #1a1a1a;
 }
 
 /* Responsive */
@@ -410,22 +483,358 @@
     flex-direction: column;
     align-items: flex-start;
   }
+}
+
+/* ---------- Mobile: swipeable panel cards with bottom thumbnail pill ---------- */
+@media screen and (max-width: 749px) {
+  .fys {
+    padding: 30px 0 40px;
+  }
+
+  .fys__header {
+    padding: 0 20px;
+    margin-bottom: 20px;
+  }
+
+  .fys__title {
+    font-size: 24px;
+  }
+
+  .fys__subtitle,
+  .fys__tabs {
+    display: none;
+  }
+
+  /* Show ALL panels side-by-side as a horizontal scroll-snap carousel */
+  .fys__panels {
+    display: flex;
+    flex-wrap: nowrap;
+    gap: 14px;
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding: 0 20px 6px;
+    scrollbar-width: none;
+  }
+  .fys__panels::-webkit-scrollbar { display: none; }
+
+  .fys__panel,
+  .fys__panel--active {
+    display: block;
+    flex: 0 0 86%;
+    max-width: 86%;
+    scroll-snap-align: start;
+    animation: none;
+  }
 
   .fys__panel-inner {
-    min-height: 380px;
-    padding: 25px 20px;
-    align-items: center;
-    background-position: top center;
+    min-height: 460px;
+    padding: 0;
+    align-items: stretch;
+    justify-content: flex-end;
+    background-position: center;
+    background-size: cover;
+    border-radius: 16px;
   }
 
   .fys__right-content {
     width: 100%;
+    padding: 0;
   }
 
-  .fys__product-card {
-    min-width: calc(50% - 8px);
-    max-width: calc(50% - 8px);
+  .fys__style-title {
+    display: none;
   }
+
+  /* Bottom pill containing thumbs + view all */
+  .fys__carousel-wrap {
+    margin: 14px;
+    background: #ffffff;
+    border-radius: 999px;
+    padding: 10px 22px 10px 12px;
+    gap: 14px;
+    box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12);
+  }
+
+  .fys__arrow {
+    display: none;
+  }
+
+  .fys__carousel {
+    overflow: hidden;
+    flex: 0 0 auto;
+  }
+
+  .fys__carousel-track {
+    gap: 8px;
+    align-items: center;
+    transform: none !important;
+  }
+
+  /* Only show first 3 product thumbs in the pill */
+  .fys__product-card {
+    min-width: 46px;
+    max-width: 46px;
+    background: transparent;
+    border-radius: 50%;
+    overflow: visible;
+  }
+
+  .fys__product-card:nth-child(n + 4) {
+    display: none;
+  }
+
+  .fys__product-link {
+    padding: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    background: #fff;
+    border: 1px solid #eee;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+  }
+
+  .fys__product-img,
+  .fys__product-img-placeholder {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    object-fit: contain;
+    padding: 2px;
+  }
+
+  .fys__product-info {
+    display: none;
+  }
+
+  .fys__view-all-mobile {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-left: auto;
+    padding: 0;
+    background: transparent;
+    border: none;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 700;
+    color: #1a1a1a;
+    text-decoration: none;
+    white-space: nowrap;
+    cursor: pointer;
+    box-shadow: none;
+    transition: opacity 0.2s ease;
+  }
+
+  .fys__view-all-mobile:hover,
+  .fys__view-all-mobile:active {
+    background: transparent;
+    opacity: 0.7;
+    transform: none;
+  }
+
+  .fys__view-all-count {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-width: auto;
+    height: auto;
+    padding: 0;
+    background: transparent;
+    color: #1a1a1a;
+    border-radius: 0;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .fys__view-all-text {
+    font-weight: 700;
+    color: #1a1a1a;
+    letter-spacing: 0.2px;
+  }
+}
+
+/* ---------- Mobile "View all" Drawer ---------- */
+.fys-drawer {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+}
+
+.fys-drawer.is-open {
+  display: block;
+}
+
+.fys-drawer__overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+
+.fys-drawer__panel {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  max-height: 88vh;
+  background: #fff;
+  border-top-left-radius: 18px;
+  border-top-right-radius: 18px;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  animation: fysDrawerUp 0.3s ease;
+}
+
+@keyframes fysDrawerUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+
+.fys-drawer__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 18px 20px 12px;
+  flex-shrink: 0;
+}
+
+.fys-drawer__header-left {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.fys-drawer__thumb {
+  width: 56px;
+  height: 56px;
+  border-radius: 10px;
+  background-size: cover;
+  background-position: center;
+  display: block;
+  flex-shrink: 0;
+}
+
+.fys-drawer__title {
+  font-size: 22px;
+  font-weight: 800;
+  color: #111;
+  margin: 0;
+  letter-spacing: 0.5px;
+}
+
+.fys-drawer__close {
+  background: transparent;
+  border: none;
+  font-size: 32px;
+  line-height: 1;
+  color: #555;
+  cursor: pointer;
+  padding: 0 6px;
+}
+
+.fys-drawer__count {
+  margin: 0;
+  padding: 0 20px 10px;
+  font-size: 13px;
+  font-weight: 600;
+  color: #666;
+  flex-shrink: 0;
+}
+
+.fys-drawer__grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 18px 10px;
+  padding: 12px 14px 28px;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+.fys-drawer__card {
+  display: flex;
+  flex-direction: column;
+}
+
+.fys-drawer__card-link {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  aspect-ratio: 1 / 1;
+  border: 1px solid #e5e5e5;
+  border-radius: 14px;
+  overflow: hidden;
+  background: #fff;
+  text-decoration: none;
+  padding: 14px;
+}
+
+.fys-drawer__img {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  display: block;
+}
+
+.fys-drawer__img--placeholder {
+  background: #f5f5f5;
+  border-radius: 8px;
+}
+
+.fys-drawer__info {
+  padding: 10px 2px 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.fys-drawer__name {
+  font-size: 13px;
+  font-weight: 600;
+  color: #1a1a1a;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  line-height: 1.2;
+}
+
+.fys-drawer__price {
+  font-size: 18px;
+  font-weight: 800;
+  color: #111;
+  line-height: 1.2;
+}
+
+.fys-drawer__add {
+  margin-top: 10px;
+  width: 100%;
+  padding: 14px;
+  background: #1a1a1a;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.3px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.fys-drawer__add:hover {
+  background: #000;
+}
+
+body.fys-drawer-open {
+  overflow: hidden;
+}
+
+@media screen and (min-width: 750px) {
+  .fys-drawer { display: none !important; }
 }
 
 @media screen and (max-width: 480px) {
@@ -433,33 +842,8 @@
     font-size: 22px;
   }
 
-  .fys__tab {
-    padding: 8px 16px;
-    font-size: 12px;
-  }
-
   .fys__panel-inner {
-    min-height: 340px;
-    padding: 20px 15px;
-  }
-
-  .fys__product-card {
-    min-width: calc(50% - 8px);
-    max-width: calc(50% - 8px);
-  }
-
-  .fys__product-img {
-    height: 110px;
-  }
-
-  .fys__arrow {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
-  }
-
-  .fys__style-title {
-    font-size: 28px;
+    min-height: 420px;
   }
 }
 </style>
@@ -510,6 +894,39 @@ document.addEventListener("DOMContentLoaded", function () {
       track.style.transform = "translateX(-" + currentScroll + "px)";
       track.setAttribute("data-scroll", currentScroll);
     });
+  });
+
+  /* Mobile "View all" Drawer */
+  document.querySelectorAll("[data-fys-open-drawer]").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      var idx = this.getAttribute("data-fys-open-drawer");
+      var drawer = document.querySelector('.fys-drawer[data-fys-drawer="' + idx + '"]');
+      if (!drawer) return;
+      drawer.classList.add("is-open");
+      drawer.setAttribute("aria-hidden", "false");
+      document.body.classList.add("fys-drawer-open");
+    });
+  });
+
+  document.querySelectorAll("[data-fys-close-drawer]").forEach(function (el) {
+    el.addEventListener("click", function () {
+      var drawer = this.closest(".fys-drawer");
+      if (!drawer) return;
+      drawer.classList.remove("is-open");
+      drawer.setAttribute("aria-hidden", "true");
+      document.body.classList.remove("fys-drawer-open");
+    });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") {
+      document.querySelectorAll(".fys-drawer.is-open").forEach(function (d) {
+        d.classList.remove("is-open");
+        d.setAttribute("aria-hidden", "true");
+      });
+      document.body.classList.remove("fys-drawer-open");
+    }
   });
 
   /* Add to Cart */

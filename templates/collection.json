@@ -82,6 +82,10 @@
         "padding-block-end": 0
       }
     },
+    "people_also_searched": {
+      "type": "people-also-searched",
+      "settings": {}
+    },
     "main": {
       "type": "main-collection",
       "blocks": {
@@ -350,6 +354,7 @@
   },
   "order": [
     "section",
-    "main"
+    "main",
+    "people_also_searched"
   ]
 }
