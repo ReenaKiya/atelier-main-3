@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_xGzRG7": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Plugs & Tunnels",
+            "product": "black-silicone-ear-tunnel"
+          }
+        },
         "featured_product_d6AEAE": {
           "type": "featured_product",
           "settings": {
@@ -142,6 +150,7 @@
         }
       },
       "block_order": [
+        "featured_product_xGzRG7",
         "featured_product_d6AEAE",
         "featured_product_E744nm",
         "featured_product_GPFw9n",
