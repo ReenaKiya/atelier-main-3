@@ -86,26 +86,6 @@
               </div>
 
               <button class="fys__arrow fys__arrow--next" data-panel="{{ forloop.index0 }}">&#10095;</button>
-
-              {%- assign visible_count = 3 -%}
-              {%- if collection != blank -%}
-                {%- assign extra_count = collection.products.size | minus: visible_count -%}
-                <button
-                  type="button"
-                  class="fys__view-all-mobile"
-                  data-fys-open-drawer="{{ forloop.index0 }}"
-                >
-                  {%- if extra_count > 0 -%}
-                    <span class="fys__view-all-count">+{{ extra_count }}</span>
-                  {%- endif -%}
-                  <span class="fys__view-all-text">View all</span>
-                </button>
-              {%- else -%}
-                <button type="button" class="fys__view-all-mobile" data-fys-open-drawer="{{ forloop.index0 }}">
-                  <span class="fys__view-all-count">+3</span>
-                  <span class="fys__view-all-text">View all</span>
-                </button>
-              {%- endif -%}
             </div>
           </div>
 
@@ -113,65 +93,6 @@
       </div>
     {% endfor %}
   </div>
-
-  <!-- Mobile "View all" Drawers -->
-  {% for block in section.blocks %}
-    {% assign drawer_collection = block.settings.collection %}
-    <div class="fys-drawer" data-fys-drawer="{{ forloop.index0 }}" aria-hidden="true">
-      <div class="fys-drawer__overlay" data-fys-close-drawer></div>
-      <div class="fys-drawer__panel" role="dialog" aria-modal="true">
-        <div class="fys-drawer__header">
-          <div class="fys-drawer__header-left">
-            {% if block.settings.bg_image != blank %}
-              <span class="fys-drawer__thumb" style="background-image: url({{ block.settings.bg_image | image_url: width: 200 }});"></span>
-            {% else %}
-              <span class="fys-drawer__thumb" style="background-color: {{ block.settings.bg_color | default: '#fce4ec' }};"></span>
-            {% endif %}
-            <h3 class="fys-drawer__title">{{ block.settings.tab_label | upcase }}</h3>
-          </div>
-          <button type="button" class="fys-drawer__close" data-fys-close-drawer aria-label="Close">&times;</button>
-        </div>
-
-        {% if drawer_collection != blank %}
-          <p class="fys-drawer__count">
-            {{ drawer_collection.products_count }} available {% if drawer_collection.products_count == 1 %}product{% else %}products{% endif %}
-          </p>
-        {% endif %}
-
-        <div class="fys-drawer__grid">
-          {% if drawer_collection != blank %}
-            {% for product in drawer_collection.products %}
-              <div class="fys-drawer__card">
-                <a href="{{ product.url }}" class="fys-drawer__card-link">
-                  {% if product.featured_image != blank %}
-                    <img
-                      src="{{ product.featured_image | image_url: width: 400 }}"
-                      alt="{{ product.title | escape }}"
-                      class="fys-drawer__img"
-                      loading="lazy"
-                    >
-                  {% else %}
-                    <div class="fys-drawer__img fys-drawer__img--placeholder"></div>
-                  {% endif %}
-                </a>
-                <div class="fys-drawer__info">
-                  <span class="fys-drawer__name">{{ product.title }}</span>
-                  <span class="fys-drawer__price">{{ product.price | money }}</span>
-                </div>
-                <button
-                  type="button"
-                  class="fys-drawer__add fys__product-atc"
-                  data-variant-id="{{ product.selected_or_first_available_variant.id }}"
-                >
-                  Add
-                </button>
-              </div>
-            {% endfor %}
-          {% endif %}
-        </div>
-      </div>
-    </div>
-  {% endfor %}
 </section>
 
 {% schema %}
