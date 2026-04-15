@@ -49,14 +49,14 @@
   {% endif %}
 
   <div class="facets-mobile-wrapper facets-controls-wrapper">
-    {% if block.settings.enable_filtering == false and block.settings.enable_sorting %}
+    {% if block.settings.enable_sorting %}
       {% render 'sorting',
         results: results,
         sort_by: sort_by,
         filter_style: block.settings.filter_style,
         suffix: 'mobile',
         section_id: section_id,
-        should_use_select_on_mobile: false
+        should_use_select_on_mobile: true
       %}
     {% endif %}
     {% if block.settings.enable_grid_density %}
@@ -144,6 +144,64 @@
       & > .facets-mobile-wrapper {
         width: 100%;
       }
+    }
+  }
+
+  /* Mobile: red filter & sort bar styled like a rounded white card */
+  @media screen and (max-width: 749px) {
+    .facets-toggle {
+      background-color: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 14px 18px;
+      margin-inline: 12px;
+      height: auto;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .facets-toggle .facets-toggle__button,
+    .facets-toggle .facets-toggle__button span,
+    .facets-toggle .sorting-filter,
+    .facets-toggle .sorting-filter .facets__summary,
+    .facets-toggle .sorting-filter .facets__label,
+    .facets-toggle .sorting-filter .facets__status {
+      color: #e91e3c !important;
+      font-weight: 700;
+    }
+
+    .facets-toggle .facets-toggle__button .svg-wrapper svg,
+    .facets-toggle .sorting-filter .svg-wrapper svg {
+      color: #e91e3c !important;
+      stroke: #e91e3c !important;
+      fill: #e91e3c !important;
+    }
+
+    .facets-toggle .facets-toggle__button {
+      gap: 8px;
+      font-size: 16px;
+      text-transform: none;
+    }
+
+    .facets-toggle .facets-mobile-wrapper {
+      gap: 16px;
+    }
+
+    .facets-toggle .sorting-filter .facets__summary {
+      gap: 8px;
+      font-size: 16px;
+    }
+
+    /* Grid density (column picker) icons */
+    .facets-toggle .column-options__option .column-picker svg,
+    .facets-toggle .column-options__option .column-picker svg path {
+      color: #e91e3c !important;
+      fill: #e91e3c !important;
+    }
+
+    .facets-toggle .column-options__option:has(.column-options__option-input:checked) .column-picker {
+      background-color: #fde8ec;
+      border-radius: 8px;
+      padding: 4px;
     }
   }
 {% endstylesheet %}

@@ -1,0 +1,17 @@
+# Editor / OS temp & backup files
+*.tmp
+*.tmp.*
+*.temp
+*.swp
+*.swo
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# VSCode / IDE
+.vscode/
+.idea/
+
+# Node / misc
+node_modules/

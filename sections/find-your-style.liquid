@@ -30,6 +30,14 @@
             style="background-color: {{ block.settings.bg_color | default: '#fce4ec' }};"
           {% endif %}
         >
+          {% if block.settings.bg_image != blank %}
+            <img
+              class="fys__panel-bg-img"
+              src="{{ block.settings.bg_image | image_url: width: 900 }}"
+              alt="{{ block.settings.tab_label | default: block.settings.style_title | escape }}"
+              loading="lazy"
+            >
+          {% endif %}
 
           <div class="fys__right-content">
             {% if block.settings.style_title != blank %}
@@ -44,8 +52,14 @@
                 <div class="fys__carousel-track">
                   {% assign collection = block.settings.collection %}
                   {% if collection != blank %}
+                    {% assign total_products = collection.products | size %}
+                    {% if total_products > 12 %}
+                      {% assign display_limit = 12 %}
+                    {% else %}
+                      {% assign display_limit = total_products %}
+                    {% endif %}
                     {% for product in collection.products limit: 12 %}
-                      <div class="fys__product-card">
+                      <div class="fys__product-card" data-card-index="{{ forloop.index0 }}">
                         <a href="{{ product.url }}" class="fys__product-link">
                           {% if product.featured_image != blank %}
                             <img
@@ -89,6 +103,77 @@
             </div>
           </div>
 
+          {% comment %} Mobile overlay: circular thumbnails + view all {% endcomment %}
+          <div class="fys__mobile-overlay">
+            <div class="fys__mobile-thumbs">
+              {% assign coll = block.settings.collection %}
+              {% if coll != blank and coll.products.size > 0 %}
+                {% assign thumb_limit = 3 %}
+                {% for product in coll.products limit: thumb_limit %}
+                  <a href="{{ product.url }}" class="fys__mobile-thumb">
+                    {% if product.featured_image != blank %}
+                      <img src="{{ product.featured_image | image_url: width: 120 }}" alt="{{ product.title | escape }}" loading="lazy">
+                    {% endif %}
+                  </a>
+                {% endfor %}
+                {% assign remaining = coll.products.size | minus: thumb_limit %}
+                {% if remaining > 0 %}
+                  <span class="fys__mobile-more">+{{ remaining }}</span>
+                {% endif %}
+              {% else %}
+                {% for i in (1..3) %}
+                  <span class="fys__mobile-thumb fys__mobile-thumb--placeholder"></span>
+                {% endfor %}
+                <span class="fys__mobile-more">+3</span>
+              {% endif %}
+            </div>
+            <button type="button" class="fys__mobile-viewall" data-viewall-panel="{{ forloop.index0 }}">View all</button>
+          </div>
+
+        </div>
+
+        {% comment %} Mobile "View all" modal {% endcomment %}
+        <div class="fys__modal" data-modal-panel="{{ forloop.index0 }}" aria-hidden="true">
+          <div class="fys__modal-backdrop" data-modal-close></div>
+          <div class="fys__modal-dialog" role="dialog" aria-modal="true">
+            <div class="fys__modal-header">
+              <div class="fys__modal-head-left">
+                {% if block.settings.bg_image != blank %}
+                  <span class="fys__modal-thumb" style="background-image: url({{ block.settings.bg_image | image_url: width: 120 }});"></span>
+                {% else %}
+                  <span class="fys__modal-thumb" style="background-color: {{ block.settings.bg_color | default: '#fce4ec' }};"></span>
+                {% endif %}
+                <h4 class="fys__modal-title">{{ block.settings.tab_label | default: block.settings.style_title }}</h4>
+              </div>
+              <button type="button" class="fys__modal-close" data-modal-close aria-label="Close">&times;</button>
+            </div>
+
+            {% if coll != blank and coll.products.size > 0 %}
+              <p class="fys__modal-count">{{ coll.products.size }} available product{% if coll.products.size != 1 %}s{% endif %}</p>
+              <div class="fys__modal-grid">
+                {% for product in coll.products %}
+                  <div class="fys__modal-card">
+                    <a href="{{ product.url }}" class="fys__modal-card-link">
+                      {% if product.featured_image != blank %}
+                        <img src="{{ product.featured_image | image_url: width: 300 }}" alt="{{ product.title | escape }}" loading="lazy">
+                      {% endif %}
+                    </a>
+                    <div class="fys__modal-card-info">
+                      <span class="fys__modal-card-title">{{ product.title | truncate: 14 }}</span>
+                      <span class="fys__modal-card-price">{{ product.price | money }}</span>
+                      <button
+                        type="button"
+                        class="fys__modal-card-atc fys__product-atc"
+                        data-variant-id="{{ product.selected_or_first_available_variant.id }}"
+                      >Add</button>
+                    </div>
+                  </div>
+                {% endfor %}
+              </div>
+            {% else %}
+              <p class="fys__modal-count">No products available</p>
+            {% endif %}
+          </div>
         </div>
       </div>
     {% endfor %}
@@ -404,6 +489,12 @@
   background: #000;
 }
 
+/* Panel background image (shown only on mobile) */
+.fys__panel-bg-img { display: none; }
+
+/* Mobile overlay (hidden on desktop) */
+.fys__mobile-overlay { display: none; }
+
 /* Responsive */
 @media screen and (max-width: 900px) {
   .fys__header {
@@ -428,39 +519,304 @@
   }
 }
 
-@media screen and (max-width: 480px) {
-  .fys__title {
-    font-size: 22px;
+/* Mobile: match reference layout (image card + circular thumbs + view all) */
+@media screen and (max-width: 600px) {
+  .fys {
+    padding: 20px 0 20px 16px;
+    max-width: 100%;
   }
 
+  .fys__header {
+    padding-right: 16px;
+    margin-bottom: 16px;
+    gap: 12px;
+  }
+
+  .fys__title {
+    font-size: 20px;
+    font-weight: 800;
+  }
+
+  .fys__subtitle {
+    display: none;
+  }
+
+  /* Hide tabs on mobile — panel is single-card with peek */
+  .fys__tabs {
+    gap: 8px;
+    overflow-x: auto;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    width: 100%;
+    padding-bottom: 4px;
+  }
+  .fys__tabs::-webkit-scrollbar { display: none; }
+
   .fys__tab {
-    padding: 8px 16px;
+    padding: 7px 16px;
     font-size: 12px;
+    white-space: nowrap;
+    flex-shrink: 0;
+  }
+
+  /* Panels: horizontal scroll with peek of next card */
+  .fys__panels {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 12px;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    padding-right: 16px;
+  }
+  .fys__panels::-webkit-scrollbar { display: none; }
+
+  .fys__panel,
+  .fys__panel--active {
+    display: block;
+    flex: 0 0 90%;
+    scroll-snap-align: start;
+    animation: none;
   }
 
   .fys__panel-inner {
-    min-height: 340px;
-    padding: 20px 15px;
+    position: relative;
+    min-height: 0;
+    height: auto;
+    aspect-ratio: 4 / 5;
+    width: 100%;
+    padding: 0;
+    border-radius: 14px;
+    background-color: #2a0a0a;
+    /* Hide the CSS background on mobile; use <img> instead for reliable rendering */
+    background-image: none !important;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    justify-content: flex-end;
+    overflow: hidden;
   }
 
-  .fys__product-card {
-    min-width: calc(50% - 8px);
-    max-width: calc(50% - 8px);
+  .fys__panel-bg-img {
+    display: block;
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: center center;
+    z-index: 0;
+    pointer-events: none;
   }
 
-  .fys__product-img {
-    height: 110px;
+  /* Hide desktop carousel/title on mobile */
+  .fys__right-content {
+    display: none;
   }
 
-  .fys__arrow {
-    width: 32px;
-    height: 32px;
-    font-size: 14px;
+  /* Show mobile overlay */
+  .fys__mobile-overlay {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 6px 14px 6px 6px;
+    background: #fff;
+    border-radius: 999px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.15);
+    position: relative;
+    z-index: 2;
+    margin: 0 12px 12px;
   }
 
-  .fys__style-title {
-    font-size: 28px;
+  .fys__mobile-thumbs {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    flex: 1;
+    min-width: 0;
   }
+
+  .fys__mobile-thumb {
+    width: 34px;
+    height: 34px;
+    border-radius: 50%;
+    overflow: hidden;
+    background: #fff;
+    border: 2px solid #fff;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+    flex-shrink: 0;
+    display: block;
+    margin-left: -8px;
+  }
+  .fys__mobile-thumb:first-child { margin-left: 0; }
+
+  .fys__mobile-thumb img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  .fys__mobile-thumb--placeholder {
+    background: #f0f0f0;
+  }
+
+  .fys__mobile-more {
+    color: #333;
+    font-size: 13px;
+    font-weight: 700;
+    margin-left: 4px;
+  }
+
+  .fys__mobile-viewall {
+    color: #111;
+    font-size: 13px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 6px 4px;
+    flex-shrink: 0;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-family: inherit;
+  }
+}
+
+/* View-all Modal */
+.fys__modal {
+  position: fixed;
+  inset: 0;
+  z-index: 9999;
+  display: none;
+  align-items: center;
+  justify-content: center;
+}
+.fys__modal[aria-hidden="false"] {
+  display: flex;
+}
+.fys__modal-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.45);
+}
+.fys__modal-dialog {
+  position: relative;
+  background: #fff;
+  width: calc(100% - 32px);
+  max-width: 440px;
+  max-height: 85vh;
+  border-radius: 14px;
+  overflow-y: auto;
+  padding: 16px 16px 20px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+}
+.fys__modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 6px;
+}
+.fys__modal-head-left {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.fys__modal-thumb {
+  width: 38px;
+  height: 38px;
+  border-radius: 8px;
+  background-size: cover;
+  background-position: center;
+  display: inline-block;
+  flex-shrink: 0;
+}
+.fys__modal-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  color: #111;
+  text-transform: uppercase;
+}
+.fys__modal-close {
+  background: transparent;
+  border: none;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+  color: #666;
+  padding: 4px 8px;
+}
+.fys__modal-count {
+  margin: 4px 0 14px;
+  font-size: 13px;
+  color: #555;
+}
+.fys__modal-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+.fys__modal-card {
+  background: #fff;
+  border: 1px solid #eee;
+  border-radius: 8px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.fys__modal-card-link {
+  display: block;
+  padding: 8px;
+  background: #fafafa;
+}
+.fys__modal-card-link img {
+  width: 100%;
+  height: 90px;
+  object-fit: contain;
+  display: block;
+}
+.fys__modal-card-info {
+  padding: 6px 8px 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.fys__modal-card-title {
+  font-size: 11px;
+  font-weight: 600;
+  color: #333;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 1;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.fys__modal-card-price {
+  font-size: 12px;
+  font-weight: 700;
+  color: #111;
+}
+.fys__modal-card-atc {
+  width: 100%;
+  padding: 6px;
+  background: #222;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-size: 11px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.fys__modal-card-atc:hover {
+  background: #000;
+}
+
+/* Lock body scroll when modal open */
+body.fys-modal-open {
+  overflow: hidden;
 }
 </style>
 
@@ -481,6 +837,34 @@ document.addEventListener("DOMContentLoaded", function () {
       var targetPanel = document.querySelector('.fys__panel[data-panel-index="' + index + '"]');
       if (targetPanel) targetPanel.classList.add("fys__panel--active");
     });
+  });
+
+  /* View All Modal */
+  function closeFysModal() {
+    document.querySelectorAll(".fys__modal").forEach(function (m) {
+      m.setAttribute("aria-hidden", "true");
+    });
+    document.body.classList.remove("fys-modal-open");
+  }
+
+  document.querySelectorAll(".fys__mobile-viewall").forEach(function (btn) {
+    btn.addEventListener("click", function (e) {
+      e.preventDefault();
+      var idx = this.getAttribute("data-viewall-panel");
+      var modal = document.querySelector('.fys__modal[data-modal-panel="' + idx + '"]');
+      if (!modal) return;
+      closeFysModal();
+      modal.setAttribute("aria-hidden", "false");
+      document.body.classList.add("fys-modal-open");
+    });
+  });
+
+  document.querySelectorAll("[data-modal-close]").forEach(function (el) {
+    el.addEventListener("click", function () { closeFysModal(); });
+  });
+
+  document.addEventListener("keydown", function (e) {
+    if (e.key === "Escape") closeFysModal();
   });
 
   /* Carousel */
