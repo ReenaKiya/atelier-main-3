@@ -289,7 +289,7 @@
     {% endif %}
 
     <div class="facets-mobile-wrapper facets-controls-wrapper">
-      {% if block.settings.enable_filtering == false and block.settings.enable_sorting %}
+      {% if block.settings.enable_sorting %}
         <facets-form-component
           section-id="{{ section.id }}"
           id="FacetFiltersForm--{{ section.id }}-mobile-sorting-only"
@@ -1055,6 +1055,91 @@
   .collection-wrapper:has(> .facets--horizontal) .facets__panel[open] {
     @media screen and (min-width: 750px) {
       z-index: var(--facets-open-z-index);
+    }
+  }
+
+  /* Mobile: red filter & sort bar styled like a rounded white card */
+  @media screen and (max-width: 749px) {
+    .facets-toggle {
+      background-color: #ffffff;
+      border: 1px solid #e5e5e5;
+      border-radius: 12px;
+      padding: 12px 18px;
+      margin-inline: 12px;
+      height: auto;
+      box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+    }
+
+    .facets-toggle .facets-toggle__button,
+    .facets-toggle .facets-toggle__button span,
+    .facets-toggle .sorting-filter,
+    .facets-toggle .sorting-filter .facets__summary,
+    .facets-toggle .sorting-filter .facets__label,
+    .facets-toggle .sorting-filter .facets__status,
+    .facets-toggle .sorting-filter__select-label-mobile,
+    .facets-toggle .sorting-filter__select-label-mobile span {
+      color: #e3173e !important;
+      font-weight: 700;
+    }
+
+    .facets-toggle .facets-toggle__button .svg-wrapper svg,
+    .facets-toggle .facets-toggle__button .svg-wrapper svg path,
+    .facets-toggle .sorting-filter .svg-wrapper svg,
+    .facets-toggle .sorting-filter .svg-wrapper svg path,
+    .facets-toggle .sorting-filter__sort-icon,
+    .facets-toggle .sorting-filter__sort-icon path {
+      color: #e3173e !important;
+      stroke: #e3173e !important;
+    }
+
+    .facets-toggle .facets-toggle__button {
+      gap: 8px;
+      font-size: 16px;
+      text-transform: none;
+      padding-inline: 0;
+    }
+
+    .facets-toggle .facets-mobile-wrapper {
+      gap: 18px;
+    }
+
+    .facets-toggle .sorting-filter__container {
+      padding: 0;
+      margin: 0;
+    }
+
+    .facets-toggle .sorting-filter__select-wrapper {
+      padding: 0;
+      gap: 6px;
+    }
+
+    .facets-toggle .sorting-filter .facets__summary {
+      gap: 8px;
+      font-size: 16px;
+    }
+
+    .facets-toggle .sorting-filter .utils-filter-icon {
+      display: none;
+    }
+
+    /* Grid density (column picker) icons */
+    .facets-toggle .column-options__option .column-picker svg,
+    .facets-toggle .column-options__option .column-picker svg path {
+      color: #111 !important;
+      fill: #111 !important;
+    }
+
+    .facets-toggle .column-options__option:has(.column-options__option-input:checked) .column-picker,
+    .facets-toggle .column-options__option:has(.column-options__option-input:checked) .column-picker svg,
+    .facets-toggle .column-options__option:has(.column-options__option-input:checked) .column-picker svg path {
+      color: #e3173e !important;
+      fill: #e3173e !important;
+      stroke: #e3173e !important;
+    }
+
+    .facets-toggle .column-options__option:has(.column-options__option-input:checked) .column-picker {
+      background-color: #fde8ec;
+      border-radius: 8px;
     }
   }
 {% endstylesheet %}
