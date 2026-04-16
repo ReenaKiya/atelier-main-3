@@ -11,8 +11,6 @@
   endif
 %}
 
-{{ 'cf-card.css' | asset_url | stylesheet_tag }}
-
 <script
   src="{{ 'results-list.js' | asset_url }}"
   type="module"
@@ -74,7 +72,7 @@
             data-product-id="{{ product.id }}"
             ref="cards[]"
           >
-            {% render 'cf-card', product: product %}
+            {% content_for 'block', type: '_product-card', id: 'product-card', closest.product: product %}
           </li>
         {% endfor %}
       {% endcapture %}

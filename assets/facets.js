@@ -56,82 +56,18 @@ class FacetsFormComponent extends Component {
   }
 
   /**
-   * Extracts a URL-friendly slug from a Shopify filter parameter name.
-   * e.g. filter.p.product_type → type, filter.v.option.Material → material
-   * @param {string} paramName - The filter parameter name
-   * @returns {string} The slug
-   */
-  #getFilterSlug(paramName) {
-    if (paramName === 'filter.p.product_type') return 'type';
-    if (paramName === 'filter.p.vendor') return 'vendor';
-    if (paramName === 'filter.p.tag') return 'tag';
-
-    const optionMatch = paramName.match(/^filter\.v\.option\.(.+)$/);
-    if (optionMatch) return optionMatch[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    const customMatch = paramName.match(/^filter\.p\.m\.custom\.(.+)$/);
-    if (customMatch) return customMatch[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    const metafieldMatch = paramName.match(/^filter\.p\.m\.(.+)$/);
-    if (metafieldMatch) return metafieldMatch[1].toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-
-    return paramName.replace(/^filter\.[a-z.]+\./, '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-  }
-
-  /**
-   * Updates the URL with current filter parameters.
-   * Converts filter selections to path-based URL segments.
-   * e.g. /collections/flat-backs/type_flat-back+material_14k+thread-type_internal+stone_cubic-zirconia?filter.v.price.gte=4&filter.v.price.lte=336
+   * Updates the URL hash with current filter parameters
    */
   #updateURLHash() {
     const url = new URL(window.location.href);
     const urlParameters = this.createURLParameters();
 
-    // Get base collection path (strip any existing filter segment)
-    let basePath = url.pathname.replace(/\/+$/, '');
-    const pathParts = basePath.split('/');
-    if (pathParts.length > 3 && pathParts[1] === 'collections') {
-      basePath = pathParts.slice(0, 3).join('/');
+    url.search = '';
+    for (const [param, value] of urlParameters.entries()) {
+      url.searchParams.append(param, value);
     }
 
-    // Separate filter params into path-based segments and query params
-    const pathSegments = [];
-    const queryParams = new URLSearchParams();
-
-    // Get default price range from the price inputs to skip default values in URL
-    const minInput = this.refs.facetsForm?.querySelector('[name="filter.v.price.gte"]');
-    const maxInput = this.refs.facetsForm?.querySelector('[name="filter.v.price.lte"]');
-    const defaultMin = minInput?.getAttribute('data-min') || '';
-    const defaultMax = maxInput?.getAttribute('data-max') || '';
-
-    for (const [key, value] of urlParameters.entries()) {
-      if (key === 'filter.v.price.gte' || key === 'filter.v.price.lte') {
-        // Only add price to URL if it differs from the default range
-        const isDefaultMin = key === 'filter.v.price.gte' && value === defaultMin;
-        const isDefaultMax = key === 'filter.v.price.lte' && value === defaultMax;
-        if (!isDefaultMin && !isDefaultMax) {
-          queryParams.append(key, value);
-        }
-      } else if (key.startsWith('filter.')) {
-        const labelSlug = this.#getFilterSlug(key);
-        const valueSlug = value.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-        if (labelSlug && valueSlug) {
-          pathSegments.push(`${labelSlug}_${valueSlug}`);
-        }
-      } else if (key !== 'sort_by') {
-        queryParams.append(key, value);
-      }
-    }
-
-    let newPath = basePath;
-    if (pathSegments.length > 0) {
-      newPath += '/' + pathSegments.join('+');
-    }
-
-    const queryString = queryParams.toString();
-    const newUrl = queryString ? `${newPath}?${queryString}` : newPath;
-
-    history.pushState({ urlParameters: urlParameters.toString() }, '', newUrl);
+    history.pushState({ urlParameters: urlParameters.toString() }, '', url.toString());
   }
 
   /**
@@ -148,25 +84,11 @@ class FacetsFormComponent extends Component {
    */
   #updateSection() {
     const viewTransition = !this.closest('dialog');
-    const urlParameters = this.createURLParameters();
-
-    // Build a Shopify-compatible URL with filter query params for section rendering.
-    // The display URL may be a clean path (e.g. /collections/handle/type_ear-stud)
-    // but Shopify needs query params (e.g. ?filter.p.product_type=Ear+Stud) to filter.
-    let basePath = window.location.pathname.replace(/\/+$/, '');
-    const pathParts = basePath.split('/');
-    if (pathParts.length > 3 && pathParts[1] === 'collections') {
-      basePath = pathParts.slice(0, 3).join('/');
-    }
-    const renderUrl = new URL(basePath, window.location.origin);
-    for (const [key, value] of urlParameters) {
-      renderUrl.searchParams.append(key, value);
-    }
 
     if (viewTransition) {
-      startViewTransition(() => sectionRenderer.renderSection(this.sectionId, { url: renderUrl }), ['product-grid']);
+      startViewTransition(() => sectionRenderer.renderSection(this.sectionId), ['product-grid']);
     } else {
-      sectionRenderer.renderSection(this.sectionId, { url: renderUrl });
+      sectionRenderer.renderSection(this.sectionId);
     }
   }
 
@@ -351,9 +273,6 @@ if (!customElements.get('facet-inputs-component')) {
  */
 class PriceFacetComponent extends Component {
   #rangeInitialized = false;
-  /** @type {MutationObserver | null} */
-  #styleObserver = null;
-  #updatingFill = false;
 
   connectedCallback() {
     super.connectedCallback();
@@ -362,17 +281,12 @@ class PriceFacetComponent extends Component {
     requestAnimationFrame(() => {
       this.#initRangeSlider();
       this.#updateRangeFill();
-      this.#observeRangeStyle();
     });
   }
 
   disconnectedCallback() {
     super.disconnectedCallback();
     this.removeEventListener('keydown', this.#onKeyDown);
-    if (this.#styleObserver) {
-      this.#styleObserver.disconnect();
-      this.#styleObserver = null;
-    }
   }
 
   /**
@@ -419,24 +333,7 @@ class PriceFacetComponent extends Component {
     const val = this.#parseMoney(rangeMax.value);
     const percent = ((val - min) / (max - min)) * 100;
 
-    this.#updatingFill = true;
     rangeMax.style.background = `linear-gradient(to right, #db1e37 0%, #db1e37 ${percent}%, #ddd ${percent}%, #ddd 100%)`;
-    this.#updatingFill = false;
-  }
-
-  /**
-   * Observes the range input style attribute so that after a morph resets it, the fill is re-applied
-   */
-  #observeRangeStyle() {
-    const { rangeMax } = this.refs;
-    if (!rangeMax) return;
-
-    this.#styleObserver = new MutationObserver(() => {
-      if (this.#updatingFill) return;
-      this.#updateRangeFill();
-    });
-
-    this.#styleObserver.observe(rangeMax, { attributes: true, attributeFilter: ['style'] });
   }
 
   /**

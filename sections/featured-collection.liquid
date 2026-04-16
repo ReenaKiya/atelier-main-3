@@ -76,7 +76,7 @@
                         {%- if show_18k -%}<span class="cf-badge cf-badge--gold">18K</span>{%- endif -%}
                         {%- if show_925 -%}<span class="cf-badge cf-badge--silver">925</span>{%- endif -%}
                         {%- if show_bestseller -%}<span class="cf-badge cf-badge--bestseller">BEST SELLER</span>{%- endif -%}
-              </div>
+                      </div>
 
 
                       {%- comment -%} Product Image {%- endcomment -%}
@@ -144,11 +144,11 @@
                                 {% endif %}
                               ></span>
                             {% endif %}
-            {% endfor %}
+                          {% endfor %}
                           {% if option.values.size > 6 %}
                             <span class="cf-swatch-more">+{{ option.values.size | minus: 6 }}</span>
                           {% endif %}
-          </div>
+                        </div>
                       {% endif %}
                     {% endfor %}
                   {% endif %}
