@@ -38,6 +38,15 @@
 {% comment %} We always render this full-width, as the child blocks have width: page/full settings {% endcomment %}
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 
+<div class="breadcrumbs-container">
+  <nav class="breadcrumbs" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}" class="breadcrumbs__link">Home</a>
+    <span class="breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
+    <span class="breadcrumbs__current" aria-current="page">{{ collection.title }}</span>
+  </nav>
+  <h1 class="collection--title">{{ collection.title }}</h1>
+</div>
+
 <results-list
   class="section product-grid-container color-{{ section.settings.color_scheme }}"
   style="--padding-block-start: {{ section.settings.padding-block-start }}px; --padding-block-end: {{ section.settings.padding-block-end }}px;"
@@ -118,6 +127,53 @@
 
 
 {% stylesheet %}
+  .breadcrumbs-container {
+    padding: 16px 24px 0;
+    max-width: var(--page-width);
+    margin: 0 auto;
+  }
+
+  .breadcrumbs {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 14px;
+    margin-bottom: 8px;
+    flex-wrap: wrap;
+  }
+
+  .breadcrumbs__link {
+    color: #e3173e;
+    text-decoration: none;
+    font-weight: 600;
+  }
+
+  .breadcrumbs__link:hover {
+    text-decoration: underline;
+  }
+
+  .breadcrumbs__separator {
+    color: #999;
+  }
+
+  .breadcrumbs__current {
+    color: #111;
+  }
+
+  .collection--title {
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 700;
+    margin: 8px 0 16px;
+    line-height: 1.1;
+    color: #111;
+  }
+
+  @media screen and (max-width: 749px) {
+    .breadcrumbs-container {
+      padding: 12px 16px 0;
+    }
+  }
+
   .pagination-wrapper.after-grid {
   display: flex;
   justify-content: center;

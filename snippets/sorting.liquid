@@ -29,12 +29,6 @@
   %}
 
   <div class="sorting-filter__container {% if should_use_select_on_mobile %} desktop:hidden {% else %} hidden {% endif %}">
-    <label
-      for="sort-select-{{ section_id }}"
-      class="facets__label"
-    >
-      {{- 'actions.sort' | t -}}
-    </label>
     <div
       class="sorting-filter__select-wrapper"
       role="button"
@@ -43,8 +37,7 @@
       aria-controls="sort-modal-{{ section_id }}"
       data-sort-modal-trigger="sort-modal-{{ section_id }}"
     >
-      <label
-        for="sort-select-{{ section_id }}"
+      <span
         class="facets__label sorting-filter__select-label-mobile"
       >
         <svg class="sorting-filter__sort-icon" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 20 20" fill="none" aria-hidden="true">
@@ -52,7 +45,7 @@
           <path d="M15 17V4M15 4L12 7M15 4L18 7" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
         <span>Sort by</span>
-      </label>
+      </span>
       <span class="sorting-filter__select-value" data-sort-current-label>
         {{- status -}}
       </span>
@@ -80,52 +73,50 @@
           </option>
         {% endfor %}
       </select>
-      <span class="utils-filter-icon">
-        <svg class="icon-sort" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="currentColor">
-          <path fill-rule="evenodd" clip-rule="evenodd" d="M8.70711 14.7071L5.20711 18.2071C4.81658 18.5976 4.18342 18.5976 3.79289 18.2071L0.292893 14.7071C-0.0976311 14.3166 -0.0976311 13.6834 0.292893 13.2929C0.683417 12.9024 1.31658 12.9024 1.70711 13.2929L3.5 15.0858V3C3.5 2.44771 3.94772 2 4.5 2C5.05228 2 5.5 2.44771 5.5 3V15.0858L7.2929 13.2929C7.68342 12.9024 8.31658 12.9024 8.70711 13.2929C9.09763 13.6834 9.09763 14.3166 8.70711 14.7071ZM16.2071 2.29289C15.8166 1.90237 15.1834 1.90237 14.7929 2.29289L11.2929 5.79289C10.9024 6.18342 10.9024 6.81658 11.2929 7.20711C11.6834 7.59763 12.3166 7.59763 12.7071 7.20711L14.5 5.41421V17.5C14.5 18.0523 14.9477 18.5 15.5 18.5C16.0523 18.5 16.5 18.0523 16.5 17.5V5.41421L18.2929 7.20711C18.6834 7.59763 19.3166 7.59763 19.7071 7.20711C20.0976 6.81658 20.0976 6.18342 19.7071 5.79289L16.2071 2.29289Z" fill="currentColor"/>
-        </svg>
-      </span>
     </div>
   </div>
 
-  <dialog
+  <div
     id="sort-modal-{{ section_id }}"
     class="sort-modal"
+    role="dialog"
+    aria-modal="true"
     aria-labelledby="sort-modal-title-{{ section_id }}"
+    aria-hidden="true"
+    hidden
   >
-    <div class="sort-modal__inner">
-      <div class="sort-modal__header">
-        <h2 id="sort-modal-title-{{ section_id }}" class="sort-modal__title">
-          Sort by
-        </h2>
-        <button
-          type="button"
-          class="sort-modal__close"
-          aria-label="{{ 'accessibility.close' | t }}"
-          data-sort-modal-close
-        >
-          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true">
-            <path d="M5 5L15 15M15 5L5 15" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
-          </svg>
-        </button>
-      </div>
-      <div class="sort-modal__list" role="radiogroup" aria-labelledby="sort-modal-title-{{ section_id }}">
+    <div class="sort-modal__backdrop" data-sort-modal-close></div>
+    <div class="sort-modal__inner" role="document">
+      <button
+        type="button"
+        class="sort-modal__close"
+        aria-label="Close"
+        data-sort-modal-close
+      >
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 13 13" aria-hidden="true">
+          <path fill="currentColor" fill-rule="evenodd" d="M5.306 6.5L0 1.194 1.194 0 6.5 5.306 11.806 0 13 1.194 7.694 6.5 13 11.806 11.806 13 6.5 7.694 1.194 13 0 11.806 5.306 6.5z"/>
+        </svg>
+      </button>
+      <h2 id="sort-modal-title-{{ section_id }}" class="sort-modal__title">Sort by</h2>
+      <ul class="sort-modal__list" role="radiogroup" aria-labelledby="sort-modal-title-{{ section_id }}">
         {% for option in results.sort_options %}
-          <button
-            type="button"
-            class="sort-modal__option {% if option.value == sort_by %}is-active{% endif %}"
-            data-sort-value="{{ option.value }}"
-            data-sort-label="{{ option.name | escape }}"
-            data-sort-target="sort-select-{{ section_id }}"
-            role="radio"
-            aria-checked="{% if option.value == sort_by %}true{% else %}false{% endif %}"
-          >
-            {{ option.name }}
-          </button>
+          <li class="sort-modal__item">
+            <button
+              type="button"
+              class="sort-modal__option {% if option.value == sort_by %}is-active{% endif %}"
+              data-sort-value="{{ option.value }}"
+              data-sort-label="{{ option.name | escape }}"
+              data-sort-target="sort-select-{{ section_id }}"
+              role="radio"
+              aria-checked="{% if option.value == sort_by %}true{% else %}false{% endif %}"
+            >
+              {{ option.name }}
+            </button>
+          </li>
         {% endfor %}
-      </div>
+      </ul>
     </div>
-  </dialog>
+  </div>
 
   <accordion-custom
     {% if filter_style == 'horizontal' %}
@@ -374,13 +365,13 @@
     }
   }
 
-  .facets-toggle .sorting-filter__container .facets__label {
+  .facets-toggle .sorting-filter::before {
     @media screen and (max-width: 749px) {
       display: none;
     }
   }
 
-  .facets-toggle .sorting-filter::before {
+  .facets-toggle .sorting-filter__select-value {
     @media screen and (max-width: 749px) {
       display: none;
     }
@@ -447,57 +438,78 @@
     display: none;
   }
 
-  .sort-modal {
-    border: 0;
-    padding: 0;
-    background: transparent;
-    max-width: 92vw;
-    width: 440px;
+  .sort-modal[hidden] {
+    display: none !important;
   }
 
-  .sort-modal::backdrop {
+  .sort-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 99999;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  .sort-modal__backdrop {
+    position: absolute;
+    inset: 0;
     background: rgba(0, 0, 0, 0.45);
   }
 
   .sort-modal__inner {
+    position: relative;
     background: #ffffff;
     border-radius: 8px;
+    width: calc(100% - 32px);
+    max-width: 440px;
+    margin-top: 16px;
     padding: 22px 22px 26px;
     display: flex;
     flex-direction: column;
     gap: 14px;
-  }
-
-  .sort-modal__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 6px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.2);
   }
 
   .sort-modal__title {
     font-size: 1.35rem;
     font-weight: 800;
-    margin: 0;
+    margin: 0 0 6px;
     color: #111;
     letter-spacing: -0.01em;
+    padding-right: 32px;
   }
 
   .sort-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
     background: transparent;
     border: 0;
     cursor: pointer;
     color: #111;
-    padding: 4px;
+    padding: 6px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
+    line-height: 0;
   }
 
   .sort-modal__list {
+    list-style: none;
+    margin: 0;
+    padding: 0;
     display: flex;
     flex-direction: column;
     gap: 14px;
+  }
+
+  .sort-modal__item {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 
   .sort-modal__option {
@@ -524,6 +536,10 @@
     font-weight: 600;
   }
 
+  body.sort-modal-open {
+    overflow: hidden;
+  }
+
   details[open] .sorting-filter__options {
     opacity: 1;
     block-size: auto;
@@ -542,94 +558,88 @@
 
 <script>
   (function () {
-    if (window.__sortModalInit) return;
-    window.__sortModalInit = true;
-
-    function openModal(id) {
-      var dialog = document.getElementById(id);
+    function openModal(dialog) {
       if (!dialog) return;
-      if (typeof dialog.showModal === 'function') {
-        dialog.showModal();
-      } else {
-        dialog.setAttribute('open', '');
+      if (dialog.parentNode !== document.body) {
+        document.body.appendChild(dialog);
       }
+      dialog.hidden = false;
+      dialog.removeAttribute('aria-hidden');
+      document.body.classList.add('sort-modal-open');
     }
 
     function closeModal(dialog) {
       if (!dialog) return;
-      if (typeof dialog.close === 'function') {
-        dialog.close();
-      } else {
-        dialog.removeAttribute('open');
-      }
+      dialog.hidden = true;
+      dialog.setAttribute('aria-hidden', 'true');
+      document.body.classList.remove('sort-modal-open');
     }
 
-    document.addEventListener('click', function (e) {
-      var trigger = e.target.closest('[data-sort-modal-trigger]');
-      if (trigger) {
+    function wireTrigger(trigger) {
+      if (trigger.__sortModalWired) return;
+      trigger.__sortModalWired = true;
+
+      var dialogId = trigger.getAttribute('data-sort-modal-trigger');
+      var dialog = document.getElementById(dialogId);
+      if (!dialog) return;
+
+      trigger.addEventListener('click', function (e) {
         e.preventDefault();
-        openModal(trigger.getAttribute('data-sort-modal-trigger'));
-        return;
-      }
+        e.stopPropagation();
+        openModal(dialog);
+      }, true);
 
-      var closeBtn = e.target.closest('[data-sort-modal-close]');
-      if (closeBtn) {
-        closeModal(closeBtn.closest('dialog'));
-        return;
-      }
+      trigger.addEventListener('keydown', function (e) {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          openModal(dialog);
+        }
+      });
 
-      var option = e.target.closest('.sort-modal__option');
-      if (option) {
-        var dialog = option.closest('dialog');
-        var selectId = option.getAttribute('data-sort-target');
-        var value = option.getAttribute('data-sort-value');
-        var label = option.getAttribute('data-sort-label');
-        var select = document.getElementById(selectId);
-
-        if (select) {
-          select.value = value;
-          select.dispatchEvent(new Event('change', { bubbles: true }));
+      dialog.addEventListener('click', function (e) {
+        var closeBtn = e.target.closest('[data-sort-modal-close]');
+        if (closeBtn) {
+          closeModal(dialog);
+          return;
         }
 
-        var wrapper = document.querySelector('[data-sort-modal-trigger="' + (dialog && dialog.id) + '"]');
-        if (wrapper) {
-          var labelEl = wrapper.querySelector('[data-sort-current-label]');
+        var option = e.target.closest('.sort-modal__option');
+        if (option) {
+          var value = option.getAttribute('data-sort-value');
+          var label = option.getAttribute('data-sort-label');
+
+          var labelEl = trigger.querySelector('[data-sort-current-label]');
           if (labelEl) labelEl.textContent = label;
-        }
 
-        if (dialog) {
           dialog.querySelectorAll('.sort-modal__option').forEach(function (opt) {
             var active = opt === option;
             opt.classList.toggle('is-active', active);
             opt.setAttribute('aria-checked', active ? 'true' : 'false');
           });
+
+          closeModal(dialog);
+
+          var basePath = window.location.pathname;
+          window.location.href = basePath + '?sort_by=' + encodeURIComponent(value);
+          return;
         }
+      });
 
-        closeModal(dialog);
-      }
-    });
+      document.addEventListener('keydown', function (e) {
+        if (e.key === 'Escape' && !dialog.hidden) closeModal(dialog);
+      });
+    }
 
-    document.addEventListener('keydown', function (e) {
-      if (e.key !== 'Enter' && e.key !== ' ') return;
-      var trigger = e.target.closest && e.target.closest('[data-sort-modal-trigger]');
-      if (trigger) {
-        e.preventDefault();
-        openModal(trigger.getAttribute('data-sort-modal-trigger'));
-      }
-    });
+    function init() {
+      document.querySelectorAll('[data-sort-modal-trigger]').forEach(wireTrigger);
+    }
 
-    document.addEventListener('click', function (e) {
-      if (e.target.tagName === 'DIALOG' && e.target.classList.contains('sort-modal')) {
-        var rect = e.target.getBoundingClientRect();
-        if (
-          e.clientX < rect.left ||
-          e.clientX > rect.right ||
-          e.clientY < rect.top ||
-          e.clientY > rect.bottom
-        ) {
-          closeModal(e.target);
-        }
-      }
-    });
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', init);
+    } else {
+      init();
+    }
+
+    document.addEventListener('shopify:section:load', init);
   })();
 </script>
