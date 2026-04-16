@@ -1,0 +1,188 @@
+{%- doc -%}
+  CF-card style product card for use in the collection grid.
+  Renders the same card design as the Customer Favourites section.
+
+  @param {object} product - The product object
+{%- enddoc -%}
+
+{%- liquid
+  assign on_sale = false
+  if product.compare_at_price > product.price
+    assign on_sale = true
+    assign discount = product.compare_at_price | minus: product.price | times: 100.0 | divided_by: product.compare_at_price | round
+  endif
+
+  assign is_best_seller = false
+  if product.tags contains 'best-seller' or product.tags contains 'Best Seller' or product.tags contains 'bestseller'
+    assign is_best_seller = true
+  endif
+
+  assign badge_title = product.title | downcase
+  assign show_14k = false
+  assign show_9k = false
+  assign show_18k = false
+  assign show_925 = false
+
+  for tag in product.tags
+    assign tl = tag | downcase
+    if tl == '14k' or tl == '14k gold'
+      assign show_14k = true
+    endif
+    if tl == '9k' or tl == '9k gold'
+      assign show_9k = true
+    endif
+    if tl == '18k' or tl == '18k gold'
+      assign show_18k = true
+    endif
+    if tl == '925' or tl == '925 sterling' or tl == 'sterling silver'
+      assign show_925 = true
+    endif
+  endfor
+
+  if badge_title contains '14k'
+    assign show_14k = true
+  endif
+  if badge_title contains '9k'
+    assign show_9k = true
+  endif
+  if badge_title contains '18k'
+    assign show_18k = true
+  endif
+  if badge_title contains '925' or badge_title contains 'sterling'
+    assign show_925 = true
+  endif
+
+  assign color_option = nil
+  for option in product.options_with_values
+    assign downcased = option.name | downcase
+    if downcased contains 'color' or downcased contains 'colour'
+      assign color_option = option
+      break
+    endif
+  endfor
+-%}
+
+<div class="cf-card">
+  <a href="{{ product.url }}" class="cf-card__link">
+    <div class="cf-card__image-wrap">
+      <div class="cf-card__badges">
+        {%- if show_14k -%}<span class="cf-badge cf-badge--gold">14K</span>{%- endif -%}
+        {%- if show_9k -%}<span class="cf-badge cf-badge--gold">9K</span>{%- endif -%}
+        {%- if show_18k -%}<span class="cf-badge cf-badge--gold">18K</span>{%- endif -%}
+        {%- if show_925 -%}<span class="cf-badge cf-badge--silver">925</span>{%- endif -%}
+        {%- if is_best_seller -%}<span class="cf-badge cf-badge--bestseller">BEST SELLER</span>{%- endif -%}
+      </div>
+
+      {% if product.featured_image != blank %}
+        <img
+          class="cf-card__image cf-card__image--primary"
+          src="{{ product.featured_image | image_url: width: 500 }}"
+          srcset="{{ product.featured_image | image_url: width: 250 }} 250w,
+                  {{ product.featured_image | image_url: width: 400 }} 400w,
+                  {{ product.featured_image | image_url: width: 500 }} 500w"
+          sizes="(max-width: 600px) 45vw, (max-width: 999px) 30vw, 20vw"
+          alt="{{ product.title | escape }}"
+          loading="lazy"
+          width="{{ product.featured_image.width }}"
+          height="{{ product.featured_image.height }}"
+          data-original-src="{{ product.featured_image | image_url: width: 500 }}"
+        >
+      {% endif %}
+      {% if product.images.size > 1 %}
+        <img
+          class="cf-card__image cf-card__image--hover"
+          src="{{ product.images[1] | image_url: width: 500 }}"
+          alt="{{ product.title | escape }}"
+          loading="lazy"
+          width="{{ product.images[1].width }}"
+          height="{{ product.images[1].height }}"
+        >
+      {% endif %}
+    </div>
+  </a>
+
+  {%- comment -%} Color Swatches {%- endcomment -%}
+  {% if color_option and color_option.values.size > 1 %}
+    <div class="cf-card__swatches">
+      {% assign swatch_count = 0 %}
+      {% for value in color_option.values %}
+        {% assign swatch_count = swatch_count | plus: 1 %}
+        {% if swatch_count <= 6 %}
+          {% assign swatch_handle = value | handleize %}
+          {%- assign variant_image = nil -%}
+          {%- for variant in product.variants -%}
+            {%- if color_option.position == 1 and variant.option1 == value -%}
+              {%- assign variant_image = variant.featured_image -%}
+              {%- break -%}
+            {%- elsif color_option.position == 2 and variant.option2 == value -%}
+              {%- assign variant_image = variant.featured_image -%}
+              {%- break -%}
+            {%- elsif color_option.position == 3 and variant.option3 == value -%}
+              {%- assign variant_image = variant.featured_image -%}
+              {%- break -%}
+            {%- endif -%}
+          {%- endfor -%}
+          <span
+            class="cf-swatch"
+            title="{{ value }}"
+            style="background-color: {{ swatch_handle }};"
+            data-swatch-color="{{ swatch_handle }}"
+            {% if variant_image %}
+              data-image="{{ variant_image | image_url: width: 500 }}"
+              data-srcset="{{ variant_image | image_url: width: 250 }} 250w, {{ variant_image | image_url: width: 400 }} 400w, {{ variant_image | image_url: width: 500 }} 500w"
+            {% endif %}
+          ></span>
+        {% endif %}
+      {% endfor %}
+      {% if color_option.values.size > 6 %}
+        <span class="cf-swatch-more">+{{ color_option.values.size | minus: 6 }}</span>
+      {% endif %}
+    </div>
+  {% endif %}
+
+  {%- comment -%} Product Info {%- endcomment -%}
+  <a href="{{ product.url }}" class="cf-card__info">
+    <h3 class="cf-card__title">{{ product.title }}</h3>
+    <div class="cf-card__price">
+      {% if product.price_varies %}
+        <span class="cf-price">{{ product.price_min | money }} - {{ product.price_max | money }}</span>
+      {% else %}
+        {% if product.compare_at_price > product.price %}
+          <span class="cf-price cf-price--sale">{{ product.price | money }}</span>
+          <span class="cf-price cf-price--compare">{{ product.compare_at_price | money }}</span>
+        {% else %}
+          <span class="cf-price">{{ product.price | money }}</span>
+        {% endif %}
+      {% endif %}
+    </div>
+  </a>
+
+  {%- comment -%} Star Reviews {%- endcomment -%}
+  {%- assign cf_rating = product.metafields.reviews.rating.value.rating -%}
+  {%- assign cf_rating_count = product.metafields.reviews.rating_count -%}
+  {% if cf_rating_count > 0 %}
+    {%- assign cf_filled = cf_rating | floor -%}
+    {%- assign cf_decimal = cf_rating | modulo: 1 -%}
+    {%- assign cf_half = false -%}
+    {%- if cf_decimal >= 0.3 and cf_decimal <= 0.7 -%}
+      {%- assign cf_half = true -%}
+      {%- assign cf_filled = cf_filled | plus: 1 -%}
+    {%- elsif cf_decimal > 0.7 -%}
+      {%- assign cf_filled = cf_filled | plus: 1 -%}
+    {%- endif -%}
+    <div class="cf-card__stars">
+      {% for i in (1..5) %}
+        <svg class="cf-star {% if i <= cf_filled %}cf-star--filled{% endif %}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+          <path d="M31.547 12a.848.848 0 00-.677-.577l-9.427-1.376-4.224-8.532a.847.847 0 00-1.516 0l-4.218 8.534-9.427 1.355a.847.847 0 00-.467 1.467l6.823 6.664-1.612 9.375a.847.847 0 001.23.893l8.428-4.434 8.432 4.432a.847.847 0 001.229-.894l-1.615-9.373 6.822-6.665a.845.845 0 00.214-.869z"/>
+        </svg>
+      {% endfor %}
+      <span class="cf-review-count">{{ cf_rating_count }} Reviews</span>
+    </div>
+  {% endif %}
+
+  {%- comment -%} Hover Action Buttons {%- endcomment -%}
+  <div class="cf-card__actions">
+    <button type="button" class="cf-card__btn cf-card__btn--quickshop" data-quickshop-url="{{ product.url }}">Quick Shop</button>
+    <button type="button" class="cf-card__btn cf-card__btn--options" data-quickshop-url="{{ product.url }}" data-quickshop-mode="options-only">Choose Options</button>
+  </div>
+</div>
