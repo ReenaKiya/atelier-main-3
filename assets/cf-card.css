@@ -1,0 +1,275 @@
+/* ===== CF Card Shared Styles ===== */
+/* Used by both featured-collection slider and main-collection grid */
+
+/* Product Card */
+.cf-card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.cf-card__link {
+  text-decoration: none;
+  display: block;
+}
+
+.cf-card__image-wrap {
+  position: relative;
+  background: #fff;
+  border-radius: 4px;
+  overflow: hidden;
+  aspect-ratio: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.cf-card__image {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  transition: opacity 0.3s ease;
+}
+
+.cf-card__image--hover {
+  position: absolute;
+  inset: 0;
+  opacity: 0;
+}
+
+.cf-card:hover .cf-card__image--primary {
+  opacity: 0;
+}
+
+.cf-card:hover .cf-card__image--hover {
+  opacity: 1;
+}
+
+/* When hovering a swatch, cancel the card hover flip so JS swatch preview works */
+.cf-card:has(.cf-swatch:hover) .cf-card__image--primary {
+  opacity: 1;
+}
+
+.cf-card:has(.cf-swatch:hover) .cf-card__image--hover {
+  opacity: 0;
+}
+
+/* Hover Action Buttons */
+.cf-card__actions {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-top: 8px;
+  opacity: 0;
+  transform: translateY(6px);
+  transition: opacity 0.25s ease, transform 0.25s ease;
+  pointer-events: none;
+}
+
+.cf-slide:hover .cf-card__actions,
+.cf-card:hover .cf-card__actions,
+.product-grid__item:hover .cf-card__actions {
+  opacity: 1;
+  transform: translateY(0);
+  pointer-events: auto;
+}
+
+.cf-card__btn {
+  display: block;
+  text-align: center;
+  text-decoration: none;
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  padding: 8px 12px;
+  border-radius: 3px;
+  transition: opacity 0.2s ease;
+  cursor: pointer;
+}
+
+.cf-card__btn:hover {
+  opacity: 0.88;
+}
+
+.cf-card__btn--quickshop {
+  background: #fff;
+  color: #DA1E37;
+  border: 1.5px solid #DA1E37;
+}
+
+.cf-card__btn--options {
+  background: #111;
+  color: #fff;
+  border: 1.5px solid #111;
+}
+
+/* Badges */
+.cf-card__badges {
+  position: absolute;
+  top: 8px;
+  left: 8px;
+  right: 8px;
+  display: flex;
+  gap: 6px;
+  z-index: 2;
+  flex-wrap: wrap;
+}
+
+.cf-badge {
+  display: inline-block;
+  padding: 3px 10px;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.03em;
+  line-height: 1.4;
+  border-radius: 2px;
+  text-transform: uppercase;
+}
+
+.cf-badge--gold {
+  background: #d4af37;
+  color: #fff;
+}
+
+.cf-badge--silver {
+  background: #888;
+  color: #fff;
+}
+
+.cf-badge--bestseller {
+  background: #e53935;
+  color: #fff;
+}
+
+/* Swatches */
+.cf-card__swatches {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  padding: 8px 0 4px;
+  flex-wrap: wrap;
+}
+
+.cf-swatch {
+  display: inline-block;
+  width: 22px;
+  height: 22px;
+  border-radius: 50%;
+  border: 1px solid #ddd;
+  cursor: pointer;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.cf-swatch:hover,
+.cf-swatch--active {
+  transform: scale(1.15);
+  box-shadow: 0 0 0 2px #fff, 0 0 0 3px #999;
+}
+
+.cf-swatch-more {
+  font-size: 12px;
+  color: #999;
+  margin-left: 2px;
+}
+
+/* Color mappings for common swatch names */
+.cf-swatch[data-swatch-color="yellow-gold"],
+.cf-swatch[data-swatch-color="yellow"] {
+  background-color: #d4af37 !important;
+}
+
+.cf-swatch[data-swatch-color="white-gold"],
+.cf-swatch[data-swatch-color="white"] {
+  background-color: #e8e8e8 !important;
+}
+
+.cf-swatch[data-swatch-color="rose-gold"],
+.cf-swatch[data-swatch-color="rose"] {
+  background-color: #e8a090 !important;
+}
+
+.cf-swatch[data-swatch-color="silver"] {
+  background-color: #c0c0c0 !important;
+}
+
+.cf-swatch[data-swatch-color="gold"] {
+  background-color: #d4af37 !important;
+}
+
+.cf-swatch[data-swatch-color="black"] {
+  background-color: #222 !important;
+}
+
+.cf-swatch[data-swatch-color="rainbow"] {
+  background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red) !important;
+}
+
+/* Product Info */
+.cf-card__info {
+  text-decoration: none;
+  display: block;
+  padding: 4px 0 0;
+}
+
+.cf-card__title {
+  font-family: inherit;
+  font-size: 13px;
+  font-weight: 400;
+  color: var(--cf-title-color, #333);
+  margin: 0 0 4px;
+  line-height: 1.4;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.cf-card__price {
+  margin: 0;
+}
+
+.cf-price {
+  font-family: inherit;
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--cf-price-color, #e53935);
+}
+
+.cf-price--sale {
+  color: var(--cf-price-color, #e53935);
+}
+
+.cf-price--compare {
+  font-size: 12px;
+  font-weight: 400;
+  color: #999;
+  text-decoration: line-through;
+  margin-left: 6px;
+}
+
+/* Star Reviews */
+.cf-card__stars {
+  display: flex;
+  align-items: center;
+  gap: 2px;
+  margin-top: 5px;
+  flex-wrap: nowrap;
+}
+
+.cf-star {
+  width: 13px;
+  height: 13px;
+  fill: #e0e0e0;
+  flex-shrink: 0;
+}
+
+.cf-star--filled {
+  fill: #DA1E37;
+}
+
+.cf-review-count {
+  font-size: 11px;
+  color: #888;
+  margin-left: 4px;
+  white-space: nowrap;
+}
