@@ -367,7 +367,7 @@
     white-space: nowrap;
   }
 
-  .cf-card__actions {
+  .product-grid .cf-card__actions {
     display: flex;
     flex-direction: column;
     gap: 6px;
@@ -377,7 +377,7 @@
     pointer-events: auto;
   }
 
-  .cf-card__btn {
+  .product-grid .cf-card__btn {
     display: block;
     text-align: center;
     text-decoration: none;
@@ -390,18 +390,21 @@
     cursor: pointer;
   }
 
-  .cf-card__btn:hover {
+  .product-grid .cf-card__btn:hover {
     opacity: 0.88;
   }
 
-  .cf-card__btn--quickshop {
+  .product-grid .cf-card__btn--quickshop {
+    display: block;
     background: #fff;
     color: #DA1E37;
     border: 1.5px solid #DA1E37;
+    opacity: 1;
+    visibility: visible;
   }
 
-  .cf-card__btn--options {
-    display: none;
+  .product-grid .cf-card__btn--options {
+    display: none !important;
   }
 
   /* Quick Shop Modal */
