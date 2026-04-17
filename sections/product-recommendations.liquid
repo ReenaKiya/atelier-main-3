@@ -168,7 +168,434 @@
       </div>
     {%- endif -%}
   </div>
+
+  {%- comment -%} Quick Shop Modal for cf-card {%- endcomment -%}
+  <div class="cf-quickshop-overlay" id="cf-quickshop-overlay-{{ section.id }}"></div>
+  <div class="cf-quickshop-modal" id="cf-quickshop-modal-{{ section.id }}">
+    <button type="button" class="cf-quickshop-modal__close" aria-label="Close">&times;</button>
+    <div class="cf-quickshop-modal__body">
+      <div class="cf-quickshop-modal__loading">
+        <svg class="cf-quickshop-spinner" viewBox="0 0 50 50"><circle cx="25" cy="25" r="20" fill="none" stroke="#ccc" stroke-width="4" stroke-linecap="round" stroke-dasharray="90,150" stroke-dashoffset="0"><animateTransform attributeName="transform" type="rotate" dur="0.8s" from="0 25 25" to="360 25 25" repeatCount="indefinite"/></circle></svg>
+      </div>
+      <div class="cf-quickshop-modal__content" id="cf-quickshop-content-{{ section.id }}"></div>
+    </div>
+  </div>
 </product-recommendations>
+
+<script>
+(function () {
+  var sectionId = "{{ section.id }}";
+
+  function initCfCards() {
+    var container = document.querySelector('product-recommendations[data-section-id="' + sectionId + '"]');
+    if (!container) return;
+
+    /* ── Swatch image preview on hover + permanent swap on click ── */
+    container.querySelectorAll(".cf-card").forEach(function (card) {
+      var img = card.querySelector(".cf-card__image--primary");
+      if (!img) return;
+
+      if (!img.getAttribute("data-original-src")) {
+        img.setAttribute("data-original-src", img.getAttribute("src"));
+      }
+
+      function setImage(src) {
+        if (!src) return;
+        img.removeAttribute("srcset");
+        img.removeAttribute("sizes");
+        img.setAttribute("src", src);
+      }
+
+      card.querySelectorAll(".cf-swatch").forEach(function (swatch) {
+        swatch.addEventListener("mouseenter", function () {
+          var previewSrc = swatch.getAttribute("data-image");
+          if (previewSrc) setImage(previewSrc);
+        });
+
+        swatch.addEventListener("mouseleave", function () {
+          var active = card.querySelector(".cf-swatch--active");
+          var resetSrc = active
+            ? active.getAttribute("data-image")
+            : img.getAttribute("data-original-src");
+          setImage(resetSrc);
+        });
+
+        swatch.addEventListener("click", function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          var newSrc = swatch.getAttribute("data-image");
+          if (!newSrc) return;
+          setImage(newSrc);
+          card.querySelectorAll(".cf-swatch").forEach(function (s) {
+            s.classList.remove("cf-swatch--active");
+          });
+          swatch.classList.add("cf-swatch--active");
+        });
+      });
+    });
+
+    /* ── Quick Shop Modal ── */
+    var overlay = document.getElementById("cf-quickshop-overlay-" + sectionId);
+    var modal = document.getElementById("cf-quickshop-modal-" + sectionId);
+    var modalContent = document.getElementById("cf-quickshop-content-" + sectionId);
+    var modalLoading = modal ? modal.querySelector(".cf-quickshop-modal__loading") : null;
+    var closeBtn = modal ? modal.querySelector(".cf-quickshop-modal__close") : null;
+
+    function openModal() {
+      if (overlay) overlay.classList.add("cf-active");
+      if (modal) modal.classList.add("cf-active");
+      document.body.style.overflow = "hidden";
+    }
+
+    function closeModal() {
+      if (overlay) overlay.classList.remove("cf-active");
+      if (modal) modal.classList.remove("cf-active");
+      document.body.style.overflow = "";
+    }
+
+    if (closeBtn) closeBtn.addEventListener("click", closeModal);
+    if (overlay) overlay.addEventListener("click", closeModal);
+
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal && modal.classList.contains("cf-active")) closeModal();
+    });
+
+    container.querySelectorAll("[data-quickshop-url]").forEach(function (btn) {
+      btn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        var productUrl = btn.getAttribute("data-quickshop-url");
+        if (!productUrl) return;
+        var isOptionsOnly = btn.getAttribute("data-quickshop-mode") === "options-only";
+
+        if (modalContent) { modalContent.innerHTML = ""; modalContent.classList.remove("cf-loaded"); modalContent.classList.remove("cf-options-only"); }
+        if (modal) modal.classList.remove("cf-options-only-modal");
+        if (modalLoading) modalLoading.classList.remove("cf-hidden");
+        if (isOptionsOnly && modal) modal.classList.add("cf-options-only-modal");
+        openModal();
+
+        fetch(productUrl)
+          .then(function (res) { return res.text(); })
+          .then(function (html) {
+            var doc = new DOMParser().parseFromString(html, "text/html");
+
+            var titleEl = doc.querySelector(".view-product-title a")
+              || doc.querySelector(".view-product-title")
+              || doc.querySelector("h1");
+            var title = titleEl ? titleEl.textContent.trim() : "";
+            if (!title) {
+              var ogTitle = doc.querySelector('meta[property="og:title"]');
+              if (ogTitle) title = ogTitle.getAttribute("content") || "";
+            }
+            var vendor = "";
+            var vendorEl = doc.querySelector(".product-vendor, [class*='vendor']");
+            if (vendorEl) vendor = vendorEl.textContent.trim();
+
+            var priceHtml = "";
+            var priceEl = doc.querySelector("product-price, .product-price, [class*='product__price'], .price");
+            if (priceEl) priceHtml = priceEl.innerHTML;
+
+            var images = [];
+            doc.querySelectorAll(".product-media img, .product__media img, [data-product-grid-content] img, .media-gallery img").forEach(function (img) {
+              var src = img.getAttribute("src");
+              if (src && images.indexOf(src) === -1) images.push(src);
+            });
+            if (images.length === 0) {
+              var ogImg = doc.querySelector('meta[property="og:image"]');
+              if (ogImg) images.push(ogImg.getAttribute("content"));
+            }
+
+            var productForm = doc.querySelector('form[action*="/cart/add"]');
+            var variantSelectHtml = "";
+            var variantId = "";
+            var optionHtml = "";
+
+            if (productForm) {
+              var variantSelect = productForm.querySelector('select[name="id"]');
+              var variantInput = productForm.querySelector('input[name="id"]');
+
+              if (variantSelect) {
+                variantSelectHtml = '<div class="cf-quickshop__option-group"><label class="cf-quickshop__option-label">Thickness | Inner Diameter</label><select class="cf-quickshop__select" id="cf-qs-variant-' + sectionId + '">' + variantSelect.innerHTML + '</select></div>';
+                variantId = variantSelect.value;
+              } else if (variantInput) {
+                variantId = variantInput.value;
+              }
+
+              var optionGroups = doc.querySelectorAll(".variant-option, .product-form__option, fieldset[class*='variant']");
+              optionGroups.forEach(function (group) {
+                var legend = group.querySelector("legend, label, .variant-option__label");
+                var legendText = legend ? legend.textContent.trim() : "";
+                var isColor = /colou?r/i.test(legendText);
+                var inputs = group.querySelectorAll("input[type='radio']");
+                var selectEl = group.querySelector("select");
+
+                if (inputs.length > 0) {
+                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
+                  if (isColor) {
+                    optionHtml += '<div class="cf-quickshop__swatches">';
+                    inputs.forEach(function (input, idx) {
+                      var val = input.value;
+                      var handle = val.toLowerCase().replace(/\s+/g, "-");
+                      var checked = input.checked || idx === 0 ? " cf-selected" : "";
+                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + legendText + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
+                    });
+                    optionHtml += '</div>';
+                  } else {
+                    optionHtml += '<select class="cf-quickshop__select" data-option-name="' + legendText + '">';
+                    inputs.forEach(function (input) {
+                      var val = input.value;
+                      var selected = input.checked ? " selected" : "";
+                      optionHtml += '<option value="' + val + '"' + selected + '>' + val + '</option>';
+                    });
+                    optionHtml += '</select>';
+                  }
+                  optionHtml += '</div>';
+                } else if (selectEl) {
+                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
+                  optionHtml += '<select class="cf-quickshop__select" data-option-name="' + legendText + '">';
+                  Array.from(selectEl.options).forEach(function (opt) {
+                    var selected = opt.selected ? " selected" : "";
+                    optionHtml += '<option value="' + opt.value + '"' + selected + '>' + opt.textContent + '</option>';
+                  });
+                  optionHtml += '</select></div>';
+                }
+              });
+            }
+
+            var reviewsHtml = "";
+            var reviewEl = doc.querySelector("[class*='rating'], [class*='review'], .spr-badge, .jdgm-widget");
+            if (reviewEl) reviewsHtml = '<div class="cf-quickshop__reviews">' + reviewEl.innerHTML + '</div>';
+
+            var imagesHtml = '<div class="cf-quickshop__images">';
+            if (images.length > 0) {
+              imagesHtml += '<img class="cf-quickshop__main-img" src="' + images[0] + '" alt="' + title + '">';
+              if (images.length > 1) {
+                imagesHtml += '<div class="cf-quickshop__thumbs">';
+                images.slice(0, 5).forEach(function (src, i) {
+                  imagesHtml += '<img class="cf-quickshop__thumb' + (i === 0 ? ' cf-thumb-active' : '') + '" src="' + src + '" alt="Thumbnail ' + (i + 1) + '">';
+                });
+                imagesHtml += '</div>';
+              }
+            }
+            imagesHtml += '</div>';
+
+            var descriptionText = "";
+            var descTabEl = doc.querySelector('[data-pdt-panel="description"]');
+            if (descTabEl) descriptionText = descTabEl.textContent.trim().substring(0, 250);
+            if (!descriptionText) {
+              var descBlockEl = doc.querySelector('.quick-add-description');
+              if (descBlockEl) descriptionText = descBlockEl.textContent.trim();
+            }
+            if (!descriptionText) {
+              var metaDesc = doc.querySelector('meta[name="description"]');
+              if (metaDesc) descriptionText = (metaDesc.getAttribute("content") || "").substring(0, 250);
+            }
+
+            var detailsHtml = '<div class="cf-quickshop__details">';
+            if (vendor) detailsHtml += '<p class="cf-quickshop__vendor">by <a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '">' + vendor + '</a></p>';
+            detailsHtml += '<h2 class="cf-quickshop__title">' + title + '</h2>';
+            detailsHtml += reviewsHtml;
+            if (priceHtml) detailsHtml += '<div class="cf-quickshop__price">' + priceHtml + '</div>';
+            if (optionHtml) detailsHtml += optionHtml;
+            if (variantSelectHtml) detailsHtml += variantSelectHtml;
+            detailsHtml += '<div class="cf-quickshop__quantity-row">';
+            detailsHtml += '<div class="cf-quickshop__qty"><button type="button" class="cf-qs-minus">&minus;</button><input type="number" class="cf-qs-qty-input" value="1" min="1" max="99"><button type="button" class="cf-qs-plus">&plus;</button></div>';
+            detailsHtml += '<button type="button" class="cf-quickshop__atc" data-variant-id="' + variantId + '">Add to cart</button>';
+            detailsHtml += '</div>';
+            detailsHtml += '<button type="button" class="cf-quickshop__buy-now" data-variant-id="' + variantId + '">';
+            detailsHtml += '<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2" ry="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>';
+            detailsHtml += ' Buy it now</button>';
+            detailsHtml += '<a href="#" class="cf-quickshop__more-payment" data-variant-id="' + variantId + '">More payment options</a>';
+            if (descriptionText) detailsHtml += '<div class="cf-quickshop__description">' + descriptionText + '</div>';
+            detailsHtml += '<a href="' + productUrl + '" class="cf-quickshop__view-full">View full details</a>';
+            detailsHtml += '</div>';
+
+            if (modalContent) {
+              modalContent.innerHTML = isOptionsOnly ? detailsHtml : (imagesHtml + detailsHtml);
+              modalContent.classList.add("cf-loaded");
+              if (isOptionsOnly) modalContent.classList.add("cf-options-only");
+            }
+            if (modalLoading) modalLoading.classList.add("cf-hidden");
+
+            /* Thumbnail click */
+            modalContent.querySelectorAll(".cf-quickshop__thumb").forEach(function (thumb) {
+              thumb.addEventListener("click", function () {
+                var mainImg = modalContent.querySelector(".cf-quickshop__main-img");
+                if (mainImg) mainImg.src = thumb.src;
+                modalContent.querySelectorAll(".cf-quickshop__thumb").forEach(function (t) { t.classList.remove("cf-thumb-active"); });
+                thumb.classList.add("cf-thumb-active");
+              });
+            });
+
+            /* Color swatch selection */
+            modalContent.querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (swBtn) {
+              swBtn.addEventListener("click", function () {
+                swBtn.closest(".cf-quickshop__swatches").querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (s) { s.classList.remove("cf-selected"); });
+                swBtn.classList.add("cf-selected");
+                updateVariantFromOptions();
+              });
+            });
+
+            /* Select change */
+            modalContent.querySelectorAll(".cf-quickshop__select[data-option-name]").forEach(function (sel) {
+              sel.addEventListener("change", function () { updateVariantFromOptions(); });
+            });
+
+            /* Variant select direct change */
+            var directVariantSelect = document.getElementById("cf-qs-variant-" + sectionId);
+            if (directVariantSelect) {
+              directVariantSelect.addEventListener("change", function () {
+                var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
+                if (atcBtn) atcBtn.setAttribute("data-variant-id", directVariantSelect.value);
+                var buyNowBtn = modalContent.querySelector(".cf-quickshop__buy-now");
+                if (buyNowBtn) buyNowBtn.setAttribute("data-variant-id", directVariantSelect.value);
+                var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
+                if (morePayLink) morePayLink.setAttribute("data-variant-id", directVariantSelect.value);
+                var selectedOpt = directVariantSelect.options[directVariantSelect.selectedIndex];
+                if (selectedOpt) {
+                  var priceDiv = modalContent.querySelector(".cf-quickshop__price");
+                  if (priceDiv && selectedOpt.textContent.indexOf("-") > -1) {
+                    var parts = selectedOpt.textContent.split("-");
+                    var priceText = parts[parts.length - 1].trim();
+                    if (priceText) priceDiv.textContent = priceText;
+                  }
+                }
+              });
+            }
+
+            function updateVariantFromOptions() {
+              if (!directVariantSelect) return;
+              var selectedColor = "";
+              var colorBtn = modalContent.querySelector(".cf-quickshop__swatch-btn.cf-selected");
+              if (colorBtn) selectedColor = colorBtn.getAttribute("data-option-value") || "";
+              var opts = directVariantSelect.options;
+              for (var i = 0; i < opts.length; i++) {
+                var optText = opts[i].textContent.toLowerCase();
+                if (selectedColor && optText.indexOf(selectedColor.toLowerCase()) > -1) {
+                  directVariantSelect.selectedIndex = i;
+                  directVariantSelect.dispatchEvent(new Event("change"));
+                  break;
+                }
+              }
+            }
+
+            /* Quantity buttons */
+            var qtyInput = modalContent.querySelector(".cf-qs-qty-input");
+            var minusBtn = modalContent.querySelector(".cf-qs-minus");
+            var plusBtn = modalContent.querySelector(".cf-qs-plus");
+
+            if (minusBtn && qtyInput) {
+              minusBtn.addEventListener("click", function () {
+                var v = parseInt(qtyInput.value) || 1;
+                if (v > 1) qtyInput.value = v - 1;
+              });
+            }
+            if (plusBtn && qtyInput) {
+              plusBtn.addEventListener("click", function () {
+                var v = parseInt(qtyInput.value) || 1;
+                qtyInput.value = v + 1;
+              });
+            }
+
+            /* Add to Cart */
+            var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
+            if (atcBtn) {
+              atcBtn.addEventListener("click", function () {
+                var vid = atcBtn.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+                atcBtn.disabled = true;
+                atcBtn.textContent = "Adding...";
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function (res) { return res.json(); })
+                .then(function (data) {
+                  if (data.status && data.status === 422) {
+                    atcBtn.textContent = data.description || "Error";
+                    setTimeout(function () { atcBtn.textContent = "Add to cart"; atcBtn.disabled = false; }, 2000);
+                  } else {
+                    atcBtn.textContent = "Added!";
+                    setTimeout(function () {
+                      atcBtn.textContent = "Add to cart";
+                      atcBtn.disabled = false;
+                      closeModal();
+                      fetch("/cart.js").then(function (r) { return r.json(); }).then(function (cart) {
+                        var cartCountEls = document.querySelectorAll("[data-cart-count], .cart-count-bubble span, .cart-count");
+                        cartCountEls.forEach(function (el) { el.textContent = cart.item_count; });
+                      });
+                    }, 1000);
+                  }
+                })
+                .catch(function () {
+                  atcBtn.textContent = "Error - try again";
+                  setTimeout(function () { atcBtn.textContent = "Add to cart"; atcBtn.disabled = false; }, 2000);
+                });
+              });
+            }
+
+            /* Buy it now */
+            var buyNowBtn = modalContent.querySelector(".cf-quickshop__buy-now");
+            if (buyNowBtn) {
+              buyNowBtn.addEventListener("click", function () {
+                var vid = buyNowBtn.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+                buyNowBtn.disabled = true;
+                buyNowBtn.textContent = "Redirecting...";
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function () { window.location.href = "/checkout"; })
+                .catch(function () {
+                  buyNowBtn.textContent = "Error - try again";
+                  buyNowBtn.disabled = false;
+                });
+              });
+            }
+
+            /* More payment options */
+            var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
+            if (morePayLink) {
+              morePayLink.addEventListener("click", function (e) {
+                e.preventDefault();
+                var vid = morePayLink.getAttribute("data-variant-id");
+                var qty = parseInt(qtyInput ? qtyInput.value : 1) || 1;
+                if (!vid) { alert("Please select a variant."); return; }
+                fetch("/cart/add.js", {
+                  method: "POST",
+                  headers: { "Content-Type": "application/json" },
+                  body: JSON.stringify({ id: parseInt(vid), quantity: qty })
+                })
+                .then(function () { window.location.href = "/checkout"; })
+                .catch(function () { alert("Something went wrong. Please try again."); });
+              });
+            }
+          })
+          .catch(function (err) {
+            console.error("Quick Shop fetch error:", err);
+            if (modalLoading) modalLoading.classList.add("cf-hidden");
+            if (modalContent) {
+              modalContent.innerHTML = '<div style="padding:40px;text-align:center;grid-column:1/-1;"><p>Could not load product. <a href="' + productUrl + '">View product page</a></p></div>';
+              modalContent.classList.add("cf-loaded");
+            }
+          });
+      });
+    });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initCfCards);
+  } else {
+    initCfCards();
+  }
+})();
+</script>
 
 {% stylesheet %}
   .product-recommendations__skeleton-item {
@@ -186,6 +613,654 @@
 
   product-recommendations:has([data-has-recommendations='false']) {
     display: none;
+  }
+
+  /* ===== CF-Card Styles ===== */
+  .cf-card {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+  }
+
+  .cf-card__link {
+    text-decoration: none;
+    display: block;
+  }
+
+  .cf-card__image-wrap {
+    position: relative;
+    background: #fff;
+    border-radius: 4px;
+    overflow: hidden;
+    aspect-ratio: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cf-card__image {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    transition: opacity 0.3s ease;
+  }
+
+  .cf-card__image--hover {
+    position: absolute;
+    inset: 0;
+    opacity: 0;
+  }
+
+  .cf-card:hover .cf-card__image--primary {
+    opacity: 0;
+  }
+
+  .cf-card:hover .cf-card__image--hover {
+    opacity: 1;
+  }
+
+  .cf-card:has(.cf-swatch:hover) .cf-card__image--primary {
+    opacity: 1;
+  }
+
+  .cf-card:has(.cf-swatch:hover) .cf-card__image--hover {
+    opacity: 0;
+  }
+
+  .cf-card__badges {
+    position: absolute;
+    top: 8px;
+    left: 8px;
+    right: 8px;
+    display: flex;
+    gap: 6px;
+    z-index: 2;
+    flex-wrap: wrap;
+  }
+
+  .cf-badge {
+    display: inline-block;
+    padding: 3px 10px;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    line-height: 1.4;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+
+  .cf-badge--gold {
+    background: #d4af37;
+    color: #fff;
+  }
+
+  .cf-badge--silver {
+    background: #888;
+    color: #fff;
+  }
+
+  .cf-badge--bestseller {
+    background: #d91e37 !important;
+    color: #fff;
+  }
+
+  .cf-card__swatches {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    padding: 8px 0 4px;
+    flex-wrap: wrap;
+  }
+
+  .cf-swatch {
+    display: inline-block;
+    width: 22px;
+    height: 22px;
+    border-radius: 50%;
+    border: 1px solid #ddd;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+
+  .cf-swatch:hover,
+  .cf-swatch--active {
+    transform: scale(1.15);
+    box-shadow: 0 0 0 2px #fff, 0 0 0 3px #999;
+  }
+
+  .cf-swatch-more {
+    font-size: 12px;
+    color: #999;
+    margin-left: 2px;
+  }
+
+  .cf-swatch[data-swatch-color="yellow-gold"],
+  .cf-swatch[data-swatch-color="yellow"] {
+    background-color: #d4af37 !important;
+  }
+
+  .cf-swatch[data-swatch-color="white-gold"],
+  .cf-swatch[data-swatch-color="white"] {
+    background-color: #e8e8e8 !important;
+  }
+
+  .cf-swatch[data-swatch-color="rose-gold"],
+  .cf-swatch[data-swatch-color="rose"] {
+    background-color: #e8a090 !important;
+  }
+
+  .cf-swatch[data-swatch-color="silver"] {
+    background-color: #c0c0c0 !important;
+  }
+
+  .cf-swatch[data-swatch-color="gold"] {
+    background-color: #d4af37 !important;
+  }
+
+  .cf-swatch[data-swatch-color="black"] {
+    background-color: #222 !important;
+  }
+
+  .cf-swatch[data-swatch-color="rainbow"] {
+    background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red) !important;
+  }
+
+  .cf-card__info {
+    text-decoration: none;
+    display: block;
+    padding: 4px 0 0;
+  }
+
+  .cf-card__title {
+    font-family: inherit;
+    font-size: 13px;
+    font-weight: 400;
+    color: #333;
+    margin: 0 0 4px;
+    line-height: 1.4;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .cf-card__price {
+    margin: 0;
+  }
+
+  .cf-price {
+    font-family: inherit;
+    font-size: 14px;
+    font-weight: 600;
+    color: #e53935;
+  }
+
+  .cf-price--sale {
+    color: #e53935;
+  }
+
+  .cf-price--compare {
+    font-size: 12px;
+    font-weight: 400;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 6px;
+  }
+
+  .cf-card__stars {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    margin-top: 5px;
+    flex-wrap: nowrap;
+  }
+
+  .cf-star {
+    width: 13px;
+    height: 13px;
+    fill: #e0e0e0;
+    flex-shrink: 0;
+  }
+
+  .cf-star--filled {
+    fill: #DA1E37;
+  }
+
+  .cf-review-count {
+    font-size: 11px;
+    color: #888;
+    margin-left: 4px;
+    white-space: nowrap;
+  }
+
+  .cf-card__actions {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+    margin-top: 8px;
+    opacity: 1;
+    transform: translateY(0);
+    pointer-events: auto;
+  }
+
+  .cf-card__btn {
+    display: block;
+    text-align: center;
+    text-decoration: none;
+    font-size: 12px;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    padding: 8px 12px;
+    border-radius: 3px;
+    transition: opacity 0.2s ease;
+    cursor: pointer;
+  }
+
+  .cf-card__btn:hover {
+    opacity: 0.88;
+  }
+
+  .cf-card__btn--quickshop {
+    background: #fff;
+    color: #DA1E37;
+    border: 1.5px solid #DA1E37;
+  }
+
+  .cf-card__btn--options {
+    display: none;
+  }
+
+  /* Quick Shop Modal */
+  .cf-quickshop-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 9998;
+    cursor: pointer;
+  }
+
+  .cf-quickshop-overlay.cf-active {
+    display: block;
+  }
+
+  .cf-quickshop-modal {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fff;
+    z-index: 9999;
+    border-radius: 8px;
+    width: 90%;
+    max-width: 900px;
+    max-height: 90vh;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  }
+
+  .cf-quickshop-modal.cf-active {
+    display: block;
+    animation: cfModalIn 0.3s ease forwards;
+  }
+
+  .cf-quickshop-modal.cf-options-only-modal {
+    max-width: 520px;
+  }
+
+  @keyframes cfModalIn {
+    from { opacity: 0; transform: translate(-50%, -48%); }
+    to { opacity: 1; transform: translate(-50%, -50%); }
+  }
+
+  .cf-quickshop-modal__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 36px;
+    height: 36px;
+    border: none;
+    background: #fff;
+    font-size: 24px;
+    line-height: 1;
+    cursor: pointer;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 2;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    transition: background 0.2s;
+  }
+
+  .cf-quickshop-modal__close:hover {
+    background: #f0f0f0;
+  }
+
+  .cf-quickshop-modal__body {
+    overflow-y: auto;
+    max-height: 90vh;
+  }
+
+  .cf-quickshop-modal__loading {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 300px;
+  }
+
+  .cf-quickshop-modal__loading.cf-hidden {
+    display: none;
+  }
+
+  .cf-quickshop-spinner {
+    width: 40px;
+    height: 40px;
+  }
+
+  .cf-quickshop-modal__content {
+    display: none;
+  }
+
+  .cf-quickshop-modal__content.cf-loaded {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+  }
+
+  .cf-quickshop-modal__content.cf-loaded.cf-options-only {
+    grid-template-columns: 1fr;
+  }
+
+  .cf-quickshop-modal__content.cf-options-only .cf-quickshop__description,
+  .cf-quickshop-modal__content.cf-options-only .cf-quickshop__view-full {
+    display: none;
+  }
+
+  .cf-quickshop__images {
+    padding: 20px;
+    background: #fafafa;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .cf-quickshop__images img {
+    width: 100%;
+    max-width: 400px;
+    height: auto;
+    object-fit: contain;
+    border-radius: 4px;
+  }
+
+  .cf-quickshop__images .cf-quickshop__thumbs {
+    display: flex;
+    gap: 8px;
+    margin-top: 12px;
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+
+  .cf-quickshop__images .cf-quickshop__thumb {
+    width: 60px;
+    height: 60px;
+    object-fit: contain;
+    border: 2px solid transparent;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: border-color 0.2s;
+  }
+
+  .cf-quickshop__images .cf-quickshop__thumb:hover,
+  .cf-quickshop__images .cf-quickshop__thumb.cf-thumb-active {
+    border-color: #333;
+  }
+
+  .cf-quickshop__details {
+    padding: 30px 25px;
+    overflow-y: auto;
+    max-height: 85vh;
+  }
+
+  .cf-quickshop__vendor {
+    font-size: 13px;
+    color: #e53935;
+    margin: 0 0 4px;
+  }
+
+  .cf-quickshop__vendor a {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .cf-quickshop__title {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0 0 8px;
+    color: #333;
+    line-height: 1.3;
+  }
+
+  .cf-quickshop__reviews {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+
+  .cf-quickshop__reviews .cf-star {
+    width: 16px;
+    height: 16px;
+  }
+
+  .cf-quickshop__price {
+    font-size: 20px;
+    font-weight: 600;
+    color: #333;
+    margin-bottom: 16px;
+  }
+
+  .cf-quickshop__price .cf-price--compare {
+    font-size: 16px;
+    font-weight: 400;
+    color: #999;
+    text-decoration: line-through;
+    margin-left: 8px;
+  }
+
+  .cf-quickshop__option-group {
+    margin-bottom: 16px;
+  }
+
+  .cf-quickshop__option-label {
+    font-size: 14px;
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+  }
+
+  .cf-quickshop__swatches {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .cf-quickshop__swatch-btn {
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    border: 2px solid #ddd;
+    cursor: pointer;
+    padding: 0;
+    transition: border-color 0.2s, box-shadow 0.2s;
+  }
+
+  .cf-quickshop__swatch-btn:hover,
+  .cf-quickshop__swatch-btn.cf-selected {
+    border-color: #333;
+    box-shadow: 0 0 0 2px #fff, 0 0 0 4px #333;
+  }
+
+  .cf-quickshop__select {
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    background: #fff;
+    cursor: pointer;
+  }
+
+  .cf-quickshop__quantity-row {
+    display: flex;
+    gap: 12px;
+    align-items: stretch;
+    margin-bottom: 12px;
+  }
+
+  .cf-quickshop__qty {
+    display: flex;
+    align-items: center;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    overflow: hidden;
+  }
+
+  .cf-quickshop__qty button {
+    width: 40px;
+    height: 44px;
+    border: none;
+    background: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.2s;
+  }
+
+  .cf-quickshop__qty button:hover {
+    background: #f5f5f5;
+  }
+
+  .cf-quickshop__qty input {
+    width: 50px;
+    text-align: center;
+    border: none;
+    border-left: 1px solid #ddd;
+    border-right: 1px solid #ddd;
+    font-size: 15px;
+    -moz-appearance: textfield;
+  }
+
+  .cf-quickshop__qty input::-webkit-inner-spin-button,
+  .cf-quickshop__qty input::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  .cf-quickshop__atc {
+    flex: 1;
+    padding: 12px 20px;
+    border: 1.5px solid #DA1E37;
+    background: #fff;
+    color: #DA1E37;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background 0.2s, color 0.2s;
+  }
+
+  .cf-quickshop__atc:hover {
+    background: #DA1E37;
+    color: #fff;
+  }
+
+  .cf-quickshop__atc:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+  }
+
+  .cf-quickshop__buy-now {
+    width: 100%;
+    padding: 14px;
+    background: #5a31f4;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    font-size: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    margin-top: 8px;
+    transition: background 0.2s;
+  }
+
+  .cf-quickshop__buy-now:hover {
+    background: #4926c7;
+  }
+
+  .cf-quickshop__buy-now:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .cf-quickshop__more-payment {
+    display: block;
+    text-align: center;
+    margin-top: 8px;
+    font-size: 13px;
+    color: #5a31f4;
+    text-decoration: underline;
+    cursor: pointer;
+  }
+
+  .cf-quickshop__more-payment:hover {
+    color: #4926c7;
+  }
+
+  .cf-quickshop__description {
+    font-size: 14px;
+    line-height: 1.6;
+    color: #555;
+    margin-top: 16px;
+    padding-top: 12px;
+    border-top: 1px solid #eee;
+  }
+
+  .cf-quickshop__view-full {
+    display: block;
+    text-align: center;
+    margin-top: 16px;
+    font-size: 13px;
+    color: #666;
+    text-decoration: underline;
+  }
+
+  @media screen and (max-width: 600px) {
+    .cf-quickshop-modal {
+      width: 95%;
+      max-height: 95vh;
+    }
+
+    .cf-quickshop-modal__content.cf-loaded {
+      grid-template-columns: 1fr;
+    }
+
+    .cf-quickshop__images {
+      padding: 15px;
+    }
+
+    .cf-quickshop__details {
+      padding: 20px 15px;
+      max-height: none;
+    }
   }
 {% endstylesheet %}
 
