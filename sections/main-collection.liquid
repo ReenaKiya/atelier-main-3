@@ -1217,6 +1217,7 @@
 
             /* Variant data + price formatting */
             var variantById = {};
+            var productData = null;
             function formatMoney(cents) {
               try {
                 if (window.Shopify && Shopify.formatMoney) {
@@ -1241,10 +1242,8 @@
               .then(function (r) { return r.ok ? r.json() : null; })
               .then(function (productJson) {
                 if (!productJson || !productJson.variants) return;
+                productData = productJson;
                 productJson.variants.forEach(function (v) { variantById[v.id] = v; });
-                if (directVariantSelect && directVariantSelect.value) {
-                  updatePriceDisplay(directVariantSelect.value);
-                }
                 var colorOptionIdx = -1;
                 (productJson.options || []).forEach(function (optName, idx) {
                   var name = typeof optName === "string" ? optName : (optName && optName.name) || "";
@@ -1274,6 +1273,7 @@
                     if (mainImg) mainImg.src = activeSrc;
                   }
                 }
+                updateVariantFromOptions();
               })
               .catch(function () {});
 
@@ -1297,17 +1297,40 @@
             }
 
             function updateVariantFromOptions() {
-              if (!directVariantSelect) return;
-              var selectedColor = "";
-              var colorBtn = modalContent.querySelector(".cf-quickshop__swatch-btn.cf-selected");
-              if (colorBtn) selectedColor = colorBtn.getAttribute("data-option-value") || "";
-              var opts = directVariantSelect.options;
-              for (var i = 0; i < opts.length; i++) {
-                var optText = opts[i].textContent.toLowerCase();
-                if (selectedColor && optText.indexOf(selectedColor.toLowerCase()) > -1) {
-                  directVariantSelect.selectedIndex = i;
-                  directVariantSelect.dispatchEvent(new Event("change"));
-                  break;
+              if (!productData || !productData.variants) return;
+              var selectedValues = [];
+              modalContent.querySelectorAll(".cf-quickshop__swatch-btn.cf-selected").forEach(function (btn) {
+                var val = btn.getAttribute("data-option-value");
+                if (val) selectedValues.push(val.toLowerCase());
+              });
+              modalContent.querySelectorAll(".cf-quickshop__select[data-option-name]").forEach(function (selEl) {
+                if (selEl.value) selectedValues.push(String(selEl.value).toLowerCase());
+              });
+              if (selectedValues.length === 0) return;
+              var matched = null;
+              for (var i = 0; i < productData.variants.length; i++) {
+                var v = productData.variants[i];
+                var vVals = (v.options || []).map(function (x) { return String(x).toLowerCase(); });
+                var allPresent = true;
+                for (var j = 0; j < selectedValues.length; j++) {
+                  if (vVals.indexOf(selectedValues[j]) === -1) { allPresent = false; break; }
+                }
+                if (allPresent) { matched = v; break; }
+              }
+              if (!matched) return;
+              updatePriceDisplay(matched.id);
+              var atcBtn = modalContent.querySelector(".cf-quickshop__atc");
+              if (atcBtn) atcBtn.setAttribute("data-variant-id", matched.id);
+              var buyNowBtn = modalContent.querySelector(".cf-quickshop__buy-now");
+              if (buyNowBtn) buyNowBtn.setAttribute("data-variant-id", matched.id);
+              var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
+              if (morePayLink) morePayLink.setAttribute("data-variant-id", matched.id);
+              if (directVariantSelect) {
+                for (var k = 0; k < directVariantSelect.options.length; k++) {
+                  if (String(directVariantSelect.options[k].value) === String(matched.id)) {
+                    directVariantSelect.selectedIndex = k;
+                    break;
+                  }
                 }
               }
             }
