@@ -341,11 +341,38 @@
             var images = [];
             doc.querySelectorAll(".product-media img, .product__media img, [data-product-grid-content] img, .media-gallery img").forEach(function (img) {
               var src = img.getAttribute("src");
-              if (src && images.indexOf(src) === -1) images.push(src);
+              var alt = img.getAttribute("alt") || "";
+              if (src && !images.some(function (it) { return it.src === src; })) images.push({ src: src, alt: alt });
             });
             if (images.length === 0) {
               var ogImg = doc.querySelector('meta[property="og:image"]');
-              if (ogImg) images.push(ogImg.getAttribute("content"));
+              if (ogImg) images.push({ src: ogImg.getAttribute("content"), alt: "" });
+            }
+
+            var cfColorMap = {
+              "yellow gold": "#e6c55b", "white gold": "#dcdcdc", "rose gold": "#b76e79",
+              "gold": "#d4af37", "silver": "#c0c0c0", "platinum": "#e5e4e2",
+              "black": "#000000", "white": "#ffffff", "red": "#e53935",
+              "blue": "#1e88e5", "green": "#43a047", "pink": "#ec407a",
+              "brown": "#795548", "grey": "#9e9e9e", "gray": "#9e9e9e",
+              "beige": "#f5f5dc", "navy": "#001f3f", "purple": "#8e24aa",
+              "orange": "#fb8c00", "yellow": "#fdd835"
+            };
+            function cfSwatchColor(val) {
+              var key = (val || "").toLowerCase().trim();
+              if (cfColorMap[key]) return cfColorMap[key];
+              return key.replace(/\s+/g, "");
+            }
+            function cfLegendLabel(legend) {
+              if (!legend) return "";
+              var txt = "";
+              for (var i = 0; i < legend.childNodes.length; i++) {
+                var n = legend.childNodes[i];
+                if (n.nodeType === 3) txt += n.textContent;
+              }
+              txt = txt.replace(/[:\-]+$/, "").trim();
+              if (!txt) txt = (legend.textContent || "").trim();
+              return txt;
             }
 
             var productForm = doc.querySelector('form[action*="/cart/add"]');
