@@ -183,6 +183,17 @@
   {%- comment -%} Hover Action Buttons {%- endcomment -%}
   <div class="cf-card__actions">
     <button type="button" class="cf-card__btn cf-card__btn--quickshop" data-quickshop-url="{{ product.url }}">Quick Shop</button>
-    <button type="button" class="cf-card__btn cf-card__btn--options" data-quickshop-url="{{ product.url }}" data-quickshop-mode="options-only">Choose Options</button>
+    {% if product.has_only_default_variant %}
+      <button
+        type="button"
+        class="cf-card__btn cf-card__btn--add"
+        data-cf-add-variant="{{ product.selected_or_first_available_variant.id }}"
+        {% unless product.available %}disabled{% endunless %}
+      >
+        {% if product.available %}Add to Cart{% else %}Sold Out{% endif %}
+      </button>
+    {% else %}
+      <button type="button" class="cf-card__btn cf-card__btn--options" data-quickshop-url="{{ product.url }}" data-quickshop-mode="options-only">Choose Options</button>
+    {% endif %}
   </div>
 </div>

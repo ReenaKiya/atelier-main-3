@@ -265,6 +265,43 @@
       if (e.key === "Escape" && modal && modal.classList.contains("cf-active")) closeModal();
     });
 
+    /* ── Direct Add to Cart (single-variant products) ── */
+    container.querySelectorAll("[data-cf-add-variant]").forEach(function (addBtn) {
+      addBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+        if (addBtn.disabled) return;
+        var vid = addBtn.getAttribute("data-cf-add-variant");
+        if (!vid) return;
+        var originalLabel = addBtn.textContent;
+        addBtn.disabled = true;
+        addBtn.textContent = "Adding...";
+        fetch("/cart/add.js", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ id: parseInt(vid), quantity: 1 })
+        })
+          .then(function (res) { return res.json(); })
+          .then(function (data) {
+            if (data.status && data.status === 422) {
+              addBtn.textContent = data.description || "Error";
+              setTimeout(function () { addBtn.textContent = originalLabel; addBtn.disabled = false; }, 2000);
+              return;
+            }
+            addBtn.textContent = "Added!";
+            fetch("/cart.js").then(function (r) { return r.json(); }).then(function (cart) {
+              var cartCountEls = document.querySelectorAll("[data-cart-count], .cart-count-bubble span, .cart-count");
+              cartCountEls.forEach(function (el) { el.textContent = cart.item_count; });
+            });
+            setTimeout(function () { addBtn.textContent = originalLabel; addBtn.disabled = false; }, 1200);
+          })
+          .catch(function () {
+            addBtn.textContent = "Error - try again";
+            setTimeout(function () { addBtn.textContent = originalLabel; addBtn.disabled = false; }, 2000);
+          });
+      });
+    });
+
     container.querySelectorAll("[data-quickshop-url]").forEach(function (btn) {
       btn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -907,11 +944,17 @@
     display: none;
   }
 
-  .resource-list__item .cf-card__btn--options {
+  .resource-list__item .cf-card__btn--options,
+  .resource-list__item .cf-card__btn--add {
     display: block;
     background: #000;
     color: #fff;
     border: 1.5px solid #000;
+  }
+
+  .resource-list__item .cf-card__btn--add:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
   }
 
   /* Quick Shop Modal */
