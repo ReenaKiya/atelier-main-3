@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_MTat7t": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Aftercare",
+            "product": "jojoba-healing-oil-roll-on-piercing-aftercare-1"
+          }
+        },
         "featured_product_X63iAW": {
           "type": "featured_product",
           "settings": {
@@ -214,6 +222,7 @@
         }
       },
       "block_order": [
+        "featured_product_MTat7t",
         "featured_product_X63iAW",
         "featured_product_HrJTNa",
         "featured_product_tayTky",
