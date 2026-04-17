@@ -513,33 +513,43 @@
 
 /* Color mappings for common swatch names */
 .cf-swatch[data-swatch-color="yellow-gold"],
-.cf-swatch[data-swatch-color="yellow"] {
+.cf-swatch[data-swatch-color="yellow"],
+.cf-quickshop__swatch-btn[data-swatch-color="yellow-gold"],
+.cf-quickshop__swatch-btn[data-swatch-color="yellow"] {
   background-color: #d4af37 !important;
 }
 
 .cf-swatch[data-swatch-color="white-gold"],
-.cf-swatch[data-swatch-color="white"] {
+.cf-swatch[data-swatch-color="white"],
+.cf-quickshop__swatch-btn[data-swatch-color="white-gold"],
+.cf-quickshop__swatch-btn[data-swatch-color="white"] {
   background-color: #e8e8e8 !important;
 }
 
 .cf-swatch[data-swatch-color="rose-gold"],
-.cf-swatch[data-swatch-color="rose"] {
+.cf-swatch[data-swatch-color="rose"],
+.cf-quickshop__swatch-btn[data-swatch-color="rose-gold"],
+.cf-quickshop__swatch-btn[data-swatch-color="rose"] {
   background-color: #e8a090 !important;
 }
 
-.cf-swatch[data-swatch-color="silver"] {
+.cf-swatch[data-swatch-color="silver"],
+.cf-quickshop__swatch-btn[data-swatch-color="silver"] {
   background-color: #c0c0c0 !important;
 }
 
-.cf-swatch[data-swatch-color="gold"] {
+.cf-swatch[data-swatch-color="gold"],
+.cf-quickshop__swatch-btn[data-swatch-color="gold"] {
   background-color: #d4af37 !important;
 }
 
-.cf-swatch[data-swatch-color="black"] {
+.cf-swatch[data-swatch-color="black"],
+.cf-quickshop__swatch-btn[data-swatch-color="black"] {
   background-color: #222 !important;
 }
 
-.cf-swatch[data-swatch-color="rainbow"] {
+.cf-swatch[data-swatch-color="rainbow"],
+.cf-quickshop__swatch-btn[data-swatch-color="rainbow"] {
   background: conic-gradient(red, yellow, lime, aqua, blue, magenta, red) !important;
 }
 
@@ -1296,7 +1306,7 @@
                       var val = input.value;
                       var handle = val.toLowerCase().replace(/\s+/g, "-");
                       var checked = input.checked || idx === 0 ? " cf-selected" : "";
-                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + legendText + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
+                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + legendText + '" data-swatch-color="' + handle + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
                     });
                     optionHtml += '</div>';
                   } else {
