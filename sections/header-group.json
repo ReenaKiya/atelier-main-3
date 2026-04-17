@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_wJhwQF": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Dermal Anchors",
+            "product": "g23-titanium-opal-heart-jewelled-dermal-anchor"
+          }
+        },
         "featured_product_ANaeFK": {
           "type": "featured_product",
           "settings": {
@@ -182,6 +190,7 @@
         }
       },
       "block_order": [
+        "featured_product_wJhwQF",
         "featured_product_ANaeFK",
         "featured_product_4d4WQD",
         "featured_product_jRVc7m",
