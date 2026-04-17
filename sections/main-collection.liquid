@@ -72,7 +72,7 @@
             data-product-id="{{ product.id }}"
             ref="cards[]"
           >
-            {% render 'cf-card', product: product %}
+            {% render 'cf-card', product: product, only_quickshop: true %}
           </li>
         {% endfor %}
       {% endcapture %}
