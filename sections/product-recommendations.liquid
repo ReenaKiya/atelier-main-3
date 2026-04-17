@@ -859,9 +859,25 @@
     flex-direction: column;
     gap: 6px;
     margin-top: 8px;
+    opacity: 0;
+    transform: translateY(4px);
+    pointer-events: none;
+    transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .resource-list__item .cf-card:hover .cf-card__actions,
+  .resource-list__item .cf-card:focus-within .cf-card__actions {
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
+  }
+
+  @media (hover: none) {
+    .resource-list__item .cf-card__actions {
+      opacity: 1;
+      transform: none;
+      pointer-events: auto;
+    }
   }
 
   .cf-card__btn {
@@ -889,6 +905,13 @@
 
   .cf-card__btn--options {
     display: none;
+  }
+
+  .resource-list__item .cf-card__btn--options {
+    display: block;
+    background: #DA1E37;
+    color: #fff;
+    border: 1.5px solid #DA1E37;
   }
 
   /* Quick Shop Modal */
