@@ -1215,11 +1215,36 @@
               });
             });
 
+            /* Variant data + price formatting */
+            var variantById = {};
+            function formatMoney(cents) {
+              try {
+                if (window.Shopify && Shopify.formatMoney) {
+                  return Shopify.formatMoney(cents, Shopify.money_format || "${{amount}}");
+                }
+              } catch (e) {}
+              return "$" + (Math.round(cents) / 100).toFixed(2);
+            }
+            function updatePriceDisplay(variantId) {
+              var v = variantById[variantId];
+              if (!v) return;
+              var priceDiv = modalContent.querySelector(".cf-quickshop__price");
+              if (!priceDiv) return;
+              var formatted = formatMoney(v.price);
+              var hasCompare = v.compare_at_price && v.compare_at_price > v.price;
+              var compareHtml = hasCompare ? ' <span class="cf-price--compare">' + formatMoney(v.compare_at_price) + '</span>' : '';
+              priceDiv.innerHTML = '<span class="price">' + formatted + '</span>' + compareHtml;
+            }
+
             /* Fetch variant → image map and stamp swatches with data-image */
             fetch(productUrl + ".js")
               .then(function (r) { return r.ok ? r.json() : null; })
               .then(function (productJson) {
                 if (!productJson || !productJson.variants) return;
+                productJson.variants.forEach(function (v) { variantById[v.id] = v; });
+                if (directVariantSelect && directVariantSelect.value) {
+                  updatePriceDisplay(directVariantSelect.value);
+                }
                 var colorOptionIdx = -1;
                 (productJson.options || []).forEach(function (optName, idx) {
                   var name = typeof optName === "string" ? optName : (optName && optName.name) || "";
@@ -1267,15 +1292,7 @@
                 if (buyNowBtn) buyNowBtn.setAttribute("data-variant-id", directVariantSelect.value);
                 var morePayLink = modalContent.querySelector(".cf-quickshop__more-payment");
                 if (morePayLink) morePayLink.setAttribute("data-variant-id", directVariantSelect.value);
-                var selectedOpt = directVariantSelect.options[directVariantSelect.selectedIndex];
-                if (selectedOpt) {
-                  var priceDiv = modalContent.querySelector(".cf-quickshop__price");
-                  if (priceDiv && selectedOpt.textContent.indexOf("-") > -1) {
-                    var parts = selectedOpt.textContent.split("-");
-                    var priceText = parts[parts.length - 1].trim();
-                    if (priceText) priceDiv.textContent = priceText;
-                  }
-                }
+                updatePriceDisplay(directVariantSelect.value);
               });
             }
 
