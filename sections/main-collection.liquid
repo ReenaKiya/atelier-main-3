@@ -1206,9 +1206,51 @@
               swBtn.addEventListener("click", function () {
                 swBtn.closest(".cf-quickshop__swatches").querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (s) { s.classList.remove("cf-selected"); });
                 swBtn.classList.add("cf-selected");
+                var imgSrc = swBtn.getAttribute("data-image");
+                if (imgSrc) {
+                  var mainImg = modalContent.querySelector(".cf-quickshop__main-img");
+                  if (mainImg) mainImg.src = imgSrc;
+                }
                 updateVariantFromOptions();
               });
             });
+
+            /* Fetch variant → image map and stamp swatches with data-image */
+            fetch(productUrl + ".js")
+              .then(function (r) { return r.ok ? r.json() : null; })
+              .then(function (productJson) {
+                if (!productJson || !productJson.variants) return;
+                var colorOptionIdx = -1;
+                (productJson.options || []).forEach(function (optName, idx) {
+                  var name = typeof optName === "string" ? optName : (optName && optName.name) || "";
+                  if (/colou?r/i.test(name)) colorOptionIdx = idx;
+                });
+                if (colorOptionIdx === -1) return;
+                var colorToImage = {};
+                productJson.variants.forEach(function (v) {
+                  var val = v.options && v.options[colorOptionIdx];
+                  if (!val) return;
+                  var key = val.toLowerCase();
+                  if (colorToImage[key]) return;
+                  var src = v.featured_image && v.featured_image.src
+                    ? v.featured_image.src
+                    : (typeof v.featured_image === "string" ? v.featured_image : "");
+                  if (src) colorToImage[key] = src;
+                });
+                modalContent.querySelectorAll(".cf-quickshop__swatch-btn").forEach(function (btn) {
+                  var key = (btn.getAttribute("data-option-value") || "").toLowerCase();
+                  if (colorToImage[key]) btn.setAttribute("data-image", colorToImage[key]);
+                });
+                var activeBtn = modalContent.querySelector(".cf-quickshop__swatch-btn.cf-selected");
+                if (activeBtn) {
+                  var activeSrc = activeBtn.getAttribute("data-image");
+                  if (activeSrc) {
+                    var mainImg = modalContent.querySelector(".cf-quickshop__main-img");
+                    if (mainImg) mainImg.src = activeSrc;
+                  }
+                }
+              })
+              .catch(function () {});
 
             /* Select change */
             modalContent.querySelectorAll(".cf-quickshop__select[data-option-name]").forEach(function (sel) {
