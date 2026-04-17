@@ -186,9 +186,14 @@
 (function () {
   var sectionId = "{{ section.id }}";
 
+  var cfInitialized = false;
+
   function initCfCards() {
     var container = document.querySelector('product-recommendations[data-section-id="' + sectionId + '"]');
     if (!container) return;
+    if (container.querySelectorAll(".cf-card").length === 0) return;
+    if (cfInitialized) return;
+    cfInitialized = true;
 
     /* ── Swatch image preview on hover + permanent swap on click ── */
     container.querySelectorAll(".cf-card").forEach(function (card) {
@@ -589,10 +594,26 @@
     });
   }
 
-  if (document.readyState === "loading") {
-    document.addEventListener("DOMContentLoaded", initCfCards);
-  } else {
+  function bootCfCards() {
     initCfCards();
+    if (cfInitialized) return;
+
+    var container = document.querySelector('product-recommendations[data-section-id="' + sectionId + '"]');
+    if (!container) return;
+
+    /* Recommendations are injected asynchronously. Observe the container
+       and initialize once cf-cards appear inside it. */
+    var observer = new MutationObserver(function () {
+      initCfCards();
+      if (cfInitialized) observer.disconnect();
+    });
+    observer.observe(container, { childList: true, subtree: true });
+  }
+
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", bootCfCards);
+  } else {
+    bootCfCards();
   }
 })();
 </script>
