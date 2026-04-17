@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_3BVJAK": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Accessories",
+            "product": "g23-titanium-push-fit-bar-for-labret"
+          }
+        },
         "featured_product_yX4D8Y": {
           "type": "featured_product",
           "settings": {
@@ -230,6 +238,7 @@
         }
       },
       "block_order": [
+        "featured_product_3BVJAK",
         "featured_product_yX4D8Y",
         "featured_product_MTat7t",
         "featured_product_X63iAW",
