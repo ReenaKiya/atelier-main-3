@@ -28,6 +28,70 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_3BVJAK": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Accessories",
+            "product": "g23-titanium-push-fit-bar-for-labret"
+          }
+        },
+        "featured_product_yX4D8Y": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Accessories",
+            "product": "eo-sterilised-piercing-healing-disc"
+          }
+        },
+        "featured_product_MTat7t": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Aftercare",
+            "product": "jojoba-healing-oil-roll-on-piercing-aftercare-1"
+          }
+        },
+        "featured_product_X63iAW": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Aftercare",
+            "product": "jojoba-healing-oil-roll-on-piercing-aftercare"
+          }
+        },
+        "featured_product_HrJTNa": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Sterilised Jewellery",
+            "product": "eo-gas-sterilised-g23-titanium-externally-threaded-ball-top-labret"
+          }
+        },
+        "featured_product_tayTky": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Sterilised Jewellery",
+            "product": "eo-sterilised-piercing-healing-disc"
+          }
+        },
+        "featured_product_wJhwQF": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Dermal Anchors",
+            "product": "g23-titanium-opal-heart-jewelled-dermal-anchor"
+          }
+        },
+        "featured_product_ANaeFK": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Dermal Anchors",
+            "product": "g23-titanium-solid-dermal-diver"
+          }
+        },
         "featured_product_4d4WQD": {
           "type": "featured_product",
           "settings": {
@@ -174,6 +238,14 @@
         }
       },
       "block_order": [
+        "featured_product_3BVJAK",
+        "featured_product_yX4D8Y",
+        "featured_product_MTat7t",
+        "featured_product_X63iAW",
+        "featured_product_HrJTNa",
+        "featured_product_tayTky",
+        "featured_product_wJhwQF",
+        "featured_product_ANaeFK",
         "featured_product_4d4WQD",
         "featured_product_jRVc7m",
         "featured_product_JdWiHK",

@@ -1028,9 +1028,8 @@
       "name": "People Also Searched",
       "settings": {
         "title": "People Also Searched For",
-        "fallback_term": "Jewellery",
-        "modifiers": "14K, 9K, Sterling Silver, Surgical Steel, Surgical Steel/UV, Titanium, UV",
-        "suffixes": "External, Internal",
+        "max_products": 10,
+        "truncate_length": 40,
         "background_color": "#ffffff",
         "title_color": "#333333",
         "pill_background": "#efefef",
