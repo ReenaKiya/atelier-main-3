@@ -1298,7 +1298,15 @@
                 var selectEl = group.querySelector("select");
 
                 if (inputs.length > 0) {
-                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label">' + legendText + '</div>';
+                  var inputValues = Array.from(inputs).map(function (i) { return i.value; });
+                  var baseLabel = legendText;
+                  inputValues.forEach(function (v) { baseLabel = baseLabel.split(v).join(""); });
+                  baseLabel = baseLabel.replace(/[:\s]+$/, "").trim();
+                  var initialInput = Array.from(inputs).filter(function (i) { return i.checked; })[0] || inputs[0];
+                  var initialValue = initialInput ? initialInput.value : "";
+                  var displayLabel = baseLabel + (baseLabel && initialValue ? ": " : "") + initialValue;
+                  var baseAttr = baseLabel.replace(/"/g, "&quot;");
+                  optionHtml += '<div class="cf-quickshop__option-group"><div class="cf-quickshop__option-label" data-base-label="' + baseAttr + '">' + displayLabel + '</div>';
 
                   if (isColor) {
                     optionHtml += '<div class="cf-quickshop__swatches">';
@@ -1306,7 +1314,7 @@
                       var val = input.value;
                       var handle = val.toLowerCase().replace(/\s+/g, "-");
                       var checked = input.checked || idx === 0 ? " cf-selected" : "";
-                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + legendText + '" data-swatch-color="' + handle + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
+                      optionHtml += '<button type="button" class="cf-quickshop__swatch-btn' + checked + '" data-option-value="' + val + '" data-option-name="' + baseAttr + '" data-swatch-color="' + handle + '" style="background-color: ' + handle + ';" title="' + val + '"></button>';
                     });
                     optionHtml += '</div>';
                   } else {
@@ -1411,6 +1419,15 @@
                 if (imgSrc) {
                   var mainImg = modalContent.querySelector(".cf-quickshop__main-img");
                   if (mainImg) mainImg.src = imgSrc;
+                }
+                var group = swBtn.closest(".cf-quickshop__option-group");
+                if (group) {
+                  var labelEl = group.querySelector(".cf-quickshop__option-label");
+                  if (labelEl) {
+                    var base = labelEl.getAttribute("data-base-label") || "";
+                    var val = swBtn.getAttribute("data-option-value") || "";
+                    labelEl.textContent = base + (base && val ? ": " : "") + val;
+                  }
                 }
                 updateVariantFromOptions();
               });
