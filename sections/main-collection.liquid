@@ -38,14 +38,11 @@
 {% comment %} We always render this full-width, as the child blocks have width: page/full settings {% endcomment %}
 <div class="section-background color-{{ section.settings.color_scheme }}"></div>
 
-<div class="breadcrumbs-container">
-  <nav class="breadcrumbs" aria-label="Breadcrumb">
-    <a href="{{ routes.root_url }}" class="breadcrumbs__link">Home</a>
-    <span class="breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
-    <span class="breadcrumbs__current" aria-current="page">{{ collection.title }}</span>
-  </nav>
-  <h1 class="collection--title">{{ collection.title }}</h1>
-</div>
+<nav class="breadcrumbs breadcrumbs--collection" aria-label="Breadcrumb">
+  <a href="{{ routes.root_url }}" class="breadcrumbs__link">Home</a>
+  <span class="breadcrumbs__separator" aria-hidden="true">&rsaquo;</span>
+  <span class="breadcrumbs__current" aria-current="page">{{ collection.title }}</span>
+</nav>
 
 <results-list
   class="section product-grid-container color-{{ section.settings.color_scheme }}"
@@ -62,6 +59,26 @@
         results: collection,
         results_size: collection.products_count
       %}
+
+      {%- liquid
+        assign active_filter_labels = ''
+        for f in collection.filters
+          if f.type == 'price_range'
+            continue
+          endif
+          for v in f.active_values
+            if active_filter_labels == ''
+              assign active_filter_labels = v.label
+            else
+              assign active_filter_labels = active_filter_labels | append: ', ' | append: v.label
+            endif
+          endfor
+        endfor
+      -%}
+
+      <h1 class="collection--title">
+        {% if active_filter_labels != '' %}{{ active_filter_labels }}{% else %}{{ collection.title }}{% endif %}
+      </h1>
 
       {% capture children %}
         {% for product in collection.products %}
@@ -234,6 +251,12 @@
     gap: 5px;
     padding: 8px 0 4px;
     flex-wrap: wrap;
+    min-height: 34px;
+    box-sizing: border-box;
+  }
+
+  .cf-card__swatches--empty {
+    visibility: hidden;
   }
 
   .cf-swatch {
@@ -801,9 +824,37 @@
   }
 
   .breadcrumbs-container {
-    padding: 16px 24px 0;
-    max-width: var(--page-width);
-    margin: 0 auto;
+    padding: 16px 0 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .collection-wrapper > .facets-controls-wrapper {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .collection-wrapper > .collection--title {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    padding-inline: var(--page-margin, 24px);
+  }
+
+  @media screen and (min-width: 750px) {
+    .collection-wrapper > .collection--title {
+      grid-column: var(--facets-vertical-col-width) / var(--full-width-column-number);
+      padding-inline: 0;
+    }
+
+    .collection-wrapper:has(.facets-block-wrapper--vertical:not(.hidden))
+      > .facets-block-wrapper--vertical {
+      grid-row: 2 / span 2;
+    }
+
+    .collection-wrapper:has(.facets-block-wrapper--vertical:not(.hidden))
+      > .main-collection-grid {
+      grid-row: 3;
+    }
   }
 
   .breadcrumbs {
@@ -815,10 +866,23 @@
     flex-wrap: wrap;
   }
 
+  .breadcrumbs--collection {
+    max-width: var(--page-width);
+    margin: 0 auto;
+    padding: 16px var(--page-margin, 24px) 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
   .breadcrumbs__link {
     color: #e3173e;
     text-decoration: none;
     font-weight: 600;
+  }
+
+  .breadcrumbs__link--collection {
+    color: #555;
+    font-weight: 400;
   }
 
   .breadcrumbs__link:hover {

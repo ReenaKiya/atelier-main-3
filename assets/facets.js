@@ -303,15 +303,58 @@ class PriceFacetComponent extends Component {
    */
   #initRangeSlider() {
     if (this.#rangeInitialized) return;
-    const { rangeMax, maxInput } = this.refs;
+    const { rangeMin, rangeMax, minInput, maxInput, sliderWrap } = this.refs;
     if (!rangeMax) return;
     this.#rangeInitialized = true;
 
     this.#updateRangeFill();
 
+    const revealFill = () => {
+      const { rangeFill } = this.refs;
+      if (rangeFill) rangeFill.classList.remove('price-facet__fill--hidden');
+    };
+
+    if (sliderWrap && rangeMin) {
+      const bringToFront = (clientX) => {
+        const rect = sliderWrap.getBoundingClientRect();
+        if (!rect.width) return;
+        const lo = this.#parseMoney(rangeMax.getAttribute('min') || '0');
+        const hi = this.#parseMoney(rangeMax.getAttribute('max') || '790');
+        const span = hi - lo || 1;
+        const pct = Math.max(0, Math.min(100, ((clientX - rect.left) / rect.width) * 100));
+        const minPct = ((this.#parseMoney(rangeMin.value) - lo) / span) * 100;
+        const maxPct = ((this.#parseMoney(rangeMax.value) - lo) / span) * 100;
+        const nearMin = Math.abs(pct - minPct) <= Math.abs(pct - maxPct);
+        rangeMin.style.zIndex = nearMin ? '4' : '2';
+        rangeMax.style.zIndex = nearMin ? '2' : '4';
+      };
+      sliderWrap.addEventListener('pointermove', (e) => bringToFront(e.clientX));
+      sliderWrap.addEventListener('pointerdown', (e) => bringToFront(e.clientX));
+    }
+
+    if (rangeMin) {
+      rangeMin.addEventListener('input', (e) => {
+        e.stopPropagation();
+        const minV = this.#parseMoney(rangeMin.value);
+        const maxV = this.#parseMoney(rangeMax.value);
+        if (minV > maxV) rangeMin.value = rangeMax.value;
+        if (minInput) minInput.value = rangeMin.value;
+        revealFill();
+        this.#updateRangeFill();
+      });
+      rangeMin.addEventListener('change', (e) => {
+        e.stopPropagation();
+        this.updatePriceFilterAndResults();
+      });
+    }
+
     rangeMax.addEventListener('input', (e) => {
       e.stopPropagation();
+      const lo = rangeMin ? this.#parseMoney(rangeMin.value) : this.#parseMoney(rangeMax.getAttribute('min') || '0');
+      const maxV = this.#parseMoney(rangeMax.value);
+      if (maxV < lo) rangeMax.value = rangeMin ? rangeMin.value : String(lo);
       if (maxInput) maxInput.value = rangeMax.value;
+      revealFill();
       this.#updateRangeFill();
     });
 
@@ -325,15 +368,23 @@ class PriceFacetComponent extends Component {
    * Updates the range slider background gradient
    */
   #updateRangeFill() {
-    const { rangeMax } = this.refs;
+    const { rangeMin, rangeMax, rangeFill } = this.refs;
     if (!rangeMax) return;
 
-    const min = this.#parseMoney(rangeMax.getAttribute('min') || '0');
-    const max = this.#parseMoney(rangeMax.getAttribute('max') || '790');
-    const val = this.#parseMoney(rangeMax.value);
-    const percent = ((val - min) / (max - min)) * 100;
+    const lo = this.#parseMoney(rangeMax.getAttribute('min') || '0');
+    const hi = this.#parseMoney(rangeMax.getAttribute('max') || '790');
+    const span = hi - lo || 1;
+    const minV = rangeMin ? this.#parseMoney(rangeMin.value) : lo;
+    const maxV = this.#parseMoney(rangeMax.value);
+    const leftPct = Math.max(0, Math.min(100, ((minV - lo) / span) * 100));
+    const rightPct = Math.max(0, Math.min(100, ((maxV - lo) / span) * 100));
 
-    rangeMax.style.background = `linear-gradient(to right, #db1e37 0%, #db1e37 ${percent}%, #ddd ${percent}%, #ddd 100%)`;
+    if (rangeFill) {
+      rangeFill.style.left = `${leftPct}%`;
+      rangeFill.style.right = `${100 - rightPct}%`;
+    } else {
+      rangeMax.style.background = `linear-gradient(to right, #ddd 0%, #ddd ${leftPct}%, #db1e37 ${leftPct}%, #db1e37 ${rightPct}%, #ddd ${rightPct}%, #ddd 100%)`;
+    }
   }
 
   /**
@@ -351,11 +402,12 @@ class PriceFacetComponent extends Component {
    * Updates price filter and results
    */
   updatePriceFilterAndResults() {
-    const { minInput, maxInput } = this.refs;
+    const { minInput, maxInput, rangeFill } = this.refs;
 
     this.#adjustToValidValues(minInput);
     this.#adjustToValidValues(maxInput);
     this.#syncRangeFromInputs();
+    if (rangeFill) rangeFill.classList.remove('price-facet__fill--hidden');
 
     const facetsForm = this.closest('facets-form-component');
     if (!(facetsForm instanceof FacetsFormComponent)) return;
@@ -369,10 +421,15 @@ class PriceFacetComponent extends Component {
    * Syncs range slider from text input values
    */
   #syncRangeFromInputs() {
-    const { maxInput, rangeMax } = this.refs;
+    const { rangeMin, rangeMax, minInput, maxInput } = this.refs;
     if (!rangeMax) return;
 
+    const rangeMinAttr = rangeMax.getAttribute('min') || '0';
     const rangeMaxAttr = rangeMax.getAttribute('max') || '790';
+    if (rangeMin) {
+      if (minInput && minInput.value) rangeMin.value = String(this.#parseMoney(minInput.value));
+      else rangeMin.value = rangeMinAttr;
+    }
     if (maxInput && maxInput.value) rangeMax.value = String(this.#parseMoney(maxInput.value));
     else if (maxInput) rangeMax.value = rangeMaxAttr;
 

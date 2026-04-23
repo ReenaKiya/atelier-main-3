@@ -81,17 +81,46 @@
           {%- assign max_value_display = 790 -%}
         {%- endif -%}
 
-        <input
-          type="range"
-          class="price-facet__range-input"
-          min="4"
-          max="790"
-          value="{{ max_value_display }}"
-          step="1"
-          ref="rangeMax"
-          aria-label="Maximum price"
-          style="width: 100%;"
-        >
+        {%- assign range_span = 786 -%}
+        {%- assign min_offset = min_value_display | minus: 4 -%}
+        {%- assign max_offset = max_value_display | minus: 4 -%}
+        {%- assign fill_left_pct = min_offset | times: 100 | divided_by: range_span -%}
+        {%- assign fill_right_pct_raw = max_offset | times: 100 | divided_by: range_span -%}
+        {%- assign fill_right_pct = 100 | minus: fill_right_pct_raw -%}
+        {%- if filter.min_value.value == null and filter.max_value.value == null -%}
+          {%- assign fill_hidden_class = ' price-facet__fill--hidden' -%}
+        {%- else -%}
+          {%- assign fill_hidden_class = '' -%}
+        {%- endif -%}
+
+        <div class="price-facet__slider-wrap" ref="sliderWrap">
+          <div class="price-facet__track"></div>
+          <div
+            class="price-facet__fill{{ fill_hidden_class }}"
+            ref="rangeFill"
+            style="left: {{ fill_left_pct }}%; right: {{ fill_right_pct }}%;"
+          ></div>
+          <input
+            type="range"
+            class="price-facet__range-input price-facet__range-input--min"
+            min="4"
+            max="790"
+            value="{{ min_value_display }}"
+            step="1"
+            ref="rangeMin"
+            aria-label="Minimum price"
+          >
+          <input
+            type="range"
+            class="price-facet__range-input price-facet__range-input--max"
+            min="4"
+            max="790"
+            value="{{ max_value_display }}"
+            step="1"
+            ref="rangeMax"
+            aria-label="Maximum price"
+          >
+        </div>
 
         <div class="price-filter-inputs" style="display: flex; justify-content: space-between; margin-top: 10px;">
           <div style="position: relative; width: 45%;">
@@ -172,15 +201,76 @@
     flex-direction: column;
   }
 
+  .price-facet__slider-wrap {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    margin: 14px 0;
+  }
+
+  .price-facet__track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #ddd;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .price-facet__fill {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: #db1e37;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .price-facet__fill--hidden {
+    display: none;
+  }
+
   .price-facet__range-input {
     -webkit-appearance: none;
     appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    height: 6px;
-    border-radius: 3px;
+    height: 18px;
+    background: transparent;
+    margin: 0;
+    padding: 0;
     outline: none;
-    margin: 10px 0;
-    background: #ddd;
+    touch-action: none;
+  }
+
+  .price-facet__range-input--min {
+    z-index: 3;
+  }
+
+  .price-facet__range-input--max {
+    z-index: 2;
+  }
+
+  .price-facet__range-input::-webkit-slider-runnable-track {
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
+  }
+
+  .price-facet__range-input::-moz-range-track {
+    height: 18px;
+    background: transparent;
+    border: none;
+    cursor: pointer;
   }
 
   .price-facet__range-input::-webkit-slider-thumb {
@@ -193,6 +283,7 @@
     border: 2px solid #fff;
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
     cursor: pointer;
+    margin-top: 0;
   }
 
   .price-facet__range-input::-moz-range-thumb {

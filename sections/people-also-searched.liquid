@@ -13,29 +13,24 @@
   assign max_pills = section.settings.max_products | default: 10
   assign truncate_length = section.settings.truncate_length | default: 40
 
-  assign has_products = false
+  assign has_collections = false
 
   comment
-    Collect products to display as pills.
-    - On collection pages: show products from the current collection
-    - On product pages: show other products from the product's first collection (excluding current product)
+    Collect collections to display as pills.
+    - On collection pages: show other collections (exclude current)
+    - On product pages: show collections the product belongs to
   endcomment
 -%}
 
-{%- comment -%} Determine which products to show {%- endcomment -%}
-{%- if template contains 'collection' and collection != blank and collection.products_count > 0 -%}
-  {%- assign pill_products = collection.products -%}
-  {%- assign has_products = true -%}
-{%- elsif template contains 'product' and product != blank -%}
-  {%- for col in product.collections limit: 1 -%}
-    {%- if col.products_count > 0 -%}
-      {%- assign pill_products = col.products -%}
-      {%- assign has_products = true -%}
-    {%- endif -%}
-  {%- endfor -%}
+{%- if template contains 'product' and product != blank and product.collections.size > 0 -%}
+  {%- assign pill_collections = product.collections -%}
+  {%- assign has_collections = true -%}
+{%- elsif collections.size > 0 -%}
+  {%- assign pill_collections = collections -%}
+  {%- assign has_collections = true -%}
 {%- endif -%}
 
-{%- if has_products -%}
+{%- if has_collections -%}
   <div
     class="related-searches-pills"
     style="
@@ -61,15 +56,15 @@
 
       <div class="related-searches-pills__tags">
         {%- assign pill_count = 0 -%}
-        {%- for p in pill_products -%}
-          {%- if template contains 'product' and p.id == product.id -%}
+        {%- for col in pill_collections -%}
+          {%- if template contains 'collection' and collection != blank and col.id == collection.id -%}
             {%- continue -%}
           {%- endif -%}
           {%- if pill_count >= max_pills -%}
             {%- break -%}
           {%- endif -%}
           <a
-            href="{{ p.url }}"
+            href="{{ col.url }}"
             class="related-searches-pills__tag"
             style="
               background-color: {{ pill_bg }};
@@ -78,7 +73,7 @@
               border-radius: {{ pill_radius }}px;
             "
           >
-            {{ p.title | truncate: truncate_length }}
+            {{ col.title | truncate: truncate_length }}
           </a>
           {%- assign pill_count = pill_count | plus: 1 -%}
         {%- endfor -%}
@@ -141,7 +136,7 @@
   "settings": [
     {
       "type": "paragraph",
-      "content": "Pills link to actual product pages from the current collection (on collection pages) or related products (on product pages)."
+      "content": "Pills link to collection pages. On product pages, shows the collections the product belongs to; on collection pages, shows other collections from the store."
     },
     {
       "type": "text",
@@ -156,7 +151,7 @@
     {
       "type": "range",
       "id": "max_products",
-      "label": "Max products to show",
+      "label": "Max pills to show",
       "min": 3,
       "max": 20,
       "step": 1,
