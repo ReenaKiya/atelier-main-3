@@ -61,24 +61,26 @@
       %}
 
       {%- liquid
-        assign active_filter_labels = ''
+        assign material_label = ''
         for f in collection.filters
           if f.type == 'price_range'
             continue
           endif
-          for v in f.active_values
-            if active_filter_labels == ''
-              assign active_filter_labels = v.label
-            else
-              assign active_filter_labels = active_filter_labels | append: ', ' | append: v.label
-            endif
-          endfor
+          assign f_name_down = f.label | downcase
+          if f_name_down contains 'material'
+            for v in f.active_values
+              if material_label == ''
+                assign material_label = v.label
+              endif
+            endfor
+          endif
         endfor
       -%}
 
-      <h1 class="collection--title">
-        {% if active_filter_labels != '' %}{{ active_filter_labels }}{% else %}{{ collection.title }}{% endif %}
-      </h1>
+      <div class="main-collection-column">
+        <h1 class="collection--title">
+          {% if material_label != '' %}{{ material_label }} {{ collection.title }}{% else %}{{ collection.title }}{% endif %}
+        </h1>
 
       {% capture children %}
         {% for product in collection.products %}
@@ -100,7 +102,8 @@
         products: collection.products,
         paginate: paginate
       %}
-    </div> 
+      </div>
+    </div>
 
     {% if paginate.pages > 1 %}
       <div class="pagination-wrapper after-grid">
@@ -394,7 +397,8 @@
     display: flex;
     flex-direction: column;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: auto;
+    padding-top: 8px;
     opacity: 1;
     transform: translateY(0);
     pointer-events: auto;
@@ -834,26 +838,32 @@
     grid-row: 1;
   }
 
-  .collection-wrapper > .collection--title {
+  .main-collection-column {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
     grid-column: 1 / -1;
     grid-row: 2;
     padding-inline: var(--page-margin, 24px);
+    min-width: 0;
+  }
+
+  .main-collection-column > .main-collection-grid {
+    --padding-block-start: 0;
+    padding-block-start: 0;
+    margin-block-start: 0;
   }
 
   @media screen and (min-width: 750px) {
-    .collection-wrapper > .collection--title {
+    .main-collection-column {
       grid-column: var(--facets-vertical-col-width) / var(--full-width-column-number);
       padding-inline: 0;
     }
 
     .collection-wrapper:has(.facets-block-wrapper--vertical:not(.hidden))
       > .facets-block-wrapper--vertical {
-      grid-row: 2 / span 2;
-    }
-
-    .collection-wrapper:has(.facets-block-wrapper--vertical:not(.hidden))
-      > .main-collection-grid {
-      grid-row: 3;
+      grid-row: 2;
+      align-self: start;
     }
   }
 
@@ -872,6 +882,7 @@
     padding: 16px var(--page-margin, 24px) 0;
     width: 100%;
     box-sizing: border-box;
+    margin-bottom: 32px;
   }
 
   .breadcrumbs__link {
@@ -898,11 +909,25 @@
   }
 
   .collection--title {
-    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-size: clamp(2rem, 5vw, 2.5rem);
     font-weight: 700;
-    margin: 8px 0 16px;
+    margin: 0;
     line-height: 1.1;
     color: #111;
+    margin-bottom: 45px;
+  }
+
+
+  .collection-wrapper {
+    row-gap: 8px;
+  }
+
+  .product-grid__item,
+  .product-grid__item[class*='product-grid__item--'] {
+    border: 1px solid black;
+    padding: 6px;
+    border-radius: 6px;
+    box-sizing: border-box;
   }
 
   @media screen and (max-width: 749px) {
