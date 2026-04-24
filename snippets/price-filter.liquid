@@ -93,14 +93,6 @@
           {%- assign fill_hidden_class = '' -%}
         {%- endif -%}
 
-        {%- comment -%} Decorative price-distribution histogram {%- endcomment -%}
-        <div class="price-facet__histogram" aria-hidden="true">
-          {%- assign hist_heights = '10,18,32,48,62,72,65,55,42,28,22,30,45,58,40,28,20,15,12,10,8,6,5,4' | split: ',' -%}
-          {%- for h in hist_heights -%}
-            <span class="price-facet__hist-bar" style="height: {{ h }}%;"></span>
-          {%- endfor -%}
-        </div>
-
         <div class="price-facet__slider-wrap" ref="sliderWrap">
           <div class="price-facet__track"></div>
           <div
@@ -210,25 +202,6 @@
     container-type: inline-size;
     display: flex;
     flex-direction: column;
-  }
-
-  .price-facet__histogram {
-    display: flex;
-    align-items: flex-end;
-    gap: 2px;
-    width: 100%;
-    height: 56px;
-    padding: 0 9px;
-    margin-bottom: -1px;
-    box-sizing: border-box;
-  }
-
-  .price-facet__hist-bar {
-    flex: 1 1 0;
-    min-width: 0;
-    background: #d9d9d9;
-    border-radius: 1px 1px 0 0;
-    transition: background 0.2s ease;
   }
 
   .price-facet__slider-wrap {
