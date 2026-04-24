@@ -87,16 +87,11 @@
         {%- assign fill_left_pct = min_offset | times: 100 | divided_by: range_span -%}
         {%- assign fill_right_pct_raw = max_offset | times: 100 | divided_by: range_span -%}
         {%- assign fill_right_pct = 100 | minus: fill_right_pct_raw -%}
-        {%- if filter.min_value.value == null and filter.max_value.value == null -%}
-          {%- assign fill_hidden_class = ' price-facet__fill--hidden' -%}
-        {%- else -%}
-          {%- assign fill_hidden_class = '' -%}
-        {%- endif -%}
 
         <div class="price-facet__slider-wrap" ref="sliderWrap">
           <div class="price-facet__track"></div>
           <div
-            class="price-facet__fill{{ fill_hidden_class }}"
+            class="price-facet__fill"
             ref="rangeFill"
             style="left: {{ fill_left_pct }}%; right: {{ fill_right_pct }}%;"
           ></div>
