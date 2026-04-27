@@ -4,59 +4,85 @@
     <h2 class="customer-reviews-heading">{{ section.settings.heading }}</h2>
   {% endif %}
 
-  <div class="customer-reviews-overall">
-    <div class="overall-rating">
-      <div class="overall-stars">
-        {% for i in (1..5) %}
-          <svg class="star-icon filled" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-            <path d="M31.547 12a.848.848 0 00-.677-.577l-9.427-1.376-4.224-8.532a.847.847 0 00-1.516 0l-4.218 8.534-9.427 1.355a.847.847 0 00-.467 1.467l6.823 6.664-1.612 9.375a.847.847 0 001.23.893l8.428-4.434 8.432 4.432a.847.847 0 001.229-.894l-1.615-9.373 6.822-6.665a.845.845 0 00.214-.869z" />
-          </svg>
-        {% endfor %}
-      </div>
-      <div class="overall-rating-text">
-        <span class="review-count">from {{ section.settings.total_reviews | default: 1405 }} reviews</span>
-        <svg class="checkmark-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M20 6L9 17l-5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
-        </svg>
-      </div>
-    </div>
-  </div>
-
   <div class="customer-reviews-carousel-wrapper"
        data-autoplay="{{ section.settings.autoplay }}"
        data-autoplay-speed="{{ section.settings.autoplay_speed }}">
     <div class="customer-reviews-carousel" id="reviews-carousel-{{ section.id }}">
       {% for block in section.blocks %}
-        <div class="review-card">
-          <div class="review-stars">
-            {% for i in (1..5) %}
-              <svg class="star-icon filled" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
-                <path d="M31.547 12a.848.848 0 00-.677-.577l-9.427-1.376-4.224-8.532a.847.847 0 00-1.516 0l-4.218 8.534-9.427 1.355a.847.847 0 00-.467 1.467l6.823 6.664-1.612 9.375a.847.847 0 001.23.893l8.428-4.434 8.432 4.432a.847.847 0 001.229-.894l-1.615-9.373 6.822-6.665a.845.845 0 00.214-.869z" />
-              </svg>
-            {% endfor %}
-          </div>
-          {% if block.settings.headline != blank %}
-            <h3 class="review-headline">{{ block.settings.headline }}</h3>
-          {% endif %}
-          {% if block.settings.body_text != blank %}
-            <p class="review-body">{{ block.settings.body_text }}</p>
-          {% endif %}
-          <div class="review-author">
-            {% if block.settings.author_image != blank %}
-              <img src="{{ block.settings.author_image | image_url: width: 60 }}" alt="{{ block.settings.author_name }}" class="review-author-image" />
+        {% assign rating = block.settings.rating | default: 5 %}
+        <article class="review-card" {{ block.shopify_attributes }}>
+          <div class="review-card__top">
+            <div class="review-card__stars">
+              {% for i in (1..5) %}
+                <svg class="star-icon {% if forloop.index0 < rating %}filled{% endif %}" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                  <path d="M31.547 12a.848.848 0 00-.677-.577l-9.427-1.376-4.224-8.532a.847.847 0 00-1.516 0l-4.218 8.534-9.427 1.355a.847.847 0 00-.467 1.467l6.823 6.664-1.612 9.375a.847.847 0 001.23.893l8.428-4.434 8.432 4.432a.847.847 0 001.229-.894l-1.615-9.373 6.822-6.665a.845.845 0 00.214-.869z"/>
+                </svg>
+              {% endfor %}
+            </div>
+            {% if block.settings.date != blank %}
+              <span class="review-card__date">{{ block.settings.date }}</span>
             {% endif %}
-            <span class="review-author-name">{{ block.settings.author_name }}</span>
           </div>
-        </div>
+
+          <div class="review-card__author">
+            {% if block.settings.author_image != blank %}
+              <img src="{{ block.settings.author_image | image_url: width: 60 }}" alt="{{ block.settings.author_name | escape }}" class="review-card__avatar" loading="lazy" width="28" height="28">
+            {% else %}
+              <span class="review-card__avatar review-card__avatar--placeholder" aria-hidden="true">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="1.5">
+                  <circle cx="12" cy="9" r="3.25"/>
+                  <path d="M4.5 19.5c1-3 4.5-4.5 7.5-4.5s6.5 1.5 7.5 4.5" stroke-linecap="round"/>
+                </svg>
+              </span>
+            {% endif %}
+            <span class="review-card__name">{{ block.settings.author_name }}</span>
+            {% case block.settings.badge_type %}
+              {% when 'verified' %}
+                <span class="review-card__badge">Verified</span>
+              {% when 'verified_by_shop' %}
+                <span class="review-card__badge review-card__badge--shop">Verified by <strong>shop</strong></span>
+            {% endcase %}
+          </div>
+
+          {% if block.settings.headline != blank %}
+            <h3 class="review-card__headline">{{ block.settings.headline }}</h3>
+          {% endif %}
+
+          {% if block.settings.body_text != blank %}
+            <p class="review-card__body">{{ block.settings.body_text }}</p>
+          {% endif %}
+
+          <div class="review-card__footer">
+            {% if block.settings.full_review_url != blank %}
+              <a href="{{ block.settings.full_review_url }}" class="review-card__full-review">Full Review</a>
+            {% else %}
+              <span class="review-card__full-review-spacer"></span>
+            {% endif %}
+            <div class="review-card__helpful">
+              <span class="review-card__thumb">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M7 22V11l5-7 1 1c.6.6.7 1.5.5 2.3L13 10h6c1 0 1.8.9 1.7 2l-1.4 7c-.2 1-1 1.7-2 1.7H7zM3 22h4V11H3z"/>
+                </svg>
+                <span>{{ block.settings.helpful_yes | default: 0 }}</span>
+              </span>
+              <span class="review-card__thumb">
+                <svg viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M17 2v11l-5 7-1-1c-.6-.6-.7-1.5-.5-2.3L11 13H5c-1 0-1.8-.9-1.7-2l1.4-7c.2-1 1-1.7 2-1.7H17zM21 2h-4v11h4z"/>
+                </svg>
+                <span>{{ block.settings.helpful_no | default: 0 }}</span>
+              </span>
+            </div>
+          </div>
+        </article>
       {% endfor %}
     </div>
 
-    <button class="carousel-nav-btn prev" aria-label="Previous reviews" onclick="moveCarousel('{{ section.id }}', -1)">
+    <button class="carousel-nav-btn prev" aria-label="Previous reviews" type="button" onclick="moveCarousel('{{ section.id }}', -1)">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M15 18l-6-6 6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
     </button>
-    <button class="carousel-nav-btn next" aria-label="Next reviews" onclick="moveCarousel('{{ section.id }}', 1)">
+    <button class="carousel-nav-btn next" aria-label="Next reviews" type="button" onclick="moveCarousel('{{ section.id }}', 1)">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
         <path d="M9 18l6-6-6-6" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
       </svg>
@@ -68,55 +94,14 @@
 .customer-reviews-section {
   padding: 60px 20px;
   text-align: center;
-  background: white;
+  background: #fff;
 }
 
 .customer-reviews-heading {
-  color: #ff69b4;
-  font-size: 2rem;
-  font-weight: 600;
-  margin-bottom: 30px;
-}
-
-.customer-reviews-overall {
-  margin-bottom: 40px;
-}
-
-.overall-rating {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 15px;
-  flex-wrap: wrap;
-}
-
-.overall-stars {
-  display: flex;
-  gap: 4px;
-}
-
-.overall-stars .star-icon {
-  width: 20px;
-  height: 20px;
-  fill: #bb1e6d;
-}
-
-.overall-rating-text {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-}
-
-.review-count {
-  color: #000;
-  font-size: 0.95rem;
-}
-
-.checkmark-icon {
-  width: 18px;
-  height: 18px;
-  color: #22c55e;
-  flex-shrink: 0;
+  color: #111;
+  font-size: 1.875rem;
+  font-weight: 700;
+  margin-bottom: 32px;
 }
 
 .customer-reviews-carousel-wrapper {
@@ -127,13 +112,13 @@
 
 .customer-reviews-carousel {
   display: flex;
-  gap: 20px;
+  gap: 16px;
   overflow-x: auto;
   scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   -webkit-overflow-scrolling: touch;
   scrollbar-width: none;
-  padding: 10px 0;
+  padding: 4px 0;
 }
 
 .customer-reviews-carousel::-webkit-scrollbar {
@@ -141,66 +126,159 @@
 }
 
 .review-card {
-  flex: 0 0 calc(33.333% - 14px);
-  min-width: 300px;
-  padding: 20px;
+  flex: 0 0 calc(25% - 12px);
+  min-width: 270px;
+  display: flex;
+  flex-direction: column;
+  padding: 22px 22px 18px;
+  background: #fff;
+  border: 1px solid #e5e5e5;
   text-align: left;
   scroll-snap-align: start;
+  min-height: 320px;
+  box-sizing: border-box;
 }
 
-.review-stars {
+.review-card__top {
   display: flex;
-  gap: 4px;
-  margin-bottom: 12px;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 14px;
 }
 
-.review-stars .star-icon {
-  width: 18px;
-  height: 18px;
-  fill: #bb1e6d;
+.review-card__stars {
+  display: flex;
+  gap: 2px;
 }
 
-.review-headline {
-  font-size: 1.1rem;
-  font-weight: 700;
-  color: #000;
-  margin-bottom: 10px;
-  line-height: 1.4;
+.review-card__stars .star-icon {
+  width: 16px;
+  height: 16px;
+  fill: #e5e5e5;
 }
 
-.review-body {
-  font-size: 0.95rem;
-  color: #000;
-  line-height: 1.6;
-  margin-bottom: 15px;
+.review-card__stars .star-icon.filled {
+  fill: #DA1E37;
 }
 
-.review-author {
+.review-card__date {
+  font-size: 13px;
+  color: #999;
+}
+
+.review-card__author {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
 }
 
-.review-author-image {
-  width: 50px;
-  height: 50px;
-  border-radius: 4px;
+.review-card__avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 3px;
   object-fit: cover;
   flex-shrink: 0;
 }
 
-.review-author-name {
-  font-size: 0.9rem;
-  color: #000;
+.review-card__avatar--placeholder {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  background: #e8e8e8;
+  color: #999;
+}
+
+.review-card__avatar--placeholder svg {
+  width: 18px;
+  height: 18px;
+}
+
+.review-card__name {
+  font-size: 14px;
+  font-weight: 600;
+  color: #111;
+}
+
+.review-card__badge {
+  display: inline-block;
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 7px;
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+}
+
+.review-card__badge--shop strong {
+  font-weight: 700;
+  margin-left: 1px;
+}
+
+.review-card__headline {
+  font-size: 0.95rem;
+  font-weight: 700;
+  color: #111;
+  margin: 0 0 8px;
+  line-height: 1.3;
+}
+
+.review-card__body {
+  font-size: 0.875rem;
+  color: #333;
+  line-height: 1.5;
+  margin: 0 0 16px;
+}
+
+.review-card__footer {
+  margin-top: auto;
+  padding-top: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.review-card__full-review {
+  font-size: 13px;
+  color: #111;
+  text-decoration: underline;
+}
+
+.review-card__full-review:hover {
+  text-decoration: none;
+}
+
+.review-card__full-review-spacer {
+  display: inline-block;
+}
+
+.review-card__helpful {
+  display: flex;
+  gap: 14px;
+}
+
+.review-card__thumb {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 13px;
+  color: #888;
+}
+
+.review-card__thumb svg {
+  width: 16px;
+  height: 16px;
 }
 
 .carousel-nav-btn {
   position: absolute;
   top: 50%;
   transform: translateY(-50%);
-  background: rgba(255, 255, 255, 0.9);
-  border: 1px solid #e5e5e5;
-  border-radius: 50%;
+  background: transparent;
+  border: none;
   width: 40px;
   height: 40px;
   display: flex;
@@ -208,116 +286,80 @@
   justify-content: center;
   cursor: pointer;
   z-index: 10;
-  transition: all 0.3s ease;
-  color: #666;
+  color: #111;
+  padding: 0;
 }
 
 .carousel-nav-btn:hover {
-  background: #fff;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
-  color: #000;
+  color: #444;
 }
 
 .carousel-nav-btn.prev {
-  left: -20px;
+  left: -32px;
 }
 
 .carousel-nav-btn.next {
-  right: -20px;
+  right: -32px;
 }
 
 .carousel-nav-btn svg {
-  width: 20px;
-  height: 20px;
+  width: 22px;
+  height: 22px;
 }
 
 .carousel-nav-btn:disabled {
-  opacity: 0.3;
+  opacity: 0.25;
   cursor: not-allowed;
 }
 
 @media screen and (max-width: 990px) {
   .review-card {
-    flex: 0 0 calc(50% - 10px);
+    flex: 0 0 calc(50% - 8px);
   }
-
-  .carousel-nav-btn.prev {
-    left: 10px;
-  }
-
-  .carousel-nav-btn.next {
-    right: 10px;
-  }
+  .carousel-nav-btn.prev { left: 4px; }
+  .carousel-nav-btn.next { right: 4px; }
 }
 
 @media screen and (max-width: 749px) {
   .customer-reviews-section {
     padding: 40px 15px;
   }
-
   .customer-reviews-heading {
     font-size: 1.5rem;
     margin-bottom: 20px;
   }
-
   .review-card {
-    flex: 0 0 100%;
-    min-width: 280px;
-  }
-
-  .overall-rating {
-    flex-direction: column;
-    gap: 10px;
-  }
-
-  .carousel-nav-btn {
-    width: 35px;
-    height: 35px;
-  }
-
-  .carousel-nav-btn.prev {
-    left: 5px;
-  }
-
-  .carousel-nav-btn.next {
-    right: 5px;
+    flex: 0 0 85%;
+    min-width: 260px;
   }
 }
 </style>
 
 <script>
-let carouselPositions = {};
-let autoplayIntervals = {};
+let carouselPositions = window.carouselPositions || {};
+let autoplayIntervals = window.autoplayIntervals || {};
+window.carouselPositions = carouselPositions;
+window.autoplayIntervals = autoplayIntervals;
 
 function moveCarousel(sectionId, direction) {
   const carousel = document.getElementById('reviews-carousel-' + sectionId);
   if (!carousel) return;
-
   const cards = carousel.querySelectorAll('.review-card');
   const cardWidth = cards[0]?.offsetWidth || 0;
-  const gap = 20;
-  const scrollAmount = (cardWidth + gap) * direction;
-
-  carousel.scrollBy({
-    left: scrollAmount,
-    behavior: 'smooth'
-  });
-
-  // Update button states
+  const gap = 16;
+  carousel.scrollBy({ left: (cardWidth + gap) * direction, behavior: 'smooth' });
   updateCarouselButtons(sectionId);
 }
 
 function updateCarouselButtons(sectionId) {
   const carousel = document.getElementById('reviews-carousel-' + sectionId);
   if (!carousel) return;
-
-  const prevBtn = carousel.closest('.customer-reviews-carousel-wrapper').querySelector('.prev');
-  const nextBtn = carousel.closest('.customer-reviews-carousel-wrapper').querySelector('.next');
-
+  const wrapper = carousel.closest('.customer-reviews-carousel-wrapper');
+  const prevBtn = wrapper?.querySelector('.prev');
+  const nextBtn = wrapper?.querySelector('.next');
   if (prevBtn && nextBtn) {
     const isAtStart = carousel.scrollLeft <= 0;
     const isAtEnd = carousel.scrollLeft >= carousel.scrollWidth - carousel.clientWidth - 10;
-
     prevBtn.disabled = isAtStart;
     nextBtn.disabled = isAtEnd;
   }
@@ -326,36 +368,18 @@ function updateCarouselButtons(sectionId) {
 function startAutoplay(sectionId, speed) {
   const carousel = document.getElementById('reviews-carousel-' + sectionId);
   if (!carousel) return;
-
-  // Clear existing interval if any
-  if (autoplayIntervals[sectionId]) {
-    clearInterval(autoplayIntervals[sectionId]);
-  }
-
+  if (autoplayIntervals[sectionId]) clearInterval(autoplayIntervals[sectionId]);
   autoplayIntervals[sectionId] = setInterval(() => {
     const cards = carousel.querySelectorAll('.review-card');
-    if (cards.length === 0) return;
-
+    if (!cards.length) return;
     const cardWidth = cards[0].offsetWidth;
-    const gap = 20;
-    const scrollAmount = cardWidth + gap;
+    const gap = 16;
     const maxScroll = carousel.scrollWidth - carousel.clientWidth;
-
-    // Check if we've reached the end
     if (carousel.scrollLeft >= maxScroll - 10) {
-      // Reset to start for infinite loop
-      carousel.scrollTo({
-        left: 0,
-        behavior: 'smooth'
-      });
+      carousel.scrollTo({ left: 0, behavior: 'smooth' });
     } else {
-      // Move to next card
-      carousel.scrollBy({
-        left: scrollAmount,
-        behavior: 'smooth'
-      });
+      carousel.scrollBy({ left: cardWidth + gap, behavior: 'smooth' });
     }
-
     updateCarouselButtons(sectionId);
   }, speed);
 }
@@ -367,39 +391,20 @@ function stopAutoplay(sectionId) {
   }
 }
 
-// Initialize button states and autoplay on load
 document.addEventListener('DOMContentLoaded', function() {
   document.querySelectorAll('.customer-reviews-carousel').forEach(carousel => {
     const sectionId = carousel.id.replace('reviews-carousel-', '');
     const wrapper = carousel.closest('.customer-reviews-carousel-wrapper');
     const autoplayEnabled = wrapper.dataset.autoplay === 'true';
-    const autoplaySpeed = parseInt(wrapper.dataset.autoplaySpeed) || 3000;
+    const autoplaySpeed = parseInt(wrapper.dataset.autoplaySpeed) || 4000;
 
     updateCarouselButtons(sectionId);
-
-    // Update on scroll
     carousel.addEventListener('scroll', () => updateCarouselButtons(sectionId));
 
-    // Start autoplay if enabled
     if (autoplayEnabled) {
       startAutoplay(sectionId, autoplaySpeed);
-
-      // Pause on hover
       wrapper.addEventListener('mouseenter', () => stopAutoplay(sectionId));
       wrapper.addEventListener('mouseleave', () => startAutoplay(sectionId, autoplaySpeed));
-
-      // Pause on touch/interaction
-      let userInteracting = false;
-      wrapper.addEventListener('touchstart', () => {
-        userInteracting = true;
-        stopAutoplay(sectionId);
-      });
-      wrapper.addEventListener('touchend', () => {
-        setTimeout(() => {
-          userInteracting = false;
-          if (autoplayEnabled) startAutoplay(sectionId, autoplaySpeed);
-        }, 1000);
-      });
     }
   });
 });
@@ -413,28 +418,22 @@ document.addEventListener('DOMContentLoaded', function() {
       "type": "text",
       "id": "heading",
       "label": "Heading",
-      "default": "Let customers speak for us"
-    },
-    {
-      "type": "number",
-      "id": "total_reviews",
-      "label": "Total Reviews Count",
-      "default": 1405
+      "default": "Customer Reviews"
     },
     {
       "type": "checkbox",
       "id": "autoplay",
       "label": "Enable Auto Slide",
-      "default": true
+      "default": false
     },
     {
       "type": "range",
       "id": "autoplay_speed",
-      "label": "Auto Slide Speed (milliseconds)",
+      "label": "Auto Slide Speed",
       "min": 2000,
       "max": 8000,
       "step": 500,
-      "default": 3000,
+      "default": 4000,
       "unit": "ms"
     }
   ],
@@ -444,27 +443,69 @@ document.addEventListener('DOMContentLoaded', function() {
       "name": "Review",
       "settings": [
         {
-          "type": "text",
-          "id": "headline",
-          "label": "Review Headline",
-          "default": "Perfect for walking / feeding on the go"
+          "type": "range",
+          "id": "rating",
+          "label": "Star Rating",
+          "min": 1,
+          "max": 5,
+          "step": 1,
+          "default": 5
         },
         {
-          "type": "textarea",
-          "id": "body_text",
-          "label": "Review Text",
-          "default": "Perfect for walking / feeding on the go. I wear with a sling..."
+          "type": "text",
+          "id": "date",
+          "label": "Review Date",
+          "info": "e.g. 19/08/2025",
+          "default": "01/01/2025"
         },
         {
           "type": "text",
           "id": "author_name",
           "label": "Author Name",
-          "default": "Kay"
+          "default": "Customer"
         },
         {
           "type": "image_picker",
           "id": "author_image",
-          "label": "Author Image"
+          "label": "Author Image (optional)"
+        },
+        {
+          "type": "select",
+          "id": "badge_type",
+          "label": "Badge",
+          "options": [
+            { "value": "none", "label": "None" },
+            { "value": "verified", "label": "Verified" },
+            { "value": "verified_by_shop", "label": "Verified by Shop" }
+          ],
+          "default": "verified"
+        },
+        {
+          "type": "text",
+          "id": "headline",
+          "label": "Review Headline (optional)"
+        },
+        {
+          "type": "textarea",
+          "id": "body_text",
+          "label": "Review Text"
+        },
+        {
+          "type": "url",
+          "id": "full_review_url",
+          "label": "Full Review URL (optional)"
+        },
+        {
+          "type": "number",
+          "id": "helpful_yes",
+          "label": "Thumbs Up Count",
+          "default": 0
+        },
+        {
+          "type": "number",
+          "id": "helpful_no",
+          "label": "Thumbs Down Count",
+          "default": 0
         }
       ]
     }
@@ -476,25 +517,44 @@ document.addEventListener('DOMContentLoaded', function() {
         {
           "type": "review",
           "settings": {
-            "headline": "Perfect for walking / feeding on the go",
-            "body_text": "Perfect for walking / feeding on the go. I wear with a sling...",
-            "author_name": "Kay"
+            "rating": 5,
+            "date": "19/08/2025",
+            "author_name": "Natalia Popiolek",
+            "badge_type": "verified",
+            "headline": "Amazing",
+            "body_text": "Already bought a next pair! Amazing product"
           }
         },
         {
           "type": "review",
           "settings": {
-            "headline": "So cute - love the colour and flattering too",
-            "body_text": "I wanted something for the gym that was 'fit pregnancy'...",
-            "author_name": "K."
+            "rating": 5,
+            "date": "15/06/2025",
+            "author_name": "D.M.",
+            "badge_type": "verified_by_shop",
+            "body_text": "Just perfect!"
           }
         },
         {
           "type": "review",
           "settings": {
-            "headline": "Beyond supportive",
-            "body_text": "This is my second pregnancy and the weight of the baby was so much heavier this tim...",
-            "author_name": "Kay"
+            "rating": 5,
+            "date": "08/06/2025",
+            "author_name": "Aiste",
+            "badge_type": "verified",
+            "headline": "As described",
+            "body_text": "Just what i wanted!"
+          }
+        },
+        {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "02/06/2025",
+            "author_name": "Richard",
+            "badge_type": "verified",
+            "headline": "14K Solid Gold",
+            "body_text": "Beautiful segment ring, exactly as pictured."
           }
         }
       ]

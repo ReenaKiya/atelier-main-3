@@ -291,6 +291,17 @@
         }
         const timestamps = RecentlyViewed.getTimestamps();
 
+        let backfilled = false;
+        ids.forEach((id) => {
+          if (!timestamps[id]) {
+            timestamps[id] = Date.now();
+            backfilled = true;
+          }
+        });
+        if (backfilled) {
+          localStorage.setItem('viewedProductsTimestamps', JSON.stringify(timestamps));
+        }
+
         const url = new URL('{{ routes.predictive_search_url }}', location.origin);
         url.searchParams.set('q', ids.map((id) => 'id:' + id).join(' OR '));
         url.searchParams.set('resources[type]', 'product');

@@ -511,9 +511,9 @@
         "judge_me_reviews_review_widget_HLL7Un": {
           "type": "shopify://apps/judge-me-reviews/blocks/review_widget/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
-            "review_data": "sample_data",
+            "review_data": "real_data",
             "max_width": 1200,
-            "show_shop_reviews": false,
+            "show_shop_reviews": true,
             "empty_state": "empty_widget"
           }
         }
@@ -790,6 +790,73 @@
         "faq_content": "<div class=\"pdt-faq-list\">\n  <div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n  <!-- more items... -->\n</div>"
       }
     },
+    "customer_reviews_pdp_001": {
+      "type": "customer-reviews",
+      "blocks": {
+        "review_1": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "19/08/2025",
+            "author_name": "Natalia Popiolek",
+            "badge_type": "verified",
+            "headline": "Amazing",
+            "body_text": "Already bought a next pair! Amazing product",
+            "helpful_yes": 0,
+            "helpful_no": 0
+          }
+        },
+        "review_2": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "15/06/2025",
+            "author_name": "D.M.",
+            "badge_type": "verified_by_shop",
+            "body_text": "Just perfect!",
+            "helpful_yes": 0,
+            "helpful_no": 0
+          }
+        },
+        "review_3": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "08/06/2025",
+            "author_name": "Aiste",
+            "badge_type": "verified",
+            "headline": "As described",
+            "body_text": "Just what i wanted!",
+            "helpful_yes": 0,
+            "helpful_no": 0
+          }
+        },
+        "review_4": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "02/06/2025",
+            "author_name": "Richard",
+            "badge_type": "verified",
+            "headline": "14K Solid Gold",
+            "body_text": "Beautiful segment ring, exactly as pictured.",
+            "helpful_yes": 0,
+            "helpful_no": 0
+          }
+        }
+      },
+      "block_order": [
+        "review_1",
+        "review_2",
+        "review_3",
+        "review_4"
+      ],
+      "settings": {
+        "heading": "Customer Reviews",
+        "autoplay": false,
+        "autoplay_speed": 4000
+      }
+    },
     "recently_viewed_products_Rv1Abc": {
       "type": "recently-viewed-products",
       "settings": {
@@ -866,6 +933,7 @@
     "collection_list_Ec6EQn",
     "177426350820ff0335",
     "product_description_tabs_tqRhX7",
+    "customer_reviews_pdp_001",
     "recently_viewed_products_Rv1Abc",
     "people_also_searched_Mw6Qg7",
     "1775656111a0866560"
