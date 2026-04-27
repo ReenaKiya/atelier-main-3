@@ -793,6 +793,20 @@
     "customer_reviews_pdp_001": {
       "type": "customer-reviews",
       "blocks": {
+        "review_99KJEQ": {
+          "type": "review",
+          "settings": {
+            "rating": 5,
+            "date": "03/04/2025",
+            "author_name": "Kiya patel",
+            "badge_type": "verified",
+            "headline": "",
+            "body_text": "",
+            "full_review_url": "",
+            "helpful_yes": 0,
+            "helpful_no": 0
+          }
+        },
         "review_1": {
           "type": "review",
           "settings": {
@@ -851,6 +865,7 @@
         }
       },
       "block_order": [
+        "review_99KJEQ",
         "review_1",
         "review_2",
         "review_3",
