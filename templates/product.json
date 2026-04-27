@@ -790,6 +790,18 @@
         "faq_content": "<div class=\"pdt-faq-list\">\n  <div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n<div class=\"pdt-faq-item\">\n    <details>\n      <summary>Is 14K gold hypoallergenic and suitable for sensitive skin?\n        <svg class=\"pdt-faq-icon\" viewbox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polyline points=\"6 9 12 15 18 9\"></polyline></svg>\n      </summary>\n      <div class=\"pdt-faq-answer\"><p>Your answer here...</p></div>\n    </details>\n  </div>\n  <!-- more items... -->\n</div>"
       }
     },
+    "recently_viewed_products_Rv1Abc": {
+      "type": "recently-viewed-products",
+      "settings": {
+        "title": "You recently viewed",
+        "clear_label": "Clear recently viewed",
+        "max_products": 8,
+        "columns": 5,
+        "color_scheme": "scheme-1",
+        "padding_block_start": 48,
+        "padding_block_end": 48
+      }
+    },
     "people_also_searched_Mw6Qg7": {
       "type": "people-also-searched",
       "name": "People Also Searched",
@@ -854,6 +866,7 @@
     "collection_list_Ec6EQn",
     "177426350820ff0335",
     "product_description_tabs_tqRhX7",
+    "recently_viewed_products_Rv1Abc",
     "people_also_searched_Mw6Qg7",
     "1775656111a0866560"
   ]

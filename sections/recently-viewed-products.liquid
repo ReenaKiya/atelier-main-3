@@ -1,0 +1,429 @@
+{%- comment -%}
+  Recently Viewed Products section.
+
+  Renders in two modes:
+  1. Normal page render: outputs shell + JS that hydrates cards from localStorage.
+  2. Section-rendering-API fetch (/search/suggest?section_id=...): outputs only the
+     product cards, which the client-side JS extracts and drops into the shell.
+{%- endcomment -%}
+
+{%- if predictive_search.performed -%}
+  <div data-recently-viewed-items>
+    {%- for product in predictive_search.resources.products -%}
+      <div
+        class="rv-card-slot"
+        data-product-id="{{ product.id }}"
+        data-product-handle="{{ product.handle }}"
+      >
+        {%- render 'cf-card', product: product, only_quickshop: true -%}
+      </div>
+    {%- endfor -%}
+  </div>
+{%- else -%}
+  <div
+    class="recently-viewed color-{{ section.settings.color_scheme }} section"
+    id="recently-viewed-{{ section.id }}"
+    data-section-id="{{ section.id }}"
+    data-max-products="{{ section.settings.max_products }}"
+    data-columns="{{ section.settings.columns }}"
+    hidden
+  >
+    <div class="page-width">
+      <div class="recently-viewed__header">
+        <h3 class="recently-viewed__title">{{ section.settings.title | escape }}</h3>
+        <button
+          class="recently-viewed__clear"
+          type="button"
+          data-clear-recently-viewed
+        >
+          {{ section.settings.clear_label | escape }}
+        </button>
+      </div>
+      <div class="recently-viewed__carousel">
+        <button
+          class="recently-viewed__nav recently-viewed__nav--prev"
+          type="button"
+          aria-label="Previous"
+          data-recently-viewed-prev
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="M9 1L3 7l6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+        <div class="recently-viewed__list" data-recently-viewed-list></div>
+        <button
+          class="recently-viewed__nav recently-viewed__nav--next"
+          type="button"
+          aria-label="Next"
+          data-recently-viewed-next
+        >
+          <svg width="14" height="14" viewBox="0 0 14 14" aria-hidden="true" focusable="false" xmlns="http://www.w3.org/2000/svg">
+            <path d="M5 1l6 6-6 6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  {%- style -%}
+    .recently-viewed {
+      padding-block: {{ section.settings.padding_block_start }}px {{ section.settings.padding_block_end }}px;
+      background: #f1f1f1;
+    }
+    .recently-viewed__header {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+    .recently-viewed__title {
+      margin: 0;
+      font-size: 1.25rem;
+      font-weight: 500;
+    }
+    .recently-viewed__clear {
+      background: none;
+      border: none;
+      color: #DA1E37;
+      cursor: pointer;
+      font-size: 14px;
+      padding: 0;
+    }
+    .recently-viewed__clear:hover {
+      text-decoration: underline;
+    }
+    .recently-viewed__carousel {
+      position: relative;
+    }
+    .recently-viewed__list {
+      display: flex;
+      gap: 16px;
+      overflow-x: auto;
+      scroll-snap-type: x mandatory;
+      scroll-behavior: smooth;
+      scrollbar-width: none;
+      padding: 4px 0;
+    }
+    .recently-viewed__list::-webkit-scrollbar {
+      display: none;
+    }
+    .rv-card-slot {
+      position: relative;
+      flex: 0 0 calc((100% - (({{ section.settings.columns }} - 1) * 16px)) / {{ section.settings.columns }});
+      scroll-snap-align: start;
+      background: #fff;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+      transition: opacity 0.2s ease;
+    }
+    .rv-card-slot[data-removing] {
+      opacity: 0;
+    }
+    @media (max-width: 990px) {
+      .rv-card-slot {
+        flex: 0 0 calc((100% - 32px) / 3);
+      }
+    }
+    @media (max-width: 600px) {
+      .rv-card-slot {
+        flex: 0 0 calc((100% - 16px) / 2);
+      }
+    }
+    .recently-viewed__nav {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      z-index: 3;
+      width: 36px;
+      height: 36px;
+      border-radius: 50%;
+      border: 1px solid #ddd;
+      background: #fff;
+      color: #333;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      transition: opacity 0.2s ease, background 0.15s ease;
+    }
+    .recently-viewed__nav:hover {
+      background: #f7f7f7;
+    }
+    .recently-viewed__nav--prev {
+      left: -18px;
+    }
+    .recently-viewed__nav--next {
+      right: -18px;
+    }
+    .recently-viewed__nav[disabled] {
+      opacity: 0.3;
+      cursor: not-allowed;
+    }
+    @media (max-width: 600px) {
+      .recently-viewed__nav--prev { left: 4px; }
+      .recently-viewed__nav--next { right: 4px; }
+    }
+    .product-recently-viewed-card-time {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 8px;
+      padding: 8px 10px;
+      font-size: 12px;
+      color: #666;
+      border-bottom: 1px solid #f0f0f0;
+    }
+    .product-recently-viewed-card-remove {
+      background: none;
+      border: none;
+      padding: 4px;
+      cursor: pointer;
+      color: #888;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: color 0.15s ease;
+    }
+    .product-recently-viewed-card-remove:hover {
+      color: #222;
+    }
+    .product-recently-viewed-card-remove .icon-remove {
+      display: block;
+    }
+  {%- endstyle -%}
+
+  <script type="module">
+    import { RecentlyViewed } from '@theme/recently-viewed-products';
+
+    (() => {
+      const root = document.getElementById('recently-viewed-{{ section.id }}');
+      if (!root) return;
+
+      const sectionId = root.dataset.sectionId;
+      const maxProducts = parseInt(root.dataset.maxProducts, 10) || 8;
+      const list = root.querySelector('[data-recently-viewed-list]');
+      const clearBtn = root.querySelector('[data-clear-recently-viewed]');
+      const prevBtn = root.querySelector('[data-recently-viewed-prev]');
+      const nextBtn = root.querySelector('[data-recently-viewed-next]');
+
+      const REMOVE_SVG = '<svg class="icon-remove" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="10" height="10" viewBox="0 0 10 10"><path fill="currentColor" d="M6.08785659,5 L9.77469752,1.31315906 L8.68684094,0.225302476 L5,3.91214341 L1.31315906,0.225302476 L0.225302476,1.31315906 L3.91214341,5 L0.225302476,8.68684094 L1.31315906,9.77469752 L5,6.08785659 L8.68684094,9.77469752 L9.77469752,8.68684094 L6.08785659,5 Z"/></svg>';
+
+      const MONTHS = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+
+      const relativeTime = (timestamp) => {
+        if (!timestamp) return '';
+        const diff = Math.max(0, Math.floor((Date.now() - timestamp) / 1000));
+        if (diff < 60) return diff + ' second' + (diff === 1 ? '' : 's') + ' ago';
+        const m = Math.floor(diff / 60);
+        if (m < 60) return m + ' minute' + (m === 1 ? '' : 's') + ' ago';
+        const h = Math.floor(m / 60);
+        if (h < 24) return h + ' hour' + (h === 1 ? '' : 's') + ' ago';
+        const d = new Date(timestamp);
+        return MONTHS[d.getMonth()] + ' ' + d.getDate();
+      };
+
+      const getIds = () => {
+        return (RecentlyViewed.getProducts() || []).slice(0, maxProducts);
+      };
+
+      const removeId = (productId) => {
+        const remaining = (RecentlyViewed.getProducts() || []).filter(
+          (id) => String(id) !== String(productId)
+        );
+        localStorage.setItem('viewedProducts', JSON.stringify(remaining));
+        const timestamps = RecentlyViewed.getTimestamps();
+        delete timestamps[productId];
+        localStorage.setItem('viewedProductsTimestamps', JSON.stringify(timestamps));
+      };
+
+      const updateNavState = () => {
+        if (!prevBtn || !nextBtn) return;
+        const max = list.scrollWidth - list.clientWidth;
+        const canScroll = max > 1;
+        prevBtn.hidden = !canScroll;
+        nextBtn.hidden = !canScroll;
+        prevBtn.disabled = list.scrollLeft <= 0;
+        nextBtn.disabled = list.scrollLeft >= max - 1;
+      };
+
+      const scrollByPage = (direction) => {
+        const amount = list.clientWidth * 0.8;
+        list.scrollBy({ left: direction * amount, behavior: 'smooth' });
+      };
+
+      const attachCardHeader = (slot, timestamp) => {
+        const wrapper = document.createElement('div');
+        wrapper.className = 'product-recently-viewed-card-time';
+        wrapper.setAttribute('data-product-handle', slot.dataset.productHandle || '');
+        wrapper.appendChild(document.createTextNode(relativeTime(timestamp)));
+
+        const btn = document.createElement('button');
+        btn.className = 'product-recently-viewed-card-remove';
+        btn.type = 'button';
+        btn.setAttribute('aria-label', 'close');
+        btn.setAttribute('data-remove-recently-viewed', '');
+        btn.innerHTML = REMOVE_SVG;
+        btn.addEventListener('click', (event) => {
+          event.preventDefault();
+          event.stopPropagation();
+          const pid = slot.dataset.productId;
+          removeId(pid);
+          slot.setAttribute('data-removing', '');
+          setTimeout(() => {
+            slot.remove();
+            if (!list.children.length) {
+              root.hidden = true;
+            } else {
+              updateNavState();
+            }
+          }, 200);
+        });
+        wrapper.appendChild(btn);
+
+        slot.insertBefore(wrapper, slot.firstChild);
+      };
+
+      const render = async () => {
+        const ids = getIds();
+        if (ids.length === 0) {
+          root.hidden = true;
+          return;
+        }
+        const timestamps = RecentlyViewed.getTimestamps();
+
+        const url = new URL('{{ routes.predictive_search_url }}', location.origin);
+        url.searchParams.set('q', ids.map((id) => 'id:' + id).join(' OR '));
+        url.searchParams.set('resources[type]', 'product');
+        url.searchParams.set('section_id', sectionId);
+
+        let html = '';
+        try {
+          const response = await fetch(url);
+          if (!response.ok) throw new Error(response.statusText);
+          html = await response.text();
+        } catch (error) {
+          root.hidden = true;
+          return;
+        }
+
+        const doc = new DOMParser().parseFromString(html, 'text/html');
+        const itemsContainer = doc.querySelector('[data-recently-viewed-items]');
+        if (!itemsContainer || !itemsContainer.children.length) {
+          root.hidden = true;
+          return;
+        }
+
+        const slotsById = new Map();
+        Array.from(itemsContainer.children).forEach((slot) => {
+          if (slot instanceof HTMLElement && slot.dataset.productId) {
+            slotsById.set(slot.dataset.productId, slot);
+          }
+        });
+
+        list.innerHTML = '';
+        ids.forEach((id) => {
+          const slot = slotsById.get(String(id));
+          if (slot) {
+            attachCardHeader(slot, timestamps[id]);
+            list.appendChild(slot);
+          }
+        });
+
+        if (!list.children.length) {
+          root.hidden = true;
+          return;
+        }
+
+        root.hidden = false;
+        requestAnimationFrame(updateNavState);
+      };
+
+      clearBtn.addEventListener('click', () => {
+        RecentlyViewed.clearProducts();
+        list.innerHTML = '';
+        root.hidden = true;
+      });
+
+      if (prevBtn) prevBtn.addEventListener('click', () => scrollByPage(-1));
+      if (nextBtn) nextBtn.addEventListener('click', () => scrollByPage(1));
+      list.addEventListener('scroll', updateNavState, { passive: true });
+      window.addEventListener('resize', updateNavState);
+
+      render();
+    })();
+  </script>
+{%- endif -%}
+
+{% schema %}
+{
+  "name": "Recently Viewed",
+  "disabled_on": {
+    "groups": ["header", "footer"]
+  },
+  "settings": [
+    {
+      "type": "text",
+      "id": "title",
+      "label": "Title",
+      "default": "You recently viewed"
+    },
+    {
+      "type": "text",
+      "id": "clear_label",
+      "label": "Clear button label",
+      "default": "Clear recently viewed"
+    },
+    {
+      "type": "range",
+      "id": "max_products",
+      "label": "Max products",
+      "min": 2,
+      "max": 12,
+      "step": 1,
+      "default": 8
+    },
+    {
+      "type": "range",
+      "id": "columns",
+      "label": "Visible cards (desktop)",
+      "min": 2,
+      "max": 6,
+      "step": 1,
+      "default": 5
+    },
+    {
+      "type": "color_scheme",
+      "id": "color_scheme",
+      "label": "Color scheme",
+      "default": "scheme-1"
+    },
+    {
+      "type": "range",
+      "id": "padding_block_start",
+      "label": "Padding top",
+      "min": 0,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    },
+    {
+      "type": "range",
+      "id": "padding_block_end",
+      "label": "Padding bottom",
+      "min": 0,
+      "max": 96,
+      "step": 4,
+      "unit": "px",
+      "default": 48
+    }
+  ],
+  "presets": [
+    {
+      "name": "Recently Viewed"
+    }
+  ]
+}
+{% endschema %}

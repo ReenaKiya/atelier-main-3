@@ -872,17 +872,7 @@
   }
 
   .cf-card__swatches {
-    display: flex;
-    align-items: center;
-    gap: 5px;
-    padding: 8px 0 4px;
-    flex-wrap: wrap;
-    min-height: 34px;
-    box-sizing: border-box;
-  }
-
-  .cf-card__swatches--empty {
-    visibility: hidden;
+    display: none;
   }
 
   .cf-swatch {
@@ -1018,13 +1008,29 @@
 
   .cf-card__actions {
     display: flex;
-    flex-direction: column;
+    flex-direction: row;
     gap: 6px;
-    margin-top: 8px;
+    margin-top: auto;
+    padding-top: 8px;
     opacity: 0;
     transform: translateY(4px);
     pointer-events: none;
     transition: opacity 0.25s ease, transform 0.25s ease;
+  }
+
+  .cf-card__actions .cf-card__btn {
+    flex: 1 1 0;
+    min-width: 0;
+    padding: 8px 6px;
+  }
+
+  .cf-card__actions:has(.cf-card__btn--options) {
+    flex-direction: column;
+  }
+
+  .cf-card__actions:has(.cf-card__btn--options) .cf-card__btn {
+    flex: initial;
+    padding: 8px 12px;
   }
 
   .resource-list__item .cf-card:hover .cf-card__actions,

@@ -4,8 +4,10 @@
 export class RecentlyViewed {
   /** @static @constant {string} The key used to store the viewed products in session storage */
   static #STORAGE_KEY = 'viewedProducts';
+  /** @static @constant {string} The key used to store viewed-at timestamps */
+  static #TIMESTAMP_KEY = 'viewedProductsTimestamps';
   /** @static @constant {number} The maximum number of products to store */
-  static #MAX_PRODUCTS = 4;
+  static #MAX_PRODUCTS = 12;
 
   /**
    * Adds a product to the recently viewed products list.
@@ -19,10 +21,19 @@ export class RecentlyViewed {
     viewedProducts = viewedProducts.slice(0, this.#MAX_PRODUCTS);
 
     localStorage.setItem(this.#STORAGE_KEY, JSON.stringify(viewedProducts));
+
+    const timestamps = this.getTimestamps();
+    timestamps[productId] = Date.now();
+    const validIds = new Set(viewedProducts);
+    for (const id of Object.keys(timestamps)) {
+      if (!validIds.has(id)) delete timestamps[id];
+    }
+    localStorage.setItem(this.#TIMESTAMP_KEY, JSON.stringify(timestamps));
   }
 
   static clearProducts() {
     localStorage.removeItem(this.#STORAGE_KEY);
+    localStorage.removeItem(this.#TIMESTAMP_KEY);
   }
 
   /**
@@ -31,5 +42,13 @@ export class RecentlyViewed {
    */
   static getProducts() {
     return JSON.parse(localStorage.getItem(this.#STORAGE_KEY) || '[]');
+  }
+
+  /**
+   * Retrieves the map of product IDs to view timestamps.
+   * @returns {Record<string, number>} The timestamp map.
+   */
+  static getTimestamps() {
+    return JSON.parse(localStorage.getItem(this.#TIMESTAMP_KEY) || '{}');
   }
 }
