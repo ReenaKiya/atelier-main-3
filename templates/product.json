@@ -691,6 +691,7 @@
       "block_order": [
         "group_W4NQTi"
       ],
+      "disabled": true,
       "name": "t:names.collections_grid",
       "settings": {
         "collection_list": [
