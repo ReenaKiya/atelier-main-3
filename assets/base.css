@@ -4734,3 +4734,256 @@ text-component {
   opacity: 0.3;
   cursor: not-allowed;
 } */
+
+/* ==========================================================================
+   Judge.me Cards Carousel — restyle to match site "Customer Reviews" design
+   ========================================================================== */
+.jdgm-cards-carousel {
+  --jdgm-red: #DA1E37;
+  --jdgm-card-bg: #ffffff;
+  --jdgm-card-border: #e5e5e5;
+  --jdgm-text-dark: #111111;
+  --jdgm-text-muted: #888888;
+  padding: 40px 20px !important;
+  background: #fff;
+}
+
+/* Header — show only the title, hide app's average-rating + verified badge */
+.jdgm-cards-carousel .jdgm-header {
+  text-align: center;
+  margin-bottom: 28px;
+}
+
+.jdgm-cards-carousel .jdgm-header-info,
+.jdgm-cards-carousel .jdgm-average-rating,
+.jdgm-cards-carousel .jdgm-verified-badge-header {
+  display: none !important;
+}
+
+.jdgm-cards-carousel .jdgm-title {
+  color: var(--jdgm-text-dark) !important;
+  font-size: 1.875rem !important;
+  font-weight: 700 !important;
+  margin: 0 !important;
+  text-align: center;
+}
+
+/* Force 2 narrower cards visible */
+.jdgm-cards-carousel {
+  --slides-count: 2 !important;
+  --max-width: 820px !important;
+  --width-xs: 85vw !important;
+  --width-sm: 380px !important;
+  --width-md: 380px !important;
+  --width-lg: 380px !important;
+  --width-xl: 380px !important;
+  --card-color: var(--jdgm-card-bg) !important;
+  --border-radius: 6px !important;
+}
+
+/* Direct width override on each card (beats Judge.me's width calc) */
+.jdgm-cards-carousel .jdgm-card,
+.jdgm-cards-carousel .jdgm-card.jdgm-carousel-item,
+.jdgm-cards-carousel .jdgm-card.jdgm-text-card,
+.jdgm-cards-carousel .jdgm-card.jdgm-media-card {
+  width: 380px !important;
+  min-width: 380px !important;
+  max-width: 380px !important;
+  flex: 0 0 380px !important;
+}
+
+@media screen and (max-width: 900px) {
+  .jdgm-cards-carousel .jdgm-card,
+  .jdgm-cards-carousel .jdgm-card.jdgm-carousel-item,
+  .jdgm-cards-carousel .jdgm-card.jdgm-text-card,
+  .jdgm-cards-carousel .jdgm-card.jdgm-media-card {
+    width: calc((100vw - 140px) / 2) !important;
+    min-width: calc((100vw - 140px) / 2) !important;
+    max-width: calc((100vw - 140px) / 2) !important;
+    flex: 0 0 calc((100vw - 140px) / 2) !important;
+  }
+}
+
+@media screen and (max-width: 749px) {
+  .jdgm-cards-carousel .jdgm-card,
+  .jdgm-cards-carousel .jdgm-card.jdgm-carousel-item,
+  .jdgm-cards-carousel .jdgm-card.jdgm-text-card,
+  .jdgm-cards-carousel .jdgm-card.jdgm-media-card {
+    width: 85vw !important;
+    min-width: 85vw !important;
+    max-width: 85vw !important;
+    flex: 0 0 85vw !important;
+  }
+}
+
+/* Cards — white, bordered, structured layout */
+.jdgm-cards-carousel .jdgm-card {
+  background: var(--jdgm-card-bg) !important;
+  border: 1px solid #d9d9d9 !important;
+  border-radius: 6px !important;
+  padding: 20px 22px 16px !important;
+  text-align: left !important;
+  display: flex !important;
+  flex-direction: column !important;
+  align-items: flex-start !important;
+  gap: 12px !important;
+  min-height: 320px !important;
+  box-sizing: border-box;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.04);
+  position: relative;
+}
+
+.jdgm-cards-carousel .jdgm-card > * {
+  width: 100%;
+}
+
+/* Hide review images for the clean text-only style */
+.jdgm-cards-carousel .jdgm-card > img {
+  display: none !important;
+}
+
+/* Flatten rating section so its children participate in card flex order */
+.jdgm-cards-carousel .jdgm-rating-section {
+  display: contents !important;
+}
+
+/* Stars at top, recolored to red */
+.jdgm-cards-carousel .jdgm-card .jdgm-stars {
+  order: 1;
+  display: flex !important;
+  gap: 2px;
+  margin: 0 !important;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-star {
+  color: var(--jdgm-red) !important;
+  font-size: 16px !important;
+}
+
+/* Reviewer row: avatar (via ::before) + name + "Verified" pill (via ::after) */
+.jdgm-cards-carousel .jdgm-card .jdgm-reviewer-info {
+  order: 2;
+  display: flex !important;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+  margin: 0 !important;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-reviewer-info::before {
+  content: "";
+  width: 36px;
+  height: 36px;
+  border-radius: 3px;
+  background-color: #e8e8e8;
+  background-repeat: no-repeat, no-repeat;
+  background-position: right 1px bottom 1px, center;
+  background-size: 14px 14px, 22px 22px;
+  background-image:
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 14 14'><rect width='14' height='14' fill='%23111'/><path d='M3 7.5l2.6 2.6L11 4.5' fill='none' stroke='white' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/></svg>"),
+    url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23999999' stroke-width='1.6'><circle cx='12' cy='9' r='3.25'/><path d='M4.5 19.5c1-3 4.5-4.5 7.5-4.5s6.5 1.5 7.5 4.5' stroke-linecap='round'/></svg>");
+  flex-shrink: 0;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-reviewer-name {
+  font-size: 14px !important;
+  font-weight: 600 !important;
+  color: var(--jdgm-text-dark) !important;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-reviewer-info::after {
+  content: "Verified";
+  background: #111;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 500;
+  padding: 3px 8px;
+  border-radius: 2px;
+  letter-spacing: 0.02em;
+  line-height: 1.4;
+}
+
+/* Review text styled as bold headline */
+.jdgm-cards-carousel .jdgm-card .jdgm-text {
+  order: 3;
+  margin: 0 !important;
+  -webkit-line-clamp: unset !important;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-text p {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: var(--jdgm-text-dark) !important;
+  line-height: 1.4 !important;
+  margin: 0 !important;
+}
+
+/* Footer row: "Full Review" link (left) + thumbs up/down counters (right) */
+.jdgm-cards-carousel .jdgm-card .jdgm-product-name {
+  order: 4;
+  margin-top: auto !important;
+  padding-top: 16px;
+  display: flex !important;
+  justify-content: space-between;
+  align-items: center;
+  position: relative;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-product-name a {
+  font-size: 0 !important;
+  color: transparent !important;
+  text-decoration: none !important;
+  position: relative;
+  line-height: 1;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-product-name a::before {
+  content: "Full Review";
+  font-size: 14px !important;
+  color: var(--jdgm-text-dark);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  letter-spacing: 0;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-product-name a:hover::before {
+  text-decoration: none;
+}
+
+.jdgm-cards-carousel .jdgm-card .jdgm-product-name::after {
+  content: "";
+  width: 80px;
+  height: 18px;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 80 18'><g fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'><path d='M3 16V8l3.2-5 .8.8c.5.5.6 1.2.4 1.9L7 8h4c.7 0 1.3.7 1.2 1.4l-.9 5c-.1.7-.7 1.2-1.4 1.2H3z'/></g><text x='17' y='14' font-family='Arial' font-size='11' fill='%23666'>1</text><g transform='translate(40 0)' fill='none' stroke='%23888' stroke-width='1.4' stroke-linecap='round' stroke-linejoin='round'><path d='M11 2v8L7.8 15l-.8-.8c-.5-.5-.6-1.2-.4-1.9L7 10H3c-.7 0-1.3-.7-1.2-1.4l.9-5C2.8 2.7 3.4 2 4.1 2H11z'/></g><text x='57' y='14' font-family='Arial' font-size='11' fill='%23666'>0</text></svg>");
+}
+
+/* Arrows — simple gray chevrons outside cards */
+.jdgm-cards-carousel .jdgm-arrow {
+  background: transparent !important;
+  border: none !important;
+  color: #666 !important;
+  width: 36px !important;
+  height: 36px !important;
+  padding: 0 !important;
+}
+
+.jdgm-cards-carousel .jdgm-arrow:hover {
+  color: #111 !important;
+}
+
+.jdgm-cards-carousel .jdgm-arrow svg {
+  width: 18px;
+  height: 30px;
+}
+
+@media screen and (max-width: 749px) {
+  .jdgm-cards-carousel .jdgm-title {
+    font-size: 1.5rem !important;
+  }
+  .jdgm-cards-carousel .jdgm-card {
+    min-height: 240px !important;
+    padding: 20px !important;
+  }
+}
