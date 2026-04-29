@@ -42,41 +42,35 @@
       </div>
     {% endif %}
 
-    
-
-  {% if product.metafields.custom.number_of_days_for_delivery != blank %}
-    <div class="delivery-date" style="margin: 15px 0;">
-      <p style="display: inline;"><b>Estimated Delivery Date:</b></p>
-      <div style="display: inline;">
-        {% assign days_to_add = product.metafields.custom.number_of_days_for_delivery | times: 86400 %}
-        {% assign future_date = 'now' | date: "%s" | plus: days_to_add | date: "%d %b" %}
-        {{ future_date }}
-      </div>
-    </div>
-  {% endif %}
-
-
-
-  <p> 
-Get it between <strong><span id="fromDate"></span> - <span id="toDate"></span></strong></p>
-{{ '//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js' | script_tag }}
-<script>
-var fromDate = Date.today().addDays(5);
-if (fromDate.is().saturday() || fromDate.is().sunday()) {
-fromDate = fromDate.next().monday();
-}
-var toDate = Date.today().addDays(10);
-if (toDate.is().saturday() || toDate.is().sunday()) {
-toDate = toDate.next().monday();
-}
-document.getElementById('fromDate').innerHTML = fromDate.toString('dddd MMMM dS');
-document.getElementById('toDate').innerHTML = toDate.toString('dddd MMMM dS');
-</script>
-
-
-
-
     {% content_for 'blocks' %}
+
+    {% if product.metafields.custom.number_of_days_for_delivery != blank %}
+      <div class="delivery-date" style="margin: 15px 0;">
+        <p style="display: inline;"><b>Estimated Delivery Date:</b></p>
+        <div style="display: inline;">
+          {% assign days_to_add = product.metafields.custom.number_of_days_for_delivery | times: 86400 %}
+          {% assign future_date = 'now' | date: "%s" | plus: days_to_add | date: "%d %b" %}
+          {{ future_date }}
+        </div>
+      </div>
+    {% endif %}
+
+    <p class="pdp-get-it-between">
+      Get it between <strong><span id="fromDate"></span> - <span id="toDate"></span></strong>
+    </p>
+    {{ '//cdnjs.cloudflare.com/ajax/libs/datejs/1.0/date.min.js' | script_tag }}
+    <script>
+      var fromDate = Date.today().addDays(5);
+      if (fromDate.is().saturday() || fromDate.is().sunday()) {
+        fromDate = fromDate.next().monday();
+      }
+      var toDate = Date.today().addDays(10);
+      if (toDate.is().saturday() || toDate.is().sunday()) {
+        toDate = toDate.next().monday();
+      }
+      document.getElementById('fromDate').innerHTML = fromDate.toString('dddd MMMM dS');
+      document.getElementById('toDate').innerHTML = toDate.toString('dddd MMMM dS');
+    </script>
   {% endcapture %}
 
   {% render 'group', children: children, settings: block.settings, shopify_attributes: block.shopify_attributes %}

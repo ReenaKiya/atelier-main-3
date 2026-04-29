@@ -51,6 +51,11 @@
     {% assign product_href = '#ProductInformation-' | append: section.id %}
     {% render 'skip-to-content-link', href: product_href, text: 'accessibility.skip_to_product_info' %}
   {% endif %}
+  <nav class="pdp-breadcrumb pdp-breadcrumb--top" aria-label="Breadcrumb">
+    <a href="{{ routes.root_url }}" class="pdp-breadcrumb__link">Home</a>
+    <span class="pdp-breadcrumb__sep" aria-hidden="true">&rsaquo;</span>
+    <span class="pdp-breadcrumb__current">{{ closest.product.title }}</span>
+  </nav>
   <div
     class="{{ product_grid_class }}"
     data-product-grid-content
@@ -94,6 +99,37 @@
     gap: var(--gap) 0;
   }
 
+  /* Breadcrumb above media gallery, aligned to the left like the reference design */
+  .pdp-breadcrumb--top {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 8px 0 16px;
+    font-size: 14px;
+    line-height: 1.4;
+    color: #111;
+  }
+
+  .pdp-breadcrumb--top .pdp-breadcrumb__link {
+    color: #DA1E37;
+    text-decoration: none;
+  }
+
+  .pdp-breadcrumb--top .pdp-breadcrumb__link:hover {
+    text-decoration: underline;
+  }
+
+  .pdp-breadcrumb--top .pdp-breadcrumb__sep {
+    color: #888;
+  }
+
+  .pdp-breadcrumb--top .pdp-breadcrumb__current {
+    color: #111;
+    font-weight: 400;
+  }
+
   /* Base grid layout */
   .product-information__grid {
     display: grid;
@@ -116,10 +152,12 @@
   @media screen and (max-width: 749px) {
     .product-information__media {
       grid-column: 1 / -1;
+      order: 2;
     }
 
     .product-details {
-      grid-column: 2 / 3;
+      grid-column: 1 / -1;
+      order: 1;
     }
   }
 

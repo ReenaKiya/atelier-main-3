@@ -87,14 +87,14 @@
               "type": "text",
               "name": "t:names.heading",
               "settings": {
-                "text": "<p>{{ closest.product.title }}</p>",
-                "width": "fit-content",
+                "text": "<h1>{{ closest.product.title }}</h1>",
+                "width": "fill",
                 "max_width": "normal",
                 "alignment": "left",
-                "type_preset": "h3",
+                "type_preset": "h2",
                 "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
+                "font_size": "2rem",
+                "line_height": "1.15",
                 "letter_spacing": "normal",
                 "case": "none",
                 "wrap": "pretty",
@@ -103,7 +103,7 @@
                 "background_color": "#00000026",
                 "corner_radius": 0,
                 "padding-block-start": 0,
-                "padding-block-end": 0,
+                "padding-block-end": 4,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
@@ -225,8 +225,8 @@
             }
           },
           "block_order": [
-            "review_hddTi3",
             "text_idAt7H",
+            "review_hddTi3",
             "price_PHGQkM",
             "product_inventory_cf9Nct",
             "variant_picker_R3rGDr",

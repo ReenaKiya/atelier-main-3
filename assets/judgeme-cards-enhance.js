@@ -106,6 +106,18 @@
     productName.appendChild(wrap);
   }
 
+  function openLightboxFor(card) {
+    var target = card.querySelector('.jdgm-text') || card;
+    setTimeout(function () {
+      var evt = new MouseEvent('click', {
+        bubbles: true,
+        cancelable: true,
+        view: window
+      });
+      target.dispatchEvent(evt);
+    }, 0);
+  }
+
   function enhanceFullReviewLink(card) {
     var link = card.querySelector('.jdgm-product-name a');
     if (!link || link.dataset.jdgmFullReview === '1') return;
@@ -113,9 +125,13 @@
 
     link.removeAttribute('target');
     link.removeAttribute('rel');
+    link.setAttribute('href', 'javascript:void(0)');
+    link.style.cursor = 'pointer';
 
     link.addEventListener('click', function (e) {
       e.preventDefault();
+      e.stopImmediatePropagation();
+      openLightboxFor(card);
     });
   }
 
