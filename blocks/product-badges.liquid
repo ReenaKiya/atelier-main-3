@@ -1,0 +1,212 @@
+{% assign s = block.settings %}
+
+<div class="product-badges-block" {{ block.shopify_attributes }}>
+  <div class="product-badges-grid">
+    {% for i in (1..4) %}
+      {%- liquid
+        case i
+          when 1
+            assign badge_image = s.badge_1_image
+            assign badge_image_url = s.badge_1_image_url
+            assign badge_text = s.badge_1_text
+          when 2
+            assign badge_image = s.badge_2_image
+            assign badge_image_url = s.badge_2_image_url
+            assign badge_text = s.badge_2_text
+          when 3
+            assign badge_image = s.badge_3_image
+            assign badge_image_url = s.badge_3_image_url
+            assign badge_text = s.badge_3_text
+          when 4
+            assign badge_image = s.badge_4_image
+            assign badge_image_url = s.badge_4_image_url
+            assign badge_text = s.badge_4_text
+        endcase
+      -%}
+
+      {% if badge_text != blank or badge_image != blank or badge_image_url != blank %}
+        <div class="product-badge-item">
+          {% if badge_image != blank or badge_image_url != blank %}
+            <div class="product-badge-icon">
+              {% if badge_image != blank %}
+                {{ badge_image | image_url: width: 100 | image_tag:
+                  width: 100,
+                  height: 100,
+                  alt: badge_text,
+                  loading: 'lazy'
+                }}
+              {% else %}
+                <img
+                  src="{{ badge_image_url }}{% unless badge_image_url contains 'width=' %}{% if badge_image_url contains '?' %}&{% else %}?{% endif %}width=100{% endunless %}"
+                  alt="{{ badge_text | escape }}"
+                  loading="lazy"
+                  width="100"
+                  height="100"
+                >
+              {% endif %}
+            </div>
+          {% endif %}
+          {% if badge_text != blank %}
+            <div class="product-badge-text">{{ badge_text }}</div>
+          {% endif %}
+        </div>
+      {% endif %}
+    {% endfor %}
+  </div>
+</div>
+
+{% stylesheet %}
+  .product-badges-block {
+    width: 100%;
+    padding-block: 16px;
+  }
+
+  .product-badges-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    align-items: start;
+  }
+
+  .product-badge-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 8px;
+  }
+
+  .product-badge-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-badge-icon img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+  }
+
+  .product-badge-text {
+    font-size: 13px;
+    line-height: 1.3;
+    color: #1a1a1a;
+  }
+
+  @media screen and (max-width: 749px) {
+    .product-badges-grid {
+      grid-template-columns: repeat(2, 1fr);
+      gap: 16px 12px;
+    }
+
+    .product-badge-icon {
+      width: 40px;
+      height: 40px;
+    }
+
+    .product-badge-text {
+      font-size: 12px;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Product badges",
+  "tag": null,
+  "settings": [
+    {
+      "type": "header",
+      "content": "Badge 1"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_1_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "badge_1_image_url",
+      "label": "Image URL (fallback)",
+      "default": "//www.monsterpiercing.com/cdn/shop/files/quality_checked.png?v=1773913812"
+    },
+    {
+      "type": "text",
+      "id": "badge_1_text",
+      "label": "Text",
+      "default": "Quality checked"
+    },
+    {
+      "type": "header",
+      "content": "Badge 2"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_2_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "badge_2_image_url",
+      "label": "Image URL (fallback)",
+      "default": "//www.monsterpiercing.com/cdn/shop/files/customer_reviews.png?v=1773913812"
+    },
+    {
+      "type": "text",
+      "id": "badge_2_text",
+      "label": "Text",
+      "default": "Trusted by customers"
+    },
+    {
+      "type": "header",
+      "content": "Badge 3"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_3_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "badge_3_image_url",
+      "label": "Image URL (fallback)",
+      "default": "//www.monsterpiercing.com/cdn/shop/files/easy_return.png?v=1773913812"
+    },
+    {
+      "type": "text",
+      "id": "badge_3_text",
+      "label": "Text",
+      "default": "Easy Returns"
+    },
+    {
+      "type": "header",
+      "content": "Badge 4"
+    },
+    {
+      "type": "image_picker",
+      "id": "badge_4_image",
+      "label": "Image"
+    },
+    {
+      "type": "text",
+      "id": "badge_4_image_url",
+      "label": "Image URL (fallback)",
+      "default": "//www.monsterpiercing.com/cdn/shop/files/customer_support.png?v=1773913812"
+    },
+    {
+      "type": "text",
+      "id": "badge_4_text",
+      "label": "Text",
+      "default": "Customer Support"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Product badges"
+    }
+  ]
+}
+{% endschema %}

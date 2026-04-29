@@ -197,29 +197,60 @@
               "type": "shopify://apps/essential-upsell/blocks/app-block/50627fd9-24fd-4250-8614-accc12826d80",
               "settings": {}
             },
-            "product_description_gYXQyD": {
-              "type": "product-description",
-              "name": "t:names.product_description",
+            "description_accordion_xY3kPq": {
+              "type": "accordion",
+              "name": "t:names.accordion",
               "settings": {
-                "text": "{{ closest.product.description }}",
-                "width": "fit-content",
-                "max_width": "normal",
-                "alignment": "left",
-                "type_preset": "rte",
-                "font": "var(--font-body--family)",
-                "font_size": "1rem",
-                "line_height": "normal",
-                "letter_spacing": "normal",
-                "case": "none",
-                "wrap": "pretty",
-                "color": "var(--color-foreground)",
-                "background": false,
-                "background_color": "#00000026",
-                "corner_radius": 0,
-                "padding-block-start": 0,
+                "icon": "caret",
+                "dividers": true,
+                "type_preset": "h6",
+                "inherit_color_scheme": true,
+                "color_scheme": "",
+                "border": "none",
+                "border_width": 1,
+                "border_opacity": 100,
+                "border_radius": 0,
+                "padding-block-start": 16,
                 "padding-block-end": 0,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
+              },
+              "blocks": {
+                "accordion_row_description_kJ8mNb": {
+                  "type": "_accordion-row",
+                  "name": "t:names.accordion_row",
+                  "settings": {
+                    "heading": "Description",
+                    "open_by_default": true,
+                    "icon": "none",
+                    "width": 20
+                  },
+                  "blocks": {
+                    "description_liquid_pT4qWs": {
+                      "type": "custom-liquid",
+                      "settings": {
+                        "custom_liquid": "{%- liquid\n  assign _desc = closest.product.description\n  if _desc == blank\n    assign _desc = product.description\n  endif\n-%}\n<div class=\"product-accordion-description rte\">\n  {%- if _desc != blank -%}\n    {{ _desc }}\n  {%- else -%}\n    <p>No description available for this product.</p>\n  {%- endif -%}\n</div>"
+                      },
+                      "blocks": {}
+                    }
+                  },
+                  "block_order": ["description_liquid_pT4qWs"]
+                }
+              },
+              "block_order": ["accordion_row_description_kJ8mNb"]
+            },
+            "icon_features_3Q9wZf": {
+              "type": "product-badges",
+              "name": "Product badges",
+              "settings": {
+                "badge_1_image_url": "//www.monsterpiercing.com/cdn/shop/files/quality_checked.png?v=1773913812",
+                "badge_1_text": "Quality checked",
+                "badge_2_image_url": "//www.monsterpiercing.com/cdn/shop/files/customer_reviews.png?v=1773913812",
+                "badge_2_text": "Trusted by customers",
+                "badge_3_image_url": "//www.monsterpiercing.com/cdn/shop/files/easy_return.png?v=1773913812",
+                "badge_3_text": "Easy Returns",
+                "badge_4_image_url": "//www.monsterpiercing.com/cdn/shop/files/customer_support.png?v=1773913812",
+                "badge_4_text": "Customer Support"
               },
               "blocks": {}
             }
@@ -232,7 +263,8 @@
             "variant_picker_R3rGDr",
             "buy_buttons_9MVfWi",
             "essential_upsell_app_block_UyjHwk",
-            "product_description_gYXQyD"
+            "description_accordion_xY3kPq",
+            "icon_features_3Q9wZf"
           ]
         }
       },
