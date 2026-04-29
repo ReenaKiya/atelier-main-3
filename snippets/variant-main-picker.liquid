@@ -270,9 +270,18 @@
 
   .variant-picker__form {
     display: flex;
-    flex-direction: column;
-    gap: var(--padding-lg);
+    flex-flow: row wrap;
+    gap: var(--padding-md) var(--padding-md);
     width: 100%;
+  }
+
+  .variant-picker__form > .variant-option:not(.variant-option--dropdowns) {
+    flex: 1 1 100%;
+  }
+
+  .variant-picker__form > .variant-option--dropdowns {
+    flex: 1 1 200px;
+    min-width: 0;
   }
 
   .variant-picker[data-shopify-visual-preview] {
@@ -486,10 +495,7 @@
   .variant-option__select-wrapper {
     display: flex;
     position: relative;
-    border: var(--style-border-width-inputs) solid var(--color-border);
-    border-radius: var(--style-border-radius-inputs);
     align-items: center;
-    margin-top: var(--margin-2xs);
     overflow: clip;
     transition: background-color var(--animation-speed) var(--animation-easing),
       border-color var(--animation-speed) var(--animation-easing);

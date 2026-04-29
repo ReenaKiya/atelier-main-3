@@ -5105,26 +5105,27 @@ text-component {
    ========================================================================== */
 .variant-option.variant-option--dropdowns {
   position: relative;
-  border: 1px solid #d1d1d1;
+  border: 1px solid #d9d9d9;
   border-radius: 6px;
-  padding: 8px 14px 8px;
+  padding: 10px 14px 8px;
   background: #fff;
   display: flex;
   flex-direction: column;
   justify-content: center;
-  min-height: 56px;
+  min-height: 60px;
   box-sizing: border-box;
 }
 
 .variant-option.variant-option--dropdowns > label {
   display: block;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1;
   color: #6b6b6b;
   font-weight: 400;
   margin: 0 0 4px;
   pointer-events: none;
   letter-spacing: 0.2px;
+  text-transform: none;
 }
 
 .variant-option.variant-option--dropdowns .variant-option__select-wrapper {
@@ -5132,6 +5133,12 @@ text-component {
   display: flex;
   align-items: center;
   width: 100%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  margin: 0;
+  min-height: 0;
+  overflow: visible;
 }
 
 .variant-option.variant-option--dropdowns .variant-option__select {
@@ -5144,7 +5151,7 @@ text-component {
   margin: 0;
   width: 100%;
   font-size: 15px;
-  font-weight: 600;
+  font-weight: 500;
   line-height: 1.2;
   color: #111;
   cursor: pointer;
@@ -5152,7 +5159,8 @@ text-component {
   padding-right: 20px;
 }
 
-.variant-option.variant-option--dropdowns .variant-option__select-wrapper .icon-caret {
+.variant-option.variant-option--dropdowns .variant-option__select-wrapper .icon-caret,
+.variant-option.variant-option--dropdowns .variant-option__select-wrapper .icon {
   position: absolute;
   right: 0;
   top: 50%;
