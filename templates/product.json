@@ -71,18 +71,6 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "review_hddTi3": {
-              "type": "review",
-              "name": "t:names.product_review_stars",
-              "settings": {
-                "stars_style": "outline",
-                "show_number": true,
-                "rating_color": "primary",
-                "type_preset": "paragraph",
-                "alignment": "left"
-              },
-              "blocks": {}
-            },
             "text_idAt7H": {
               "type": "text",
               "name": "t:names.heading",
@@ -106,6 +94,18 @@
                 "padding-block-end": 4,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "review_hddTi3": {
+              "type": "review",
+              "name": "t:names.product_review_stars",
+              "settings": {
+                "stars_style": "outline",
+                "show_number": true,
+                "rating_color": "primary",
+                "type_preset": "paragraph",
+                "alignment": "left"
               },
               "blocks": {}
             },
@@ -459,6 +459,7 @@
         "payment_icons_pmydfC": {
           "type": "payment-icons",
           "name": "t:names.payment_icons",
+          "disabled": true,
           "settings": {
             "horizontal_alignment": "flex-start",
             "gap": 10,
@@ -540,7 +541,7 @@
             "corner_styling": "soft",
             "header_text_color": "#000000",
             "text_color": "#000000",
-            "card_color": "#F9F9F9",
+            "card_color": "#f9f9f9",
             "stars_color": "",
             "arrows_color": "#000000",
             "transition_speed": 5,
