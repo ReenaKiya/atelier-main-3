@@ -14,6 +14,7 @@
       "blocks": {
         "essential_upsell_frequently_bought_together_app_block_7cmR7H": {
           "type": "shopify://apps/essential-upsell/blocks/frequently-bought-together-app-block/50627fd9-24fd-4250-8614-accc12826d80",
+          "disabled": true,
           "settings": {}
         },
         "media-gallery": {
@@ -71,18 +72,6 @@
             "padding-inline-end": 0
           },
           "blocks": {
-            "review_hddTi3": {
-              "type": "review",
-              "name": "t:names.product_review_stars",
-              "settings": {
-                "stars_style": "outline",
-                "show_number": true,
-                "rating_color": "primary",
-                "type_preset": "paragraph",
-                "alignment": "left"
-              },
-              "blocks": {}
-            },
             "text_idAt7H": {
               "type": "text",
               "name": "t:names.heading",
@@ -106,6 +95,18 @@
                 "padding-block-end": 4,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+            "review_hddTi3": {
+              "type": "review",
+              "name": "t:names.product_review_stars",
+              "settings": {
+                "stars_style": "outline",
+                "show_number": true,
+                "rating_color": "primary",
+                "type_preset": "paragraph",
+                "alignment": "left"
               },
               "blocks": {}
             },
@@ -491,6 +492,7 @@
         "payment_icons_pmydfC": {
           "type": "payment-icons",
           "name": "t:names.payment_icons",
+          "disabled": true,
           "settings": {
             "horizontal_alignment": "flex-start",
             "gap": 10,
@@ -572,7 +574,7 @@
             "corner_styling": "soft",
             "header_text_color": "#000000",
             "text_color": "#000000",
-            "card_color": "#F9F9F9",
+            "card_color": "#f9f9f9",
             "stars_color": "",
             "arrows_color": "#000000",
             "transition_speed": 5,
@@ -1011,6 +1013,7 @@
     "product_recommendations_qnzPkn",
     "17655238379a0febe2",
     "1765524498d58a01f3",
+    "product_description_tabs_tqRhX7",
     "1765524993cacfef3b",
     "1765966024f6f599eb",
     "1765966339907ac83e",
@@ -1018,7 +1021,6 @@
     "176603826003e86eb7",
     "collection_list_Ec6EQn",
     "177426350820ff0335",
-    "product_description_tabs_tqRhX7",
     "customer_reviews_pdp_001",
     "recently_viewed_products_Rv1Abc",
     "people_also_searched_Mw6Qg7",
