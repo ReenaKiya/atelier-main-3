@@ -146,6 +146,12 @@
               },
               "blocks": {}
             },
+            "rio_mobile_media_K8nQpV": {
+              "type": "rio-mobile-media",
+              "name": "Mobile media (Rio)",
+              "settings": {},
+              "blocks": {}
+            },
             "variant_picker_R3rGDr": {
               "type": "variant-picker",
               "settings": {
@@ -260,6 +266,7 @@
             "text_idAt7H",
             "review_hddTi3",
             "price_PHGQkM",
+            "rio_mobile_media_K8nQpV",
             "product_inventory_cf9Nct",
             "variant_picker_R3rGDr",
             "buy_buttons_9MVfWi",

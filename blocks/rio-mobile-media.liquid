@@ -1,0 +1,74 @@
+<div class="rio-media-gallery" data-rio-media-mobile-target {{ block.shopify_attributes }}></div>
+
+<script>
+  (function () {
+    if (window.__rioMobileMediaInit) return;
+    window.__rioMobileMediaInit = true;
+
+    var BREAKPOINT = '(max-width: 749px)';
+    var mq = window.matchMedia(BREAKPOINT);
+
+    function placeGallery() {
+      var gallery = document.querySelector('.product-information__media media-gallery');
+      var mobileTarget = document.querySelector('[data-rio-media-mobile-target]');
+      var desktopContainer = document.querySelector('.product-information__media');
+      if (!gallery || !mobileTarget || !desktopContainer) return;
+
+      if (mq.matches) {
+        if (gallery.parentElement !== mobileTarget) {
+          mobileTarget.appendChild(gallery);
+        }
+      } else {
+        if (gallery.parentElement !== desktopContainer) {
+          desktopContainer.appendChild(gallery);
+        }
+      }
+    }
+
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', placeGallery);
+    } else {
+      placeGallery();
+    }
+
+    if (mq.addEventListener) {
+      mq.addEventListener('change', placeGallery);
+    } else if (mq.addListener) {
+      mq.addListener(placeGallery);
+    }
+
+    document.addEventListener('shopify:section:load', placeGallery);
+    document.addEventListener('shopify:block:select', placeGallery);
+  })();
+</script>
+
+{% stylesheet %}
+  .rio-media-gallery {
+    width: 100%;
+  }
+
+  @media screen and (max-width: 749px) {
+    .rio-media-gallery {
+      display: block;
+      margin-block: 12px;
+    }
+
+    .product-information__grid:has(.rio-media-gallery media-gallery) .product-information__media {
+      display: none;
+    }
+  }
+
+  @media screen and (min-width: 750px) {
+    .rio-media-gallery {
+      display: none;
+    }
+  }
+{% endstylesheet %}
+
+{% schema %}
+{
+  "name": "Mobile media (Rio)",
+  "tag": null,
+  "settings": []
+}
+{% endschema %}
