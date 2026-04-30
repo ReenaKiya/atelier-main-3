@@ -15,6 +15,9 @@ export class MediaGallery extends Component {
   connectedCallback() {
     super.connectedCallback();
 
+    // Always create a fresh controller so listeners survive DOM moves
+    // (e.g. when the gallery is relocated to .rio-media-gallery on mobile).
+    this.#controller = new AbortController();
     const { signal } = this.#controller;
     const target = this.closest('.shopify-section, dialog');
 
