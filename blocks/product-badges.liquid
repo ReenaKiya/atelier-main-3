@@ -98,17 +98,23 @@
 
   @media screen and (max-width: 749px) {
     .product-badges-grid {
-      grid-template-columns: repeat(2, 1fr);
-      gap: 16px 12px;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 8px;
+    }
+
+    .product-badge-item {
+      gap: 6px;
     }
 
     .product-badge-icon {
-      width: 40px;
-      height: 40px;
+      width: 36px;
+      height: 36px;
     }
 
     .product-badge-text {
-      font-size: 12px;
+      font-size: 11px;
+      line-height: 1.2;
+      word-break: break-word;
     }
   }
 {% endstylesheet %}

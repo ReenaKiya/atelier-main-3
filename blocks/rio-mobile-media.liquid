@@ -41,6 +41,34 @@
 
     document.addEventListener('shopify:section:load', placeGallery);
     document.addEventListener('shopify:block:select', placeGallery);
+
+    // On mobile, tapping a pagination dot should also open the zoom dialog.
+    document.addEventListener(
+      'click',
+      function (e) {
+        if (!mq.matches) return;
+
+        var dotBtn = e.target && e.target.closest && e.target.closest('.slideshow-control.button.button-unstyled');
+        if (!dotBtn) return;
+        if (!dotBtn.closest('.rio-media-gallery')) return;
+
+        var list = dotBtn.closest('ol, ul');
+        var items = list ? list.querySelectorAll('li') : [];
+        var index = 0;
+        for (var i = 0; i < items.length; i++) {
+          if (items[i].contains(dotBtn)) {
+            index = i;
+            break;
+          }
+        }
+
+        var zoomDialog = document.querySelector('.rio-media-gallery zoom-dialog');
+        if (zoomDialog && typeof zoomDialog.open === 'function') {
+          zoomDialog.open(index, e);
+        }
+      },
+      true
+    );
   })();
 </script>
 
@@ -74,32 +102,89 @@
 
     /* Zoom dialog (full-screen expand) — match the reference layout on mobile */
     zoom-dialog dialog[open] {
-      background: #fff;
+      width: 100vw;
+      height: 100vh;
+      height: 100dvh;
+      max-width: 100vw;
+      max-height: 100dvh;
+      margin: 0;
       padding: 0;
       border: 0;
+      background: #fff;
+      overflow: hidden;
     }
 
-    .dialog-zoomed-gallery__close-button {
+    zoom-dialog dialog[open]::backdrop {
+      background: rgba(0, 0, 0, 0.5);
+    }
+
+    .dialog-zoomed-gallery__close-button.close-button {
       position: fixed;
       top: 16px;
       right: 16px;
-      width: 44px;
-      height: 44px;
+      width: 40px;
+      height: 40px;
       border-radius: 50%;
-      background: #fff;
-      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.12);
+      background: #fff !important;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.18);
       display: inline-flex;
       align-items: center;
       justify-content: center;
-      z-index: 10;
+      padding: 0;
+      z-index: 20;
     }
 
-    .dialog-zoomed-gallery__close-button svg {
-      width: 18px;
-      height: 18px;
+    .dialog-zoomed-gallery__close-button.close-button svg {
+      width: 16px;
+      height: 16px;
       color: #111;
     }
 
+    /* Image area — fills viewport minus the thumbnail strip */
+    .dialog-zoomed-gallery {
+      list-style: none;
+      margin: 0;
+      padding: 0;
+      width: 100vw;
+      height: calc(100dvh - 92px);
+      max-height: calc(100dvh - 92px);
+      overflow: hidden;
+      display: flex;
+    }
+
+    .dialog-zoomed-gallery > li.product-media-container {
+      width: 100vw;
+      height: 100%;
+      max-height: 100%;
+      flex: 0 0 100vw;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      background: #fff;
+    }
+
+    .dialog-zoomed-gallery .product-media__drag-zoom-wrapper,
+    .dialog-zoomed-gallery product-media,
+    .dialog-zoomed-gallery .product-media {
+      width: 100%;
+      height: 100%;
+      max-height: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .dialog-zoomed-gallery img,
+    .dialog-zoomed-gallery picture {
+      max-width: 100%;
+      max-height: 100%;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+    }
+
+    /* Bottom thumbnail strip */
     .dialog-thumbnails-list-container {
       position: fixed;
       left: 0;
@@ -107,23 +192,38 @@
       bottom: 0;
       background: #fff;
       border-top: 1px solid #e5e5e5;
-      padding-block: 8px;
+      padding: 0;
+      z-index: 15;
+      max-width: 100vw;
     }
 
     .dialog-thumbnails-list {
-      gap: 6px;
-      padding: 8px 12px;
+      display: flex;
+      flex-direction: row;
+      gap: 10px;
+      padding: 10px 12px;
+      margin: 0;
       overflow-x: auto;
+      overflow-y: hidden;
       flex-wrap: nowrap;
+      scroll-snap-type: x mandatory;
+      animation: none;
+      opacity: 1;
+      position: static;
+      max-height: none;
     }
 
     .dialog-thumbnails-list__thumbnail {
-      width: 64px;
-      height: 64px;
-      flex: 0 0 64px;
+      width: 86px;
+      height: 86px;
+      flex: 0 0 86px;
       border-radius: 4px;
       border: 1px solid transparent;
-      overflow: hidden;
+      overflow: visible;
+      padding: 2px;
+      scroll-snap-align: start;
+      background: transparent;
+      box-sizing: border-box;
     }
 
     .dialog-thumbnails-list__thumbnail img {
@@ -131,16 +231,14 @@
       height: 100%;
       object-fit: cover;
       aspect-ratio: 1 / 1;
-      border-radius: 0;
+      border-radius: 2px;
+      display: block;
     }
 
     .dialog-thumbnails-list__thumbnail[aria-selected='true'] {
       outline: 0;
       border: 2px solid #111;
-    }
-
-    .dialog-zoomed-gallery {
-      padding-bottom: 96px;
+      padding: 1px;
     }
   }
 

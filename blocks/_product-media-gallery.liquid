@@ -216,6 +216,37 @@
               assign media_sizes = sizes
             endif
         -%}
+        {%- if block.settings.zoom and media.media_type == 'image' -%}
+          <button
+            type="button"
+            class="button button-unstyled product-media-container__zoom-button product-gallery--expand"
+            data-gallery-expand
+            aria-haspopup="true"
+            aria-label="{{ 'actions.zoom' | t }}"
+            on:click="/zoom/{{ forloop.index0 }}"
+          >
+            <span class="click-text" tabindex="-1">
+              <svg class="icon-zoom" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="13" height="14" viewBox="0 0 13 14" fill="none">
+                <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6499 5.36407C10.6499 6.71985 10.1504 7.95819 9.32715 8.90259L12.5762 12.6036L11.4233 13.6685L8.13379 9.92206C7.31836 10.433 6.35596 10.7281 5.3252 10.7281C2.38428 10.7281 0 8.3266 0 5.36407C0 2.40155 2.38428 0 5.3252 0C8.26611 0 10.6499 2.40155 10.6499 5.36407ZM9.29102 5.36407C9.29102 7.57068 7.51514 9.35956 5.32471 9.35956C3.13428 9.35956 1.3584 7.57068 1.3584 5.36407C1.3584 3.15741 3.13428 1.36859 5.32471 1.36859C7.51514 1.36859 9.29102 3.15741 9.29102 5.36407ZM4.9502 3.23438H5.80029V4.93439H7.5V5.78436H5.80029V7.48438H4.9502V5.78436H3.25V4.93439H4.9502V3.23438Z" transform="translate(0 0.015625)" fill="currentColor"></path>
+              </svg>
+              Click to expand
+            </span>
+            <span class="tap-text" tabindex="-1">
+              <svg class="icon-tap" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="17" height="18" fill="none">
+                <g clip-path="url(#clipS-{{ block.id }}-{{ forloop.index0 }})">
+                  <path d="M10.5041 5.68411c.3161-.69947.3733-1.48877.1212-2.24947C10.1368 1.96048 8.60378.947266 6.86197.947266c-1.7418 0-3.27478 1.013214-3.76334 2.487374-.25211.7607-.19492 1.55.12117 2.24947" stroke="currentColor" stroke-width="1.18421" stroke-linecap="round" stroke-linejoin="round"></path>
+                  <path d="M1.29826 12.9496l.4482-.3869-.00078-.0009-.44742.3878zm2.1109-1.6885l.44817-.387-.00075-.0009-.44742.3879zm2.14476 2.484l-.44817.387c.16167.1872.42273.2542.6546.168.23187-.0863.38567-.3076.38567-.555h-.5921zm2.745-2.9235h-.59211c0 .327.26509.5921.59211.5921v-.5921zm-1.6868 7.3776l-4.86566-5.6365-.896406.7738L5.71571 18.973l.89641-.7738zm-4.86644-5.6374c-.26238-.3027-.22472-.749.09904-1.008l-.73973-.9248c-.84206.6736-.962533 1.8912-.254153 2.7084l.894843-.7756zm.09904-1.008c.33763-.2701.84237-.2218 1.11702.0951l.89484-.7757c-.69611-.8031-1.92341-.90664-2.75159-.2442l.73973.9248zm1.11627.0942l2.14476 2.4841.89634-.7739-2.14476-2.4841-.89634.7739zm3.18503 2.0971V5.10805H4.96181v8.63705h1.18421zm0-8.63705c0-.379.32677-.72639.7804-.72639V3.19745c-1.0624 0-1.96461.83323-1.96461 1.9106h1.18421zm.7804-.72639c.45362 0 .78039.34739.78039.72639h1.18421c0-1.07737-.90221-1.9106-1.9646-1.9106v1.18421zm.78039.72639v5.71355h1.18421V5.10805H7.70681zm.59211 6.30565H11.273v-1.1842H8.29892v1.1842zm2.97408 0c1.717 0 3.0679 1.3312 3.0679 2.9239h1.1842c0-2.2911-1.9264-4.1081-4.2521-4.1081v1.1842zm3.0679 2.9239v4.6098h1.1842v-4.6098h-1.1842z" fill="currentColor"></path>
+                </g>
+                <defs>
+                  <clipPath id="clipS-{{ block.id }}-{{ forloop.index0 }}">
+                    <path fill="#fff" d="M0 0h16.6645v18H0z"></path>
+                  </clipPath>
+                </defs>
+              </svg>
+              Tap to zoom
+            </span>
+          </button>
+        {%- endif -%}
         {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
       {% endcapture %}
       {% capture class %}
@@ -307,11 +338,32 @@
           {%- if block.settings.zoom and media.media_type == 'image' -%}
             <button
               type="button"
-              class="button button-unstyled product-media-container__zoom-button"
+              class="button button-unstyled product-media-container__zoom-button product-gallery--expand"
+              data-gallery-expand
+              aria-haspopup="true"
               aria-label="{{ 'actions.zoom' | t }}"
               on:click="/zoom/{{ forloop.index0 }}"
             >
-              <span class="visually-hidden">{{ 'actions.open_image_in_full_screen' | t }}</span>
+              <span class="click-text" tabindex="-1">
+                <svg class="icon-zoom" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="13" height="14" viewBox="0 0 13 14" fill="none">
+                  <path fill-rule="evenodd" clip-rule="evenodd" d="M10.6499 5.36407C10.6499 6.71985 10.1504 7.95819 9.32715 8.90259L12.5762 12.6036L11.4233 13.6685L8.13379 9.92206C7.31836 10.433 6.35596 10.7281 5.3252 10.7281C2.38428 10.7281 0 8.3266 0 5.36407C0 2.40155 2.38428 0 5.3252 0C8.26611 0 10.6499 2.40155 10.6499 5.36407ZM9.29102 5.36407C9.29102 7.57068 7.51514 9.35956 5.32471 9.35956C3.13428 9.35956 1.3584 7.57068 1.3584 5.36407C1.3584 3.15741 3.13428 1.36859 5.32471 1.36859C7.51514 1.36859 9.29102 3.15741 9.29102 5.36407ZM4.9502 3.23438H5.80029V4.93439H7.5V5.78436H5.80029V7.48438H4.9502V5.78436H3.25V4.93439H4.9502V3.23438Z" transform="translate(0 0.015625)" fill="currentColor"></path>
+                </svg>
+                Click to expand
+              </span>
+              <span class="tap-text" tabindex="-1">
+                <svg class="icon-tap" aria-hidden="true" focusable="false" role="presentation" xmlns="http://www.w3.org/2000/svg" width="17" height="18" fill="none">
+                  <g clip-path="url(#clip0-{{ block.id }}-{{ forloop.index0 }})">
+                    <path d="M10.5041 5.68411c.3161-.69947.3733-1.48877.1212-2.24947C10.1368 1.96048 8.60378.947266 6.86197.947266c-1.7418 0-3.27478 1.013214-3.76334 2.487374-.25211.7607-.19492 1.55.12117 2.24947" stroke="currentColor" stroke-width="1.18421" stroke-linecap="round" stroke-linejoin="round"></path>
+                    <path d="M1.29826 12.9496l.4482-.3869-.00078-.0009-.44742.3878zm2.1109-1.6885l.44817-.387-.00075-.0009-.44742.3879zm2.14476 2.484l-.44817.387c.16167.1872.42273.2542.6546.168.23187-.0863.38567-.3076.38567-.555h-.5921zm2.745-2.9235h-.59211c0 .327.26509.5921.59211.5921v-.5921zm-1.6868 7.3776l-4.86566-5.6365-.896406.7738L5.71571 18.973l.89641-.7738zm-4.86644-5.6374c-.26238-.3027-.22472-.749.09904-1.008l-.73973-.9248c-.84206.6736-.962533 1.8912-.254153 2.7084l.894843-.7756zm.09904-1.008c.33763-.2701.84237-.2218 1.11702.0951l.89484-.7757c-.69611-.8031-1.92341-.90664-2.75159-.2442l.73973.9248zm1.11627.0942l2.14476 2.4841.89634-.7739-2.14476-2.4841-.89634.7739zm3.18503 2.0971V5.10805H4.96181v8.63705h1.18421zm0-8.63705c0-.379.32677-.72639.7804-.72639V3.19745c-1.0624 0-1.96461.83323-1.96461 1.9106h1.18421zm.7804-.72639c.45362 0 .78039.34739.78039.72639h1.18421c0-1.07737-.90221-1.9106-1.9646-1.9106v1.18421zm.78039.72639v5.71355h1.18421V5.10805H7.70681zm.59211 6.30565H11.273v-1.1842H8.29892v1.1842zm2.97408 0c1.717 0 3.0679 1.3312 3.0679 2.9239h1.1842c0-2.2911-1.9264-4.1081-4.2521-4.1081v1.1842zm3.0679 2.9239v4.6098h1.1842v-4.6098h-1.1842z" fill="currentColor"></path>
+                  </g>
+                  <defs>
+                    <clipPath id="clip0-{{ block.id }}-{{ forloop.index0 }}">
+                      <path fill="#fff" d="M0 0h16.6645v18H0z"></path>
+                    </clipPath>
+                  </defs>
+                </svg>
+                Tap to zoom
+              </span>
             </button>
           {%- endif -%}
           {%- liquid
