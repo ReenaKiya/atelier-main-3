@@ -96,6 +96,44 @@
               {% if product_option_value.size > longest_value and option_id_attribute %}
                 {% assign longest_value = product_option_value.size %}
               {% endif %}
+              {%- liquid
+                assign input_featured_media = product_option_value.variant.featured_media
+                if input_featured_media == blank and product_option_value.product_url
+                  assign input_featured_media = product_option_value.variant.product.featured_media
+                endif
+                # When the FIRST variant matching this option value has no
+                # featured_media (common for multi-option products where some
+                # sub-variants are missing images), scan the rest of the variants
+                # so data-variant-media-id is still emitted. Without this, the
+                # gallery can't snap client-side and briefly shows the previous
+                # variant's image until the variant fetch returns.
+                if input_featured_media == blank
+                  for variant_lookup in product_resource.variants
+                    if variant_lookup.featured_media == blank
+                      continue
+                    endif
+                    assign matches_option_value = false
+                    case product_option.position
+                      when 1
+                        if variant_lookup.option1 == product_option_value.name
+                          assign matches_option_value = true
+                        endif
+                      when 2
+                        if variant_lookup.option2 == product_option_value.name
+                          assign matches_option_value = true
+                        endif
+                      when 3
+                        if variant_lookup.option3 == product_option_value.name
+                          assign matches_option_value = true
+                        endif
+                    endcase
+                    if matches_option_value
+                      assign input_featured_media = variant_lookup.featured_media
+                      break
+                    endif
+                  endfor
+                endif
+              -%}
               <label class="variant-option__button-label{% if variant_style == 'swatch' %} variant-option__button-label--has-swatch{% endif %}">
                <input
   type="radio"
@@ -111,6 +149,9 @@
   data-connected-product-url="{{ product_option_value.product_url }}"
   {% if product_option_value.variant.id %}
     data-variant-id="{{ product_option_value.variant.id }}"
+  {% endif %}
+  {% if input_featured_media.id %}
+    data-variant-media-id="{{ input_featured_media.id }}"
   {% endif %}
   {% if product_option_value.selected %}
     checked

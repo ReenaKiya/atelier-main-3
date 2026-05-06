@@ -1,0 +1,331 @@
+{%- doc -%}
+  Mobile-only sticky add-to-cart bar that slides up when the
+  "You may also like" (product-recommendations) section enters the viewport.
+
+  Mirrors the main variant picker — sticky variant clicks proxy to the
+  main picker, which handles the fetch + variant:update event that we
+  listen to here to refresh the price/image.
+{%- enddoc -%}
+
+{% liquid
+  assign sticky_product = closest.product
+  if sticky_product == blank
+    assign sticky_product = product
+  endif
+  assign sticky_variant = sticky_product.selected_or_first_available_variant
+
+  # Identify the color/swatch option (first option that has any swatch values),
+  # falling back to the first option.
+  assign sticky_color_option = blank
+  for opt in sticky_product.options_with_values
+    assign opt_swatch_count = opt.values | map: 'swatch' | compact | size
+    if opt_swatch_count > 0
+      assign sticky_color_option = opt
+      break
+    endif
+  endfor
+  if sticky_color_option == blank
+    assign sticky_color_option = sticky_product.options_with_values.first
+  endif
+
+  # The selected swatch (used for the small swatch indicator next to the title).
+  assign sticky_selected_swatch = blank
+  if sticky_color_option != blank
+    for v in sticky_color_option.values
+      if v.selected
+        assign sticky_selected_swatch = v.swatch
+        break
+      endif
+    endfor
+  endif
+%}
+
+{% if sticky_product != blank and template.name == 'product' %}
+  <sticky-add-to-cart
+    class="sticky-add-to-cart"
+    data-product-id="{{ sticky_product.id }}"
+  >
+    <div class="sticky-add-to-cart__top">
+      <span
+        class="sticky-add-to-cart__indicator"
+        data-sticky-indicator
+        style="
+          {%- if sticky_selected_swatch.image -%}
+            --sticky-indicator-bg: url({{ sticky_selected_swatch.image | image_url: width: 80 }});
+          {%- elsif sticky_selected_swatch.color -%}
+            --sticky-indicator-bg: rgb({{ sticky_selected_swatch.color.rgb }});
+          {%- elsif sticky_variant.featured_media -%}
+            --sticky-indicator-bg: url({{ sticky_variant.featured_media | image_url: width: 80 }});
+          {%- endif -%}
+        "
+        aria-hidden="true"
+      ></span>
+      <div class="sticky-add-to-cart__title-row">
+        <div class="sticky-add-to-cart__title">{{ sticky_product.title }}</div>
+        <div class="sticky-add-to-cart__price-row">
+          <span class="sticky-add-to-cart__price" data-sticky-price>
+            {{- sticky_variant.price | money -}}
+          </span>
+          {% if sticky_color_option != blank and sticky_color_option.values.size > 1 %}
+            <div class="sticky-add-to-cart__swatches" data-sticky-color-option>
+              {% for v in sticky_color_option.values %}
+                <button
+                  type="button"
+                  class="sticky-add-to-cart__swatch{% if v.selected %} is-selected{% endif %}{% unless v.available %} is-unavailable{% endunless %}"
+                  data-option-value-id="{{ v.id }}"
+                  aria-label="{{ v.name }}"
+                  aria-pressed="{% if v.selected %}true{% else %}false{% endif %}"
+                  style="
+                    {%- if v.swatch.image -%}
+                      --sticky-swatch-bg: url({{ v.swatch.image | image_url: width: 80 }});
+                    {%- elsif v.swatch.color -%}
+                      --sticky-swatch-bg: rgb({{ v.swatch.color.rgb }});
+                    {%- endif -%}
+                  "
+                ></button>
+              {% endfor %}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% for opt in sticky_product.options_with_values %}
+      {% if sticky_color_option != blank and opt.position == sticky_color_option.position %}
+        {% continue %}
+      {% endif %}
+      <details class="sticky-add-to-cart__accordion" data-sticky-option>
+        <summary class="sticky-add-to-cart__accordion-summary">
+          <span class="sticky-add-to-cart__accordion-label">{{ opt.name | upcase }}</span>
+          <span class="sticky-add-to-cart__accordion-value" data-sticky-option-value>
+            {{- opt.selected_value -}}
+          </span>
+          <svg class="sticky-add-to-cart__accordion-chevron" width="16" height="16" viewBox="0 0 16 16" aria-hidden="true">
+            <path d="M4 6l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </summary>
+        <div class="sticky-add-to-cart__option-values">
+          {% for v in opt.values %}
+            <button
+              type="button"
+              class="sticky-add-to-cart__option-button{% if v.selected %} is-selected{% endif %}{% unless v.available %} is-unavailable{% endunless %}"
+              data-option-value-id="{{ v.id }}"
+              data-option-position="{{ opt.position }}"
+              aria-pressed="{% if v.selected %}true{% else %}false{% endif %}"
+            >
+              {{- v.name -}}
+            </button>
+          {% endfor %}
+        </div>
+      </details>
+    {% endfor %}
+
+    <button
+      type="button"
+      class="button sticky-add-to-cart__button"
+      data-sticky-add-to-cart
+      aria-label="Add to cart"
+    >
+      <span data-sticky-button-label>Add to cart: {{ sticky_variant.price | money }}</span>
+    </button>
+  </sticky-add-to-cart>
+
+  <script src="{{ 'sticky-add-to-cart.js' | asset_url }}" type="module"></script>
+{% endif %}
+
+{% stylesheet %}
+  .sticky-add-to-cart {
+    display: none;
+  }
+
+  @media screen and (max-width: 749px) {
+    .sticky-add-to-cart {
+      display: block;
+      position: fixed;
+      inset: auto 0 0 0;
+      z-index: 90;
+      background: var(--color-background, #fff);
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      box-shadow: 0 -6px 18px rgba(0, 0, 0, 0.08);
+      transform: translateY(110%);
+      transition: transform 220ms ease-out;
+      padding: 12px 14px calc(12px + env(safe-area-inset-bottom, 0px));
+      pointer-events: none;
+    }
+
+    .sticky-add-to-cart[data-visible='true'] {
+      transform: translateY(0);
+      pointer-events: auto;
+    }
+
+    .sticky-add-to-cart__top {
+      display: flex;
+      align-items: flex-start;
+      gap: 10px;
+    }
+
+    .sticky-add-to-cart__indicator {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      flex-shrink: 0;
+      background: var(--sticky-indicator-bg, #ddd) center/cover no-repeat;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .sticky-add-to-cart__title-row {
+      flex: 1 1 auto;
+      min-width: 0;
+    }
+
+    .sticky-add-to-cart__title {
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1.25;
+      color: var(--color-foreground, #111);
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .sticky-add-to-cart__price-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      margin-top: 4px;
+    }
+
+    .sticky-add-to-cart__price {
+      font-size: 14px;
+      font-weight: 700;
+      color: #c61c2a;
+    }
+
+    .sticky-add-to-cart__swatches {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .sticky-add-to-cart__swatch {
+      width: 22px;
+      height: 22px;
+      border-radius: 50%;
+      padding: 0;
+      cursor: pointer;
+      background: var(--sticky-swatch-bg, #ccc) center/cover no-repeat;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      outline: 2px solid transparent;
+      outline-offset: 2px;
+      transition: outline-color 120ms ease;
+    }
+
+    .sticky-add-to-cart__swatch.is-selected {
+      outline-color: #c61c2a;
+    }
+
+    .sticky-add-to-cart__swatch.is-unavailable {
+      opacity: 0.45;
+    }
+
+    .sticky-add-to-cart__accordion {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.08);
+    }
+
+    .sticky-add-to-cart__accordion:first-of-type {
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      margin-top: 10px;
+    }
+
+    .sticky-add-to-cart__accordion-summary {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      list-style: none;
+      cursor: pointer;
+      padding: 12px 2px;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      color: rgba(0, 0, 0, 0.55);
+    }
+
+    .sticky-add-to-cart__accordion-summary::-webkit-details-marker {
+      display: none;
+    }
+
+    .sticky-add-to-cart__accordion-label {
+      flex: 1 1 auto;
+    }
+
+    .sticky-add-to-cart__accordion-value {
+      font-weight: 600;
+      color: var(--color-foreground, #111);
+      text-transform: none;
+      letter-spacing: 0;
+    }
+
+    .sticky-add-to-cart__accordion-chevron {
+      transition: transform 180ms ease;
+      flex-shrink: 0;
+    }
+
+    .sticky-add-to-cart__accordion[open] .sticky-add-to-cart__accordion-chevron {
+      transform: rotate(180deg);
+    }
+
+    .sticky-add-to-cart__option-values {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      padding: 0 0 12px;
+    }
+
+    .sticky-add-to-cart__option-button {
+      padding: 8px 14px;
+      border: 1px solid rgba(0, 0, 0, 0.18);
+      background: #fff;
+      border-radius: 8px;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--color-foreground, #111);
+    }
+
+    .sticky-add-to-cart__option-button.is-selected {
+      border-color: #c61c2a;
+      background: rgba(198, 28, 42, 0.06);
+      color: #c61c2a;
+    }
+
+    .sticky-add-to-cart__option-button.is-unavailable {
+      opacity: 0.45;
+      text-decoration: line-through;
+    }
+
+    .sticky-add-to-cart__button {
+      display: block;
+      width: 100%;
+      margin-top: 10px;
+      background: #c61c2a;
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 14px 18px;
+      font-size: 15px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      cursor: pointer;
+      text-align: center;
+    }
+
+    .sticky-add-to-cart__button:active {
+      transform: scale(0.99);
+    }
+
+    .sticky-add-to-cart__button:disabled {
+      opacity: 0.6;
+      cursor: not-allowed;
+    }
+  }
+{% endstylesheet %}

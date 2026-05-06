@@ -125,7 +125,41 @@
     render 'util-product-media-sizes-attr', block: block, section: section, settings: settings, is_first_image: false, is_single_column: is_single_column, needs_both_sizes: needs_both_sizes
   endcapture
   assign sizes = sizes | strip
+
+  # Collect every variant's featured_media id into a comma-delimited string so
+  # we can mark those slides as high-priority below. Without this, only the
+  # first slide is preloaded and tapping another swatch waits on a network
+  # round-trip for the new variant image.
+  assign variant_media_ids = ','
+  for variant_lookup in selected_product.variants
+    if variant_lookup.featured_media
+      assign variant_media_id_token = variant_lookup.featured_media.id | append: ','
+      unless variant_media_ids contains variant_media_id_token
+        assign variant_media_ids = variant_media_ids | append: variant_media_id_token
+      endunless
+    endif
+  endfor
 -%}
+
+{%- comment -%}
+  Preload every variant's featured_media so swatch taps swap images instantly.
+  Cheap on the network because each href is one of the slide images that's
+  already in the DOM — this just promotes them to high-priority parallel
+  fetches instead of waiting their turn.
+{%- endcomment -%}
+{%- for media in selected_product.media -%}
+  {%- assign preload_token = media.id | append: ',' -%}
+  {%- if media.media_type == 'image' and variant_media_ids contains preload_token -%}
+    <link
+      rel="preload"
+      as="image"
+      href="{{ media | image_url: width: 2000 }}"
+      imagesrcset="{{ media | image_url: width: 800 }} 800w, {{ media | image_url: width: 1200 }} 1200w, {{ media | image_url: width: 1600 }} 1600w, {{ media | image_url: width: 2000 }} 2000w"
+      imagesizes="{{ sizes }}"
+      fetchpriority="high"
+    >
+  {%- endif -%}
+{%- endfor -%}
 {%- if has_image_drop -%}
   <script
     src="{{ 'drag-zoom-wrapper.js' | asset_url }}"
@@ -215,6 +249,17 @@
             else
               assign media_sizes = sizes
             endif
+            # Promote any slide that's a variant featured_media to high fetch
+            # priority so swatch taps swap to a cached image instead of waiting
+            # for the network. forloop.first is already promoted via
+            # is_main_product_media below.
+            assign is_priority_media = forloop.first
+            unless is_priority_media
+              assign priority_token = media.id | append: ','
+              if variant_media_ids contains priority_token
+                assign is_priority_media = true
+              endif
+            endunless
         -%}
         {%- if block.settings.zoom and media.media_type == 'image' -%}
           <button
@@ -247,7 +292,7 @@
             </span>
           </button>
         {%- endif -%}
-        {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: forloop.first -%}
+        {%- render 'product-media', media: media, sizes: media_sizes, is_main_product_media: is_priority_media -%}
       {% endcapture %}
       {% capture class %}
         product-media-container product-media-container--{{ media.media_type }}{% if block.settings.constrain_to_viewport %} constrain-height{% endif %}{% if block.settings.aspect_ratio == 'adapt' and block.settings.constrain_to_viewport %} media-fit-{{ block.settings.media_fit }}{% else %} media-fit-cover{% endif %}{% if block.settings.zoom %} product-media-container--zoomable{% endif %}
@@ -264,6 +309,7 @@
       {% endif %}
 
       {% render 'slideshow-slide',
+        slide_id: media.id,
         index: forloop.index0,
         children: children,
         class: class,

@@ -1029,9 +1029,30 @@
 }
 
 @media screen and (max-width: 600px) {
+  /* Native horizontal scroll on mobile — 2 cards visible, swipe to move */
+  .cf-slider {
+    overflow-x: auto;
+    overflow-y: hidden;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+    scroll-snap-type: x mandatory;
+  }
+
+  .cf-slider::-webkit-scrollbar {
+    display: none;
+  }
+
+  .cf-track {
+    transform: none !important;
+    transition: none;
+    width: max-content;
+  }
+
   .cf-slide {
-    flex: 0 0 50%;
-    max-width: 50%;
+    flex: 0 0 50vw;
+    max-width: 50vw;
+    width: 50vw;
+    scroll-snap-align: start;
   }
 
   .cf-heading {
@@ -1039,13 +1060,7 @@
   }
 
   .cf-nav {
-    width: 30px;
-    height: 30px;
-  }
-
-  .cf-nav svg {
-    width: 12px;
-    height: 12px;
+    display: none;
   }
 
   .cf-quickshop-modal {

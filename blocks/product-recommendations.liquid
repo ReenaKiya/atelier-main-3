@@ -189,6 +189,36 @@
     opacity: var(--skeleton-opacity);
     border-radius: 4px;
   }
+
+  /* Mobile: swipeable carousel showing 2 cards at a time */
+  @media screen and (max-width: 749px) {
+    product-recommendations .resource-list,
+    product-recommendations .resource-list--grid {
+      display: flex !important;
+      flex-direction: row !important;
+      flex-wrap: nowrap !important;
+      grid-template-columns: none !important;
+      overflow-x: auto;
+      overflow-y: hidden;
+      -webkit-overflow-scrolling: touch;
+      scrollbar-width: none;
+      scroll-snap-type: x mandatory;
+      gap: 12px;
+      padding-inline: 12px;
+      width: 100%;
+    }
+
+    product-recommendations .resource-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    product-recommendations .resource-list__item {
+      flex: 0 0 calc(50% - 6px);
+      max-width: calc(50% - 6px);
+      width: calc(50% - 6px);
+      scroll-snap-align: start;
+    }
+  }
 {% endstylesheet %}
 
 {% schema %}

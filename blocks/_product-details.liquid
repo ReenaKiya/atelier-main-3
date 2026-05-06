@@ -76,6 +76,8 @@
   {% render 'group', children: children, settings: block.settings, shopify_attributes: block.shopify_attributes %}
 </div>
 
+{% render 'sticky-add-to-cart' %}
+
 {% stylesheet %}
   /* Clear padding on mobile, if not full-width */
   @media screen and (max-width: 749px) {
