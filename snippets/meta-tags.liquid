@@ -1,3 +1,11 @@
+{%- liquid
+  if template == 'collection' and current_tags.size == 1
+    assign tag_slug = current_tags.first | handleize
+    assign lookup_handle = collection.handle | append: '--' | append: tag_slug
+    assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
+  endif
+-%}
+
 <meta charset="utf-8">
 <meta
   http-equiv="X-UA-Compatible"
@@ -28,6 +36,16 @@
     assign og_type = 'article'
   elsif request.page_type == 'password'
     assign og_url = request.origin
+  endif
+
+  if tag_seo and tag_seo.seo_title.value != blank
+    assign og_title = tag_seo.seo_title.value
+  endif
+  if tag_seo and tag_seo.seo_description.value != blank
+    assign og_description = tag_seo.seo_description.value
+  endif
+  if tag_seo
+    assign og_url = shop.url | append: '/collections/' | append: collection.handle | append: '/' | append: current_tags.first | handleize
   endif
 %}
 
@@ -101,19 +119,35 @@
   content="{{ og_description | escape }}"
 >
 
-<title>
-  {{ page_title }}
-  {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
-  {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
-  {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
-</title>
+{% if tag_seo and tag_seo.seo_title.value != blank %}
+  <title>{{ tag_seo.seo_title.value }}</title>
+{% else %}
+  <title>
+    {{ page_title }}
+    {%- if current_tags %} &ndash; tagged "{{ current_tags | join: ', ' }}"{% endif -%}
+    {%- if current_page != 1 %} &ndash; Page {{ current_page }}{% endif -%}
+    {%- unless page_title contains shop.name %} &ndash; {{ shop.name }}{% endunless -%}
+  </title>
+{% endif %}
 
-<link
-  rel="canonical"
-  href="{{ canonical_url }}"
->
+{% if tag_seo %}
+  <link
+    rel="canonical"
+    href="{{ shop.url }}/collections/{{ collection.handle }}/{{ current_tags.first | handleize }}"
+  >
+{% else %}
+  <link
+    rel="canonical"
+    href="{{ canonical_url }}"
+  >
+{% endif %}
 
-{% if page_description %}
+{% if tag_seo and tag_seo.seo_description.value != blank %}
+  <meta
+    name="description"
+    content="{{ tag_seo.seo_description.value | escape }}"
+  >
+{% elsif page_description %}
   <meta
     name="description"
     content="{{ page_description | escape }}"

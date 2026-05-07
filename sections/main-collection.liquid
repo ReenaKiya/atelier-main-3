@@ -11,6 +11,14 @@
   endif
 %}
 
+{%- liquid
+  if current_tags.size == 1
+    assign tag_slug = current_tags.first | handleize
+    assign lookup_handle = collection.handle | append: '--' | append: tag_slug
+    assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
+  endif
+-%}
+
 <script
   src="{{ 'results-list.js' | asset_url }}"
   type="module"
@@ -79,8 +87,20 @@
 
       <div class="main-collection-column">
         <h1 class="collection--title">
-          {% if material_label != '' %}{{ material_label }} {{ collection.title }}{% else %}{{ collection.title }}{% endif %}
+          {% if tag_seo and tag_seo.h1_title.value != blank %}
+            {{ tag_seo.h1_title.value }}
+          {% elsif material_label != '' %}
+            {{ material_label }} {{ collection.title }}
+          {% else %}
+            {{ collection.title }}
+          {% endif %}
         </h1>
+
+        {% if tag_seo and tag_seo.intro_content.value != blank %}
+          <div class="collection-intro-content">
+            {{ tag_seo.intro_content.value }}
+          </div>
+        {% endif %}
 
       {% capture children %}
         {% for product in collection.products %}
@@ -102,6 +122,44 @@
         products: collection.products,
         paginate: paginate
       %}
+
+        {% if tag_seo and tag_seo.bottom_content.value != blank %}
+          <div class="collection-bottom-content">
+            {{ tag_seo.bottom_content.value }}
+          </div>
+        {% endif %}
+
+        {% if tag_seo and tag_seo.faq_json.value != blank %}
+          {% assign faqs = tag_seo.faq_json.value %}
+          <div class="collection-faq">
+            <h2>Frequently Asked Questions</h2>
+            {% for faq in faqs %}
+              <details>
+                <summary>{{ faq.question }}</summary>
+                <p>{{ faq.answer }}</p>
+              </details>
+            {% endfor %}
+          </div>
+
+          <script type="application/ld+json">
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {% for faq in faqs %}
+              {
+                "@type": "Question",
+                "name": {{ faq.question | json }},
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": {{ faq.answer | json }}
+                }
+              }{% unless forloop.last %},{% endunless %}
+              {% endfor %}
+            ]
+          }
+          </script>
+        {% endif %}
       </div>
     </div>
 
