@@ -12,6 +12,8 @@
   @param {string} [labelRef] - label ref attribute for use with component framework
   @param {boolean} [autofocus] - whether the input should be autofocused
   @param {number} [count] - optional count to display next to the label
+  @param {string} [dataFilterTag] - tag name for path-based collection filtering
+  @param {string} [dataFilterTagPrefix] - tag-prefix for single-select grouping
 {%- enddoc -%}
 <div
   class="checkbox"
@@ -24,6 +26,10 @@
     id="{{ id }}"
     class="checkbox__input"
     data-label="{{ label }}"
+    {% if dataFilterTag != blank %}
+      data-filter-tag="{{ dataFilterTag }}"
+      data-filter-tag-prefix="{{ dataFilterTagPrefix }}"
+    {% endif %}
     {% if checked %}
       checked
     {% endif %}

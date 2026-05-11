@@ -21,6 +21,50 @@ const SEARCH_QUERY = 'q';
 class FacetsFormComponent extends Component {
   requiredRefs = ['facetsForm'];
 
+  connectedCallback() {
+    super.connectedCallback();
+    // Sync once on connect so checkbox state always reflects the current URL path,
+    // regardless of whether Liquid managed to render `checked` on the inputs.
+    this.#syncCheckedFromURL();
+  }
+
+  /**
+   * Reads active path-tags from window.location and forces every input[data-filter-tag]
+   * in this form to match. Runs on connect and after every section render so the visual
+   * state can never drift from the URL.
+   */
+  #syncCheckedFromURL() {
+    const collectionBase = this.getAttribute('data-collection-base');
+    if (!collectionBase) return;
+
+    const path = window.location.pathname.replace(/\/+$/, '');
+    const base = collectionBase.replace(/\/+$/, '');
+    let activeTagsLower = [];
+
+    if (path === base + '/' || path.startsWith(base + '/')) {
+      const segment = path.slice(base.length + 1);
+      if (segment) {
+        activeTagsLower = segment
+          .split('+')
+          .map((t) => {
+            try {
+              return decodeURIComponent(t).toLowerCase();
+            } catch (_e) {
+              return t.toLowerCase();
+            }
+          })
+          .filter(Boolean);
+      }
+    }
+
+    this.refs.facetsForm.querySelectorAll('input[data-filter-tag]').forEach((input) => {
+      if (!(input instanceof HTMLInputElement)) return;
+      const tag = (input.getAttribute('data-filter-tag') || '').toLowerCase();
+      const shouldBeChecked = tag !== '' && activeTagsLower.includes(tag);
+      if (input.checked !== shouldBeChecked) input.checked = shouldBeChecked;
+    });
+  }
+
   /**
    * Creates URL parameters from form data
    * @param {FormData} [formData] - Optional form data to use instead of the main form
@@ -32,12 +76,91 @@ class FacetsFormComponent extends Component {
     if (newParameters.get('filter.v.price.gte') === '') newParameters.delete('filter.v.price.gte');
     if (newParameters.get('filter.v.price.lte') === '') newParameters.delete('filter.v.price.lte');
 
+    // Strip price params when they equal the full collection range — the price inputs
+    // always carry the bounds as their default value, which would leak into the URL on
+    // every filter change otherwise.
+    const minPriceInput = this.refs.facetsForm.querySelector('input[name="filter.v.price.gte"]');
+    const maxPriceInput = this.refs.facetsForm.querySelector('input[name="filter.v.price.lte"]');
+    if (minPriceInput) {
+      const lowerBound = minPriceInput.getAttribute('min') || minPriceInput.getAttribute('data-min');
+      const current = newParameters.get('filter.v.price.gte');
+      if (current != null && lowerBound != null && current === lowerBound) {
+        newParameters.delete('filter.v.price.gte');
+      }
+    }
+    if (maxPriceInput) {
+      const upperBound = maxPriceInput.getAttribute('max') || maxPriceInput.getAttribute('data-max');
+      const current = newParameters.get('filter.v.price.lte');
+      if (current != null && upperBound != null && current === upperBound) {
+        newParameters.delete('filter.v.price.lte');
+      }
+    }
+
+    // Strip sort_by when it equals the default — the default radio is checked on every
+    // page load so otherwise it would always appear in the URL. The element carrying the
+    // default lives in the sorting block, which may sit outside the form in vertical layout.
+    const defaultSortEl =
+      this.refs.facetsForm.querySelector('[data-default-sort-by]') ??
+      document.querySelector('[data-default-sort-by]');
+    const defaultSort = defaultSortEl?.getAttribute('data-default-sort-by');
+    if (defaultSort && newParameters.get('sort_by') === defaultSort) {
+      newParameters.delete('sort_by');
+    }
+
     newParameters.delete('page');
+
+    // Tag-based filter inputs are routed via the URL path (collection current_tags),
+    // not the querystring — strip their names so they don't leak into the search.
+    const tagInputNames = new Set();
+    this.refs.facetsForm.querySelectorAll('input[data-filter-tag]').forEach((el) => {
+      const name = el.getAttribute('name');
+      if (name) tagInputNames.add(name);
+    });
+    for (const name of tagInputNames) newParameters.delete(name);
 
     const searchQuery = this.#getSearchQuery();
     if (searchQuery) newParameters.set(SEARCH_QUERY, searchQuery);
 
     return newParameters;
+  }
+
+  /**
+   * Collects the active path-tag list from checked tag-filter inputs in the form.
+   * @returns {string[]}
+   */
+  #collectActiveTags() {
+    const inputs = this.refs.facetsForm.querySelectorAll('input[data-filter-tag]:checked');
+    const tags = [];
+    inputs.forEach((el) => {
+      const tag = el.getAttribute('data-filter-tag');
+      if (tag && !tags.includes(tag)) tags.push(tag);
+    });
+    return tags;
+  }
+
+  /**
+   * Builds the new URL based on current form state.
+   * Tag filters → path. Price/sort/search → querystring.
+   * @returns {URL}
+   */
+  buildFilterURL() {
+    const url = new URL(window.location.href);
+    const params = this.createURLParameters();
+    const collectionBase = this.getAttribute('data-collection-base');
+    const formHasTagInputs = !!this.refs.facetsForm.querySelector('input[data-filter-tag]');
+    const tags = this.#collectActiveTags();
+
+    // Only override path when this form actually owns tag inputs. Sort-only mobile
+    // forms otherwise wipe out current_tags from the path on every sort change.
+    if (collectionBase && formHasTagInputs) {
+      url.pathname = tags.length > 0 ? `${collectionBase}/${tags.join('+')}` : collectionBase;
+    }
+
+    url.search = '';
+    for (const [param, value] of params.entries()) {
+      url.searchParams.append(param, value);
+    }
+    return url;
   }
 
   /**
@@ -59,15 +182,8 @@ class FacetsFormComponent extends Component {
    * Updates the URL hash with current filter parameters
    */
   #updateURLHash() {
-    const url = new URL(window.location.href);
-    const urlParameters = this.createURLParameters();
-
-    url.search = '';
-    for (const [param, value] of urlParameters.entries()) {
-      url.searchParams.append(param, value);
-    }
-
-    history.pushState({ urlParameters: urlParameters.toString() }, '', url.toString());
+    const url = this.buildFilterURL();
+    history.pushState({ urlParameters: url.search.replace(/^\?/, '') }, '', url.toString());
   }
 
   /**
@@ -76,20 +192,22 @@ class FacetsFormComponent extends Component {
   updateFilters = () => {
     this.#updateURLHash();
     this.dispatchEvent(new FilterUpdateEvent(this.createURLParameters()));
-    this.#updateSection();
+    this.#updateSection().finally(() => this.#syncCheckedFromURL());
   };
 
   /**
    * Updates the section
+   * @returns {Promise<unknown>}
    */
   #updateSection() {
     const viewTransition = !this.closest('dialog');
 
     if (viewTransition) {
-      startViewTransition(() => sectionRenderer.renderSection(this.sectionId), ['product-grid']);
-    } else {
-      sectionRenderer.renderSection(this.sectionId);
+      return Promise.resolve(
+        startViewTransition(() => sectionRenderer.renderSection(this.sectionId), ['product-grid'])
+      );
     }
+    return Promise.resolve(sectionRenderer.renderSection(this.sectionId));
   }
 
   /**
@@ -99,7 +217,7 @@ class FacetsFormComponent extends Component {
   updateFiltersByURL(url) {
     history.pushState('', '', url);
     this.dispatchEvent(new FilterUpdateEvent(this.createURLParameters()));
-    this.#updateSection();
+    this.#updateSection().finally(() => this.#syncCheckedFromURL());
   }
 }
 
@@ -218,23 +336,29 @@ class FacetInputsComponent extends Component {
     const form = this.closest('form');
     if (!form) return;
 
-    const formData = new FormData(form);
     const inputElement = event.target.querySelector('input');
-
     if (!(inputElement instanceof HTMLInputElement)) return;
-
-    if (!inputElement.checked) formData.append(inputElement.name, inputElement.value);
 
     const facetsForm = this.closest('facets-form-component');
     if (!(facetsForm instanceof FacetsFormComponent)) return;
 
-    const urlParameters = facetsForm.createURLParameters(formData);
+    const isTagInput = inputElement.hasAttribute('data-filter-tag');
+    let url;
 
-    const url = new URL(window.location.pathname, window.location.origin);
-
-    for (const [key, value] of urlParameters) url.searchParams.append(key, value);
-
-    if (inputElement.checked) url.searchParams.delete(inputElement.name, inputElement.value);
+    if (isTagInput) {
+      // Simulate the toggle: temporarily flip checked state, build path-based URL, restore.
+      const wasChecked = inputElement.checked;
+      inputElement.checked = !wasChecked;
+      url = facetsForm.buildFilterURL();
+      inputElement.checked = wasChecked;
+    } else {
+      const formData = new FormData(form);
+      if (!inputElement.checked) formData.append(inputElement.name, inputElement.value);
+      const urlParameters = facetsForm.createURLParameters(formData);
+      url = new URL(window.location.pathname, window.location.origin);
+      for (const [key, value] of urlParameters) url.searchParams.append(key, value);
+      if (inputElement.checked) url.searchParams.delete(inputElement.name, inputElement.value);
+    }
 
     sectionRenderer.getSectionHTML(this.sectionId, true, url);
   }, 200);

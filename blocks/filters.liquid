@@ -137,6 +137,7 @@
         class="facets__form-wrapper"
         section-id="{{ section.id }}"
         form-style="{{ block.settings.filter_style }}"
+        {% if collection.url %}data-collection-base="{{ collection.url }}"{% endif %}
       >
         <form
           action="{{ results_url }}"

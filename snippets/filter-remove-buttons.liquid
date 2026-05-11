@@ -10,9 +10,35 @@
 {%- enddoc -%}
 
 <div class="facets-remove facets-remove--mobile-and-vertical">
+  {%- liquid
+    # Capture preserved query (sort + price) once so each remove pill keeps them.
+    assign preserved_query = ''
+    if request.path contains '/collections/'
+      capture preserved_query
+        if collection.sort_by != blank and collection.sort_by != collection.default_sort_by
+          echo 'sort_by=' | append: collection.sort_by
+        endif
+      endcapture
+    endif
+  -%}
   {%- for filter in filters -%}
     {%- liquid
       assign is_first_filter = forloop.first
+
+      # Determine if this filter resolves to a tag-based URL. Only on collection pages —
+      # search results don't have current_tags routing.
+      assign filter_is_tag = false
+      assign filter_tag_prefix = ''
+      if collection.url != blank
+        if filter.param_name contains 'filter.p.m.'
+          assign param_parts = filter.param_name | split: '.'
+          assign last_part = param_parts | last
+          assign filter_tag_prefix = last_part | replace: '_', '-' | downcase
+          assign filter_is_tag = true
+        elsif filter.param_name == 'filter.p.tag'
+          assign filter_is_tag = true
+        endif
+      endif
     -%}
     {% if filter.type == 'price_range' and filter.min_value.value != null or filter.max_value.value != null %}
       {%- liquid
@@ -50,9 +76,77 @@
         <span class="visually-hidden">{{ 'actions.remove' | t }}</span>
       </facet-remove-component>
     {% else %}
-      {%- for value in filter.active_values -%}
+      {%- liquid
+        # For tag-based filters, iterate filter.values and skip those not in current_tags
+        # (Shopify's own filter.active_values doesn't see tag-routed filters). For non-tag
+        # filters, iterate filter.active_values as before.
+        if filter_is_tag
+          assign iter_source = filter.values
+        else
+          assign iter_source = filter.active_values
+        endif
+      -%}
+      {%- for value in iter_source -%}
+        {%- liquid
+          assign skip_value = false
+          if filter_is_tag
+            if filter.param_name == 'filter.p.tag'
+              assign vt = value.value | handleize
+              assign vt_alt = value.label | handleize
+            else
+              assign vt = filter_tag_prefix | append: '-' | append: value.label | handleize
+              assign vt_alt = filter_tag_prefix | append: '-' | append: value.value | handleize
+            endif
+            assign tag_match = false
+            for ct in current_tags
+              assign ct_norm = ct | handleize
+              if ct_norm == vt or ct_norm == vt_alt
+                assign tag_match = true
+                break
+              endif
+            endfor
+            unless tag_match
+              assign skip_value = true
+            endunless
+          endif
+        -%}
+        {%- if skip_value -%}{%- continue -%}{%- endif -%}
         {%- liquid
           assign is_active = true
+
+          # Compute tag-based remove URL: rebuild path from current_tags minus this value's tag.
+          assign value_remove_url = value.url_to_remove
+          if filter_is_tag
+            if filter.param_name == 'filter.p.tag'
+              assign this_tag = value.value | handleize
+              assign this_tag_alt = value.label | handleize
+            else
+              assign this_tag = filter_tag_prefix | append: '-' | append: value.label | handleize
+              assign this_tag_alt = filter_tag_prefix | append: '-' | append: value.value | handleize
+            endif
+
+            assign remaining_tags = ''
+            for ct in current_tags
+              assign ct_norm = ct | handleize
+              if ct_norm != this_tag and ct_norm != this_tag_alt
+                if remaining_tags == ''
+                  assign remaining_tags = ct_norm
+                else
+                  assign remaining_tags = remaining_tags | append: '+' | append: ct_norm
+                endif
+              endif
+            endfor
+
+            capture value_remove_url
+              echo collection.url
+              if remaining_tags != ''
+                echo '/' | append: remaining_tags
+              endif
+              if preserved_query != ''
+                echo '?' | append: preserved_query
+              endif
+            endcapture
+          endif
         -%}
         <facet-remove-component
           class="
@@ -61,7 +155,7 @@
             facets-remove__pill
             {% if value.swatch %}pills__pill--swatch{% endif %}
           "
-          data-url="{{ value.url_to_remove }}"
+          data-url="{{ value_remove_url }}"
           tabindex="0"
           role="button"
           on:click="/removeFilter?form="

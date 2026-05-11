@@ -23,6 +23,24 @@
   if filter.presentation == 'image'
     assign is_image = true
   endif
+
+  # Tag-based filter routing: derive tag prefix from filter.param_name so that
+  # checkbox values map to /collections/{handle}/{tag1+tag2} style URLs handled
+  # by Shopify's current_tags routing. Only applies to metafield-backed filters
+  # and the explicit tag filter on collection pages; price/availability and
+  # search facets stay as query params.
+  assign tag_prefix = ''
+  assign is_tag_filter = false
+  if collection.url != blank
+    if filter.param_name contains 'filter.p.m.'
+      assign param_parts = filter.param_name | split: '.'
+      assign last_part = param_parts | last
+      assign tag_prefix = last_part | replace: '_', '-' | downcase
+      assign is_tag_filter = true
+    elsif filter.param_name == 'filter.p.tag'
+      assign is_tag_filter = true
+    endif
+  endif
 %}
 
 <accordion-custom
@@ -167,8 +185,46 @@
             {%- for value in filter.values -%}
               {% liquid
                 assign input_id = 'Filter-' | append: filter.param_name | escape | append: '-' | append: forloop.index | replace: '.', '-' | append: '-' | append: filter_style | append: '-' | append: in_drawer
+
+                # Compute tag candidates. Each step is a discrete assign to avoid any
+                # filter-chain precedence ambiguity. Two candidates are produced because
+                # Shopify metafield filters expose both a display label (e.g. '14K') and an
+                # underlying value (e.g. metaobject handle) — products may be tagged
+                # following either convention.
+                assign computed_tag = ''
+                assign computed_tag_alt = ''
+                if is_tag_filter
+                  assign value_label_clean = value.label | strip_html | strip
+                  assign value_value_clean = value.value | strip_html | strip
+                  assign value_label_handle = value_label_clean | handleize
+                  assign value_value_handle = value_value_clean | handleize
+                  if filter.param_name == 'filter.p.tag'
+                    assign computed_tag = value_value_handle
+                    assign computed_tag_alt = value_label_handle
+                  else
+                    assign tag_prefix_dash = tag_prefix | append: '-'
+                    assign computed_tag = tag_prefix_dash | append: value_label_handle
+                    assign computed_tag_alt = tag_prefix_dash | append: value_value_handle
+                  endif
+                endif
+
+                # Active state: a tag in current_tags wins over Shopify's metafield-only
+                # value.active. Compare handleized on both sides because Shopify may return
+                # current_tags in original product-tag casing (e.g. 'Material-14K') while
+                # computed_tag is always handleized.
+                assign value_is_active = value.active
+                if is_tag_filter and computed_tag != ''
+                  for ct in current_tags
+                    assign ct_norm = ct | handleize
+                    if ct_norm == computed_tag or ct_norm == computed_tag_alt
+                      assign value_is_active = true
+                      break
+                    endif
+                  endfor
+                endif
+
                 assign is_disabled = false
-                if value.count == 0 and value.active == false
+                if value.count == 0 and value_is_active == false
                   assign is_disabled = true
                 endif
                 assign hidden_class = null
@@ -186,7 +242,7 @@
                   ref="showMoreItems[]"
                 {% endif %}
               >
-                {% if value.active %}
+                {% if value_is_active %}
                   {% assign has_active_values = true %}
                 {% endif %}
                 {% if is_image %}
@@ -218,7 +274,11 @@
                       value="{{ value.value }}"
                       aria-label="{{ value.label }}"
                       id="{{ input_id }}"
-                      {% if value.active %}
+                      {% if is_tag_filter %}
+                        data-filter-tag="{{ computed_tag }}"
+                        data-filter-tag-prefix="{{ tag_prefix }}"
+                      {% endif %}
+                      {% if value_is_active %}
                         checked
                       {% endif %}
                       {% if is_disabled %}
@@ -258,7 +318,11 @@
                           value="{{ value.value }}"
                           aria-label="{{ value.label }}"
                           id="{{ input_id }}"
-                          {% if value.active %}
+                          {% if is_tag_filter %}
+                            data-filter-tag="{{ computed_tag }}"
+                            data-filter-tag-prefix="{{ tag_prefix }}"
+                          {% endif %}
+                          {% if value_is_active %}
                             checked
                           {% endif %}
                           {% if is_disabled %}
@@ -304,7 +368,11 @@
                         id="{{ input_id }}"
                         class="facets__pill-input"
                         data-label="{{ value.label }}"
-                        {% if value.active %}
+                        {% if is_tag_filter %}
+                          data-filter-tag="{{ computed_tag }}"
+                          data-filter-tag-prefix="{{ tag_prefix }}"
+                        {% endif %}
+                        {% if value_is_active %}
                           checked
                         {% endif %}
                         {% if is_disabled %}
@@ -340,13 +408,15 @@
                       name: value.param_name,
                       value: value.value,
                       label: value.label,
-                      checked: value.active,
+                      checked: value_is_active,
                       id: input_id,
                       disabled: is_disabled,
                       inputRef: 'facetInputs[]',
                       events: 'on:pointerenter="/prefetchPage" on:pointerleave="/cancelPrefetchPage"',
                       autofocus: autofocus,
-                      count: value.count
+                      count: value.count,
+                      dataFilterTag: computed_tag,
+                      dataFilterTagPrefix: tag_prefix
                     %}
                   {% endif %}
                 {% endif %}
