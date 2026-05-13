@@ -14,6 +14,7 @@
     "custom_header_frtTfa": {
       "type": "custom-header",
       "settings": {
+        "logo": "shopify://shop_images/1767088895471-etsybannersize1000x250c3015122-8c11-4737-9f27-3a9a258a16ca1000x250.avif",
         "search_placeholder": "Search the shiny things...",
         "show_account": true,
         "show_wishlist": true,
