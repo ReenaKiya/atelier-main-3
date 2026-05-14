@@ -630,15 +630,6 @@
             "bg_color": "#fce4ec"
           }
         },
-        "style_tab_cdLfUH": {
-          "type": "style_tab",
-          "settings": {
-            "tab_label": "Luxe",
-            "collection": "",
-            "style_title": "Styles",
-            "bg_color": "#fce4ec"
-          }
-        },
         "style_tab_6xUiJn": {
           "type": "style_tab",
           "settings": {
@@ -672,7 +663,6 @@
       },
       "block_order": [
         "style_tab_MUzar3",
-        "style_tab_cdLfUH",
         "style_tab_6xUiJn",
         "style_tab_cKCYB4",
         "style_tab_fPmkQ6"
