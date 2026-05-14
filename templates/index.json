@@ -394,18 +394,18 @@
     "shop_by_type_afLXVP": {
       "type": "shop-by-type",
       "blocks": {
-        "tab_FfAC8c": {
-          "type": "tab",
-          "settings": {
-            "tab_label": "Best Sellers",
-            "collection": ""
-          }
-        },
         "tab_L9PpB8": {
           "type": "tab",
           "settings": {
             "tab_label": "New Arrivals",
             "collection": "new-arrivals"
+          }
+        },
+        "tab_FfAC8c": {
+          "type": "tab",
+          "settings": {
+            "tab_label": "Best Sellers",
+            "collection": ""
           }
         },
         "tab_3kjbaq": {
@@ -417,8 +417,8 @@
         }
       },
       "block_order": [
-        "tab_FfAC8c",
         "tab_L9PpB8",
+        "tab_FfAC8c",
         "tab_3kjbaq"
       ],
       "name": "Shop by Type",
