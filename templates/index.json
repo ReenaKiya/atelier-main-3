@@ -415,6 +415,7 @@
       ],
       "name": "Shop by Type",
       "settings": {
+        "image": "shopify://shop_images/Gemini_Generated_Image_5mj4me5mj4me5mj4_035990d0-1f68-45d5-b9e0-dfbd4eedb8d2.png",
         "heading": "Shop by Type",
         "bg_color": "#fce4ec"
       }
