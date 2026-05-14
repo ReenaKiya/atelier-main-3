@@ -635,6 +635,7 @@
           "settings": {
             "tab_label": "Amour",
             "collection": "amour",
+            "bg_image": "shopify://shop_images/amour-banner.png",
             "style_title": "Styles",
             "bg_color": "#fce4ec"
           }
