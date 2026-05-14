@@ -378,7 +378,8 @@
         "icon_pjhkzz": {
           "type": "icon",
           "settings": {
-            "label": "Lips",
+            "image": "shopify://shop_images/nose_jewellery.jpg",
+            "label": "Nose",
             "link": ""
           }
         },
