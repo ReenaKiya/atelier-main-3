@@ -430,6 +430,7 @@
     },
     "featured_collection_wwdfbm": {
       "type": "featured-collection",
+      "disabled": true,
       "name": "Customer Favourites",
       "settings": {
         "heading": "Customer Favourites",
