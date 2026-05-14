@@ -386,7 +386,8 @@
         "icon_Nb4BpX": {
           "type": "icon",
           "settings": {
-            "label": "Stretch",
+            "image": "shopify://shop_images/Tongue_Barbells_Piercing_Jewellery.jpg",
+            "label": "Tongue",
             "link": ""
           }
         },
