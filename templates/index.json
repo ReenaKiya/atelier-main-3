@@ -367,6 +367,14 @@
             "link": ""
           }
         },
+        "icon_wkUpWB": {
+          "type": "icon",
+          "settings": {
+            "image": "shopify://shop_images/Fake_Piercings.jpg",
+            "label": "Streached",
+            "link": ""
+          }
+        },
         "icon_pjhkzz": {
           "type": "icon",
           "settings": {
@@ -396,6 +404,7 @@
         "icon_RhFfwd",
         "icon_ChDF7b",
         "icon_C3NkkB",
+        "icon_wkUpWB",
         "icon_pjhkzz",
         "icon_Nb4BpX",
         "icon_MBFRHw"
