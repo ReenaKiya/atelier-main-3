@@ -324,34 +324,6 @@
     "icon_marquee_WGNUpx": {
       "type": "icon-marquee",
       "blocks": {
-        "icon_9xFaW6": {
-          "type": "icon",
-          "settings": {
-            "label": "Tongue",
-            "link": ""
-          }
-        },
-        "icon_FNAEEC": {
-          "type": "icon",
-          "settings": {
-            "label": "Eye",
-            "link": ""
-          }
-        },
-        "icon_xh9hH8": {
-          "type": "icon",
-          "settings": {
-            "label": "Ear",
-            "link": ""
-          }
-        },
-        "icon_RhFfwd": {
-          "type": "icon",
-          "settings": {
-            "label": "Belly",
-            "link": ""
-          }
-        },
         "icon_ChDF7b": {
           "type": "icon",
           "settings": {
@@ -402,10 +374,6 @@
         }
       },
       "block_order": [
-        "icon_9xFaW6",
-        "icon_FNAEEC",
-        "icon_xh9hH8",
-        "icon_RhFfwd",
         "icon_ChDF7b",
         "icon_C3NkkB",
         "icon_wkUpWB",
