@@ -412,7 +412,7 @@
           "type": "tab",
           "settings": {
             "tab_label": "More",
-            "collection": ""
+            "collection": "more"
           }
         }
       },
