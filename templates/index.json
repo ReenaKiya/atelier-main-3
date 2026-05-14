@@ -552,6 +552,7 @@
         "sc_block_2": {
           "type": "collection_item",
           "settings": {
+            "image": "shopify://shop_images/nose-stude.webp",
             "title": "Nose Studs",
             "link": "/collections/nose-studs"
           }
@@ -559,6 +560,7 @@
         "sc_block_3": {
           "type": "collection_item",
           "settings": {
+            "image": "shopify://shop_images/hinged.webp",
             "title": "Hinged Segment Clicker",
             "link": "/collections/hinged-segment-clicker"
           }
@@ -566,6 +568,7 @@
         "sc_block_4": {
           "type": "collection_item",
           "settings": {
+            "image": "shopify://shop_images/hugges.webp",
             "title": "Huggies & Studs",
             "link": "/collections/huggies-studs"
           }
