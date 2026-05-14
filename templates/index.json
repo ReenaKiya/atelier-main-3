@@ -355,6 +355,7 @@
         "icon_ChDF7b": {
           "type": "icon",
           "settings": {
+            "image": "shopify://shop_images/belly_jewellery_be0af21d-2cfe-4847-b32f-17a1379739ec.jpg",
             "label": "Nose",
             "link": ""
           }
@@ -394,7 +395,8 @@
         "icon_MBFRHw": {
           "type": "icon",
           "settings": {
-            "label": "Belly",
+            "image": "shopify://shop_images/Dermal_Anchors_Piercing_Jewellery.jpg",
+            "label": "Surface",
             "link": ""
           }
         }
