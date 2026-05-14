@@ -25,6 +25,7 @@
           "type": "_slide",
           "settings": {
             "media_type_1": "image",
+            "image_1": "shopify://shop_images/banner3_71c5cae3-f670-4eba-a728-201fe600621c_780x780-3.jpg",
             "content_direction": "column",
             "vertical_on_mobile": true,
             "horizontal_alignment": "flex-start",
