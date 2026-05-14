@@ -447,6 +447,24 @@
         "padding_bottom": 40
       }
     },
+    "featured_collection_bestsellers": {
+      "type": "featured-collection",
+      "name": "Best-Selling Piercing Jewellery",
+      "settings": {
+        "heading": "Best-Selling Piercing Jewellery",
+        "collection": "best-sellers",
+        "products_limit": 20,
+        "products_per_view": 5,
+        "show_swatches": true,
+        "swatch_option": "Color",
+        "bg_color": "#ffffff",
+        "heading_color": "#333333",
+        "title_color": "#333333",
+        "price_color": "#e53935",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "trust_icons_yAwwpV": {
       "type": "trust-icons",
       "blocks": {
@@ -755,6 +773,7 @@
     "icon_marquee_WGNUpx",
     "shop_by_type_afLXVP",
     "featured_collection_wwdfbm",
+    "featured_collection_bestsellers",
     "trust_icons_yAwwpV",
     "signature_collections_abc123",
     "1774263311a512530e",
