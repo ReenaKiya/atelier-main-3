@@ -465,6 +465,35 @@
         "padding_bottom": 40
       }
     },
+    "watch_and_buy_main": {
+      "type": "watch-and-buy",
+      "name": "Watch and Buy",
+      "blocks": {
+        "wb_block_1": { "type": "video_card", "settings": {} },
+        "wb_block_2": { "type": "video_card", "settings": {} },
+        "wb_block_3": { "type": "video_card", "settings": {} },
+        "wb_block_4": { "type": "video_card", "settings": {} },
+        "wb_block_5": { "type": "video_card", "settings": {} },
+        "wb_block_6": { "type": "video_card", "settings": {} }
+      },
+      "block_order": [
+        "wb_block_1",
+        "wb_block_2",
+        "wb_block_3",
+        "wb_block_4",
+        "wb_block_5",
+        "wb_block_6"
+      ],
+      "settings": {
+        "heading": "Watch and Buy",
+        "heading_color": "#222222",
+        "bg_color": "#ffffff",
+        "cards_per_view": 6,
+        "autoplay": true,
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "trust_icons_yAwwpV": {
       "type": "trust-icons",
       "blocks": {
@@ -791,6 +820,7 @@
     "shop_by_type_afLXVP",
     "featured_collection_wwdfbm",
     "featured_collection_bestsellers",
+    "watch_and_buy_main",
     "trust_icons_yAwwpV",
     "signature_collections_abc123",
     "1774263311a512530e",
