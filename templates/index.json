@@ -25,7 +25,6 @@
           "type": "_slide",
           "settings": {
             "media_type_1": "image",
-            "image_1": "shopify://shop_images/Desktop_Slideshow-2.webp",
             "content_direction": "column",
             "vertical_on_mobile": true,
             "horizontal_alignment": "flex-start",
@@ -166,7 +165,7 @@
           "type": "_slide",
           "settings": {
             "media_type_1": "image",
-            "image_1": "shopify://shop_images/Desktop_Slideshow_1.webp",
+            "image_1": "shopify://shop_images/banner1_2000x700_2f20fd08-6afd-486e-a915-12072c0b97d9.jpg",
             "content_direction": "column",
             "vertical_on_mobile": true,
             "horizontal_alignment": "flex-start",
@@ -327,7 +326,6 @@
         "icon_9xFaW6": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/Tunge.webp",
             "label": "Tongue",
             "link": ""
           }
@@ -335,7 +333,6 @@
         "icon_FNAEEC": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/eyebrow.webp",
             "label": "Eye",
             "link": ""
           }
@@ -343,7 +340,6 @@
         "icon_xh9hH8": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/EAR.webp",
             "label": "Ear",
             "link": ""
           }
@@ -351,7 +347,6 @@
         "icon_RhFfwd": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/Belly.webp",
             "label": "Belly",
             "link": ""
           }
@@ -359,7 +354,6 @@
         "icon_ChDF7b": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/nose.webp",
             "label": "Nose",
             "link": ""
           }
@@ -375,7 +369,6 @@
         "icon_pjhkzz": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/lip.webp",
             "label": "Lips",
             "link": ""
           }
@@ -383,7 +376,6 @@
         "icon_Nb4BpX": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/stretched_1.webp",
             "label": "Stretch",
             "link": ""
           }
@@ -391,7 +383,6 @@
         "icon_MBFRHw": {
           "type": "icon",
           "settings": {
-            "image": "shopify://shop_images/Belly.webp",
             "label": "Belly",
             "link": ""
           }
@@ -442,7 +433,6 @@
       ],
       "name": "Shop by Type",
       "settings": {
-        "image": "shopify://shop_images/new-arrivels.webp",
         "heading": "Shop by Type",
         "bg_color": "#fce4ec"
       }
@@ -479,7 +469,6 @@
         "sc_block_2": {
           "type": "collection_item",
           "settings": {
-            "image": "shopify://shop_images/nose-studes.webp",
             "title": "Nose Studs",
             "link": "/collections/nose-studs"
           }
@@ -487,7 +476,6 @@
         "sc_block_3": {
           "type": "collection_item",
           "settings": {
-            "image": "shopify://shop_images/hinged.webp",
             "title": "Hinged Segment Clicker",
             "link": "/collections/hinged-segment-clicker"
           }
@@ -495,7 +483,6 @@
         "sc_block_4": {
           "type": "collection_item",
           "settings": {
-            "image": "shopify://shop_images/hugges.webp",
             "title": "Huggies & Studs",
             "link": "/collections/huggies-studs"
           }
@@ -516,36 +503,6 @@
     },
     "1774263311a512530e": {
       "type": "_blocks",
-      "blocks": {
-        "webrex_ai_seo_optimizer_product_description_tabs_rCW3i7": {
-          "type": "shopify://apps/webrex-ai-seo-optimizer/blocks/productDescriptionTabs/b26797ad-bb4d-48f5-8ef3-7c561521049c",
-          "settings": {
-            "layout_view": "tabs",
-            "description_position": "inside",
-            "description_tab_title": "Description",
-            "max_width": 1100,
-            "tab_design_style": "cards",
-            "tab_title_font_size": 16,
-            "tab_title_text_color": "#212529",
-            "active_tab_title_text_color": "#212529",
-            "tab_background_color": "#f8f9fa",
-            "tab_active_background_color": "#4ecdc4",
-            "tab_border_color": "#e9ecef",
-            "classic_underline_color": "#4ecdc4",
-            "classic_underline_thickness": 3,
-            "tab_content_background_color": "#ffffff",
-            "accordion_title_font_size": 16,
-            "accordion_title_text_color": "#212529",
-            "accordion_active_title_text_color": "#212529",
-            "accordion_title_bg_color": "#f5f5f5",
-            "accordion_active_title_bg_color": "#ffffff",
-            "accordion_content_background_color": "#ffffff"
-          }
-        }
-      },
-      "block_order": [
-        "webrex_ai_seo_optimizer_product_description_tabs_rCW3i7"
-      ],
       "settings": {
         "content_direction": "column",
         "vertical_on_mobile": true,
@@ -582,7 +539,6 @@
           "settings": {
             "tab_label": "Luxe",
             "collection": "luxe",
-            "bg_image": "shopify://shop_images/luxe_1.webp",
             "style_title": "Styles",
             "bg_color": "#fce4ec"
           }
@@ -592,7 +548,6 @@
           "settings": {
             "tab_label": "Amour",
             "collection": "amour",
-            "bg_image": "shopify://shop_images/amour.png",
             "style_title": "Styles",
             "bg_color": "#fce4ec"
           }
@@ -602,7 +557,6 @@
           "settings": {
             "tab_label": "Mystic",
             "collection": "mystic",
-            "bg_image": "shopify://shop_images/mystic.png",
             "style_title": "Styles",
             "bg_color": "#fce4ec"
           }
@@ -612,7 +566,6 @@
           "settings": {
             "tab_label": "Celestial",
             "collection": "celestial",
-            "bg_image": "shopify://shop_images/celestial.png",
             "style_title": "Styles",
             "bg_color": "#fce4ec"
           }
