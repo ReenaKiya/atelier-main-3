@@ -467,14 +467,69 @@
     },
     "watch_and_buy_main": {
       "type": "watch-and-buy",
-      "name": "Watch and Buy",
       "blocks": {
-        "wb_block_1": { "type": "video_card", "settings": {} },
-        "wb_block_2": { "type": "video_card", "settings": {} },
-        "wb_block_3": { "type": "video_card", "settings": {} },
-        "wb_block_4": { "type": "video_card", "settings": {} },
-        "wb_block_5": { "type": "video_card", "settings": {} },
-        "wb_block_6": { "type": "video_card", "settings": {} }
+        "wb_block_1": {
+          "type": "video_card",
+          "settings": {
+            "video": "shopify://files/videos/IEHB7791.MP4",
+            "video_url": "",
+            "poster": "shopify://shop_images/g4_63bfc224-5c42-4956-b79c-3d40eefb6796.png",
+            "product": "14k-gold-cubic-zirconia-jewelled-crescent-top-with-internal-thread-base-labret",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": "shopify://collections/lux"
+          }
+        },
+        "wb_block_2": {
+          "type": "video_card",
+          "settings": {
+            "video_url": "",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": ""
+          }
+        },
+        "wb_block_3": {
+          "type": "video_card",
+          "settings": {
+            "video_url": "",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": ""
+          }
+        },
+        "wb_block_4": {
+          "type": "video_card",
+          "settings": {
+            "video_url": "",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": ""
+          }
+        },
+        "wb_block_5": {
+          "type": "video_card",
+          "settings": {
+            "video_url": "",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": ""
+          }
+        },
+        "wb_block_6": {
+          "type": "video_card",
+          "settings": {
+            "video_url": "",
+            "product": "",
+            "custom_title": "",
+            "custom_price": "",
+            "fallback_link": ""
+          }
+        }
       },
       "block_order": [
         "wb_block_1",
@@ -484,6 +539,7 @@
         "wb_block_5",
         "wb_block_6"
       ],
+      "name": "Watch and Buy",
       "settings": {
         "heading": "Watch and Buy",
         "heading_color": "#222222",
