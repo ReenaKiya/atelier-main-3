@@ -36,59 +36,84 @@
             {% for block in section.blocks %}
               {%- assign product = all_products[block.settings.product] -%}
               {%- assign product_url = product.url | default: block.settings.fallback_link -%}
-              <div class="wb-slide" {{ block.shopify_attributes }}>
-                <a href="{{ product_url }}" class="wb-card" {% if product_url == blank %}onclick="return false"{% endif %}>
+              {%- assign variant_id = product.selected_or_first_available_variant.id -%}
+              {%- assign video_src = '' -%}
+              {%- assign video_mime = 'video/mp4' -%}
+              {%- if block.settings.video != blank -%}
+                {%- for source in block.settings.video.sources -%}
+                  {%- if source.format == 'mp4' -%}
+                    {%- assign video_src = source.url -%}
+                    {%- assign video_mime = source.mime_type -%}
+                    {%- break -%}
+                  {%- endif -%}
+                {%- endfor -%}
+                {%- if video_src == '' and block.settings.video.sources.first -%}
+                  {%- assign video_src = block.settings.video.sources.first.url -%}
+                  {%- assign video_mime = block.settings.video.sources.first.mime_type -%}
+                {%- endif -%}
+              {%- elsif block.settings.video_url != blank -%}
+                {%- assign video_src = block.settings.video_url -%}
+              {%- endif -%}
+              {%- assign poster_url = '' -%}
+              {%- if block.settings.poster != blank -%}
+                {%- assign poster_url = block.settings.poster | image_url: width: 800 -%}
+              {%- endif -%}
+              {%- assign thumb_url = '' -%}
+              {%- if product.featured_image != blank -%}
+                {%- assign thumb_url = product.featured_image | image_url: width: 200 -%}
+              {%- endif -%}
+              {%- assign display_title = block.settings.custom_title | default: product.title -%}
+              {%- assign display_price = product.price | money -%}
+              {%- if product == blank and block.settings.custom_price != blank -%}
+                {%- assign display_price = block.settings.custom_price -%}
+              {%- endif -%}
+
+              <div
+                class="wb-slide"
+                data-index="{{ forloop.index0 }}"
+                data-video-src="{{ video_src }}"
+                data-video-mime="{{ video_mime }}"
+                data-poster="{{ poster_url }}"
+                data-thumb="{{ thumb_url }}"
+                data-title="{{ display_title | escape }}"
+                data-price="{{ display_price | escape }}"
+                data-product-url="{{ product_url }}"
+                data-variant-id="{{ variant_id }}"
+                {{ block.shopify_attributes }}
+              >
+                <div class="wb-card" role="button" tabindex="0" aria-label="Play video">
                   <div class="wb-card__media">
-                    {% if block.settings.video != blank %}
+                    {% if video_src != blank %}
                       <video
                         class="wb-card__video"
                         muted
                         loop
                         playsinline
                         preload="metadata"
-                        {% if block.settings.poster != blank %}poster="{{ block.settings.poster | image_url: width: 600 }}"{% endif %}
+                        {% if poster_url != blank %}poster="{{ poster_url }}"{% endif %}
                       >
-                        {% for source in block.settings.video.sources %}
-                          <source src="{{ source.url }}" type="{{ source.mime_type }}">
-                        {% endfor %}
+                        <source src="{{ video_src }}" type="{{ video_mime }}">
                       </video>
-                    {% elsif block.settings.video_url != blank %}
-                      <video
-                        class="wb-card__video"
-                        muted
-                        loop
-                        playsinline
-                        preload="metadata"
-                        {% if block.settings.poster != blank %}poster="{{ block.settings.poster | image_url: width: 600 }}"{% endif %}
-                      >
-                        <source src="{{ block.settings.video_url }}" type="video/mp4">
-                      </video>
-                    {% elsif block.settings.poster != blank %}
-                      <img class="wb-card__poster" src="{{ block.settings.poster | image_url: width: 600 }}" alt="{{ product.title | escape }}" loading="lazy">
+                    {% elsif poster_url != blank %}
+                      <img class="wb-card__poster" src="{{ poster_url }}" alt="{{ display_title | escape }}" loading="lazy">
                     {% endif %}
+                    <div class="wb-card__play-icon" aria-hidden="true">
+                      <svg width="20" height="20" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>
+                    </div>
                   </div>
 
-                  {% if product != blank %}
+                  {% if display_title != blank %}
                     <div class="wb-card__info">
-                      {% if product.featured_image != blank %}
-                        <img class="wb-card__thumb" src="{{ product.featured_image | image_url: width: 120 }}" alt="" loading="lazy">
+                      {% if thumb_url != blank %}
+                        <img class="wb-card__thumb" src="{{ thumb_url | replace: 'width=200', 'width=120' }}" alt="" loading="lazy">
                       {% endif %}
                       <div class="wb-card__meta">
-                        <p class="wb-card__title">{{ block.settings.custom_title | default: product.title }}</p>
-                        <p class="wb-card__price">{{ product.price | money }}</p>
-                      </div>
-                    </div>
-                  {% elsif block.settings.custom_title != blank %}
-                    <div class="wb-card__info">
-                      <div class="wb-card__meta">
-                        <p class="wb-card__title">{{ block.settings.custom_title }}</p>
-                        {% if block.settings.custom_price != blank %}
-                          <p class="wb-card__price">{{ block.settings.custom_price }}</p>
-                        {% endif %}
+                        <p class="wb-card__title">{{ display_title }}</p>
+                        <p class="wb-card__price">{{ display_price }}</p>
                       </div>
                     </div>
                   {% endif %}
-                </a>
+                </div>
               </div>
             {% endfor %}
           </div>
@@ -103,6 +128,31 @@
     {% else %}
       <p style="text-align: center; color: #999;">Add video blocks in the section settings to populate this carousel.</p>
     {% endif %}
+  </div>
+
+  {%- comment -%} Modal {%- endcomment -%}
+  <div class="wb-modal-overlay" id="wb-overlay-{{ section.id }}" aria-hidden="true"></div>
+  <div class="wb-modal" id="wb-modal-{{ section.id }}" role="dialog" aria-modal="true" aria-hidden="true">
+    <button class="wb-modal__close" type="button" aria-label="Close">&times;</button>
+    <button class="wb-modal__nav wb-modal__nav--prev" type="button" aria-label="Previous video">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"></polyline></svg>
+    </button>
+    <button class="wb-modal__nav wb-modal__nav--next" type="button" aria-label="Next video">
+      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"></polyline></svg>
+    </button>
+    <div class="wb-modal__stage">
+      <video class="wb-modal__video" playsinline controls preload="metadata"></video>
+      <div class="wb-modal__product-card">
+        <a class="wb-modal__product-link">
+          <img class="wb-modal__product-thumb" alt="">
+          <div class="wb-modal__product-meta">
+            <p class="wb-modal__product-title"></p>
+            <p class="wb-modal__product-price"></p>
+          </div>
+        </a>
+        <button class="wb-modal__atc" type="button">ADD TO CART</button>
+      </div>
+    </div>
   </div>
 </section>
 
@@ -154,8 +204,7 @@
 
   .wb-card {
     display: block;
-    text-decoration: none;
-    color: inherit;
+    cursor: pointer;
     background: #fff;
     border-radius: 6px;
     overflow: hidden;
@@ -163,9 +212,11 @@
     transition: transform 0.25s ease, box-shadow 0.25s ease;
   }
 
-  .wb-card:hover {
+  .wb-card:hover,
+  .wb-card:focus {
     transform: translateY(-2px);
     box-shadow: 0 6px 16px rgba(0,0,0,0.12);
+    outline: none;
   }
 
   .wb-card__media {
@@ -181,6 +232,36 @@
     height: 100%;
     object-fit: cover;
     display: block;
+  }
+
+  .wb-card__play-icon {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 0.2s ease;
+  }
+
+  .wb-card__play-icon::before {
+    content: "";
+    position: absolute;
+    width: 48px;
+    height: 48px;
+    background: rgba(0,0,0,0.55);
+    border-radius: 50%;
+  }
+
+  .wb-card__play-icon svg {
+    position: relative;
+    z-index: 1;
+    margin-left: 3px;
+  }
+
+  .wb-card:hover .wb-card__play-icon {
+    opacity: 1;
   }
 
   .wb-card__info {
@@ -247,46 +328,192 @@
     box-shadow: 0 4px 14px rgba(0,0,0,0.15);
   }
 
-  .wb-nav--prev {
-    left: -20px;
+  .wb-nav--prev { left: -20px; }
+  .wb-nav--next { right: -20px; }
+  .wb-nav svg { pointer-events: none; }
+
+  /* ===== Modal ===== */
+  .wb-modal-overlay {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.75);
+    z-index: 9998;
+    cursor: pointer;
   }
 
-  .wb-nav--next {
-    right: -20px;
+  .wb-modal-overlay.wb-active {
+    display: block;
   }
 
-  .wb-nav svg {
+  .wb-modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    z-index: 9999;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
     pointer-events: none;
   }
 
-  .wb-nav[style*="hidden"] {
-    visibility: hidden;
+  .wb-modal.wb-active {
+    display: flex;
+  }
+
+  .wb-modal__close {
+    position: absolute;
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #000;
+    font-size: 26px;
+    line-height: 1;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .wb-modal__nav {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 48px;
+    height: 48px;
+    border: none;
+    background: rgba(255,255,255,0.95);
+    color: #000;
+    border-radius: 50%;
+    cursor: pointer;
+    z-index: 10000;
+    pointer-events: auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.3);
+  }
+
+  .wb-modal__nav--prev { left: 24px; }
+  .wb-modal__nav--next { right: 24px; }
+  .wb-modal__nav[disabled] { opacity: 0.4; cursor: not-allowed; }
+
+  .wb-modal__stage {
+    position: relative;
+    pointer-events: auto;
+    width: 100%;
+    max-width: 380px;
+    aspect-ratio: 9 / 16;
+    max-height: 90vh;
+    background: #000;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+  }
+
+  .wb-modal__video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+    background: #000;
+  }
+
+  .wb-modal__product-card {
+    position: absolute;
+    left: 14px;
+    right: 14px;
+    bottom: 14px;
+    background: #fff;
+    border-radius: 10px;
+    padding: 10px;
+    box-shadow: 0 4px 16px rgba(0,0,0,0.25);
+  }
+
+  .wb-modal__product-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: inherit;
+    margin-bottom: 8px;
+  }
+
+  .wb-modal__product-thumb {
+    width: 44px;
+    height: 44px;
+    object-fit: contain;
+    background: #f5f5f5;
+    border-radius: 6px;
+    flex-shrink: 0;
+  }
+
+  .wb-modal__product-meta {
+    flex: 1;
+    min-width: 0;
+  }
+
+  .wb-modal__product-title {
+    font-size: 13px;
+    line-height: 1.3;
+    color: #222;
+    margin: 0 0 3px;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+  }
+
+  .wb-modal__product-price {
+    font-size: 14px;
+    font-weight: 700;
+    color: #000;
+    margin: 0;
+  }
+
+  .wb-modal__atc {
+    width: 100%;
+    padding: 10px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    cursor: pointer;
+    transition: background 0.2s;
+  }
+
+  .wb-modal__atc:hover {
+    background: #000;
+  }
+
+  .wb-modal__atc:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
   }
 
   @media screen and (max-width: 999px) {
-    .wb-heading {
-      font-size: 28px;
-      margin-bottom: 20px;
-    }
-
+    .wb-heading { font-size: 28px; margin-bottom: 20px; }
     .wb-slide {
       flex: 0 0 calc((100% - 12px * 3) / 4);
       max-width: calc((100% - 12px * 3) / 4);
     }
-
-    .wb-nav {
-      width: 36px;
-      height: 36px;
-    }
-
+    .wb-nav { width: 36px; height: 36px; }
     .wb-nav--prev { left: -10px; }
     .wb-nav--next { right: -10px; }
   }
 
   @media screen and (max-width: 600px) {
-    .wb-heading {
-      font-size: 22px;
-    }
+    .wb-heading { font-size: 22px; }
 
     .wb-slider {
       overflow-x: auto;
@@ -295,7 +522,6 @@
       scrollbar-width: none;
       scroll-snap-type: x mandatory;
     }
-
     .wb-slider::-webkit-scrollbar { display: none; }
 
     .wb-track {
@@ -304,14 +530,21 @@
       width: max-content;
       gap: 10px;
     }
-
     .wb-slide {
       flex: 0 0 46vw;
       max-width: 46vw;
       scroll-snap-align: start;
     }
-
     .wb-nav { display: none; }
+
+    .wb-modal__stage {
+      max-width: 100%;
+      max-height: 100vh;
+      border-radius: 0;
+    }
+    .wb-modal__nav--prev { left: 8px; width: 40px; height: 40px; }
+    .wb-modal__nav--next { right: 8px; width: 40px; height: 40px; }
+    .wb-modal { padding: 0; }
   }
 </style>
 
@@ -327,7 +560,7 @@
     if (!slider) return;
 
     var track = slider.querySelector(".wb-track");
-    var slides = track.querySelectorAll(".wb-slide");
+    var slides = Array.prototype.slice.call(track.querySelectorAll(".wb-slide"));
     var prevBtn = section.querySelector(".wb-nav--prev");
     var nextBtn = section.querySelector(".wb-nav--next");
     var perViewAttr = parseInt(slider.dataset.perView, 10) || 6;
@@ -355,28 +588,22 @@
 
     function updateSlider() {
       if (window.innerWidth <= 600) return;
-      var offset = currentIndex * getSlideWidth();
-      track.style.transform = "translateX(-" + offset + "px)";
+      track.style.transform = "translateX(-" + (currentIndex * getSlideWidth()) + "px)";
       if (prevBtn) prevBtn.style.visibility = currentIndex <= 0 ? "hidden" : "visible";
       if (nextBtn) nextBtn.style.visibility = currentIndex >= getMaxIndex() ? "hidden" : "visible";
     }
 
-    if (prevBtn) {
-      prevBtn.addEventListener("click", function () {
-        if (currentIndex > 0) { currentIndex--; updateSlider(); }
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener("click", function () {
-        if (currentIndex < getMaxIndex()) { currentIndex++; updateSlider(); }
-      });
-    }
+    if (prevBtn) prevBtn.addEventListener("click", function () {
+      if (currentIndex > 0) { currentIndex--; updateSlider(); }
+    });
+    if (nextBtn) nextBtn.addEventListener("click", function () {
+      if (currentIndex < getMaxIndex()) { currentIndex++; updateSlider(); }
+    });
 
     slider.addEventListener("touchstart", function (e) {
       startX = e.touches[0].clientX;
       isDragging = true;
     }, { passive: true });
-
     slider.addEventListener("touchend", function (e) {
       if (!isDragging || window.innerWidth <= 600) return;
       isDragging = false;
@@ -399,27 +626,149 @@
       }, 150);
     });
 
-    /* Autoplay videos only when visible */
-    var videos = section.querySelectorAll(".wb-card__video");
+    /* ----- Card autoplay (muted, only when visible) ----- */
+    var cardVideos = section.querySelectorAll(".wb-card__video");
     if (autoplayEnabled && "IntersectionObserver" in window) {
       var io = new IntersectionObserver(function (entries) {
         entries.forEach(function (entry) {
           var v = entry.target;
           if (entry.isIntersecting) {
-            var p = v.play();
-            if (p && typeof p.catch === "function") p.catch(function () {});
-          } else {
-            v.pause();
-          }
+            var p = v.play(); if (p && p.catch) p.catch(function () {});
+          } else { v.pause(); }
         });
       }, { threshold: 0.25 });
-      videos.forEach(function (v) { io.observe(v); });
-    } else if (autoplayEnabled) {
-      videos.forEach(function (v) {
-        var p = v.play();
-        if (p && typeof p.catch === "function") p.catch(function () {});
-      });
+      cardVideos.forEach(function (v) { io.observe(v); });
     }
+
+    /* ----- Modal ----- */
+    var overlay = document.getElementById("wb-overlay-" + sectionId);
+    var modal = document.getElementById("wb-modal-" + sectionId);
+    if (!modal || !overlay) return;
+    var modalVideo = modal.querySelector(".wb-modal__video");
+    var modalThumb = modal.querySelector(".wb-modal__product-thumb");
+    var modalTitle = modal.querySelector(".wb-modal__product-title");
+    var modalPrice = modal.querySelector(".wb-modal__product-price");
+    var modalLink = modal.querySelector(".wb-modal__product-link");
+    var modalAtc = modal.querySelector(".wb-modal__atc");
+    var modalClose = modal.querySelector(".wb-modal__close");
+    var modalPrev = modal.querySelector(".wb-modal__nav--prev");
+    var modalNext = modal.querySelector(".wb-modal__nav--next");
+    var activeIndex = -1;
+
+    function renderModal(index) {
+      if (index < 0 || index >= slides.length) return;
+      activeIndex = index;
+      var slide = slides[index];
+      var videoSrc = slide.dataset.videoSrc;
+      var videoMime = slide.dataset.videoMime || "video/mp4";
+      var poster = slide.dataset.poster;
+      var thumb = slide.dataset.thumb;
+      var title = slide.dataset.title;
+      var price = slide.dataset.price;
+      var productUrl = slide.dataset.productUrl;
+      var variantId = slide.dataset.variantId;
+
+      modalVideo.pause();
+      modalVideo.innerHTML = "";
+      if (poster) modalVideo.setAttribute("poster", poster); else modalVideo.removeAttribute("poster");
+      if (videoSrc) {
+        var source = document.createElement("source");
+        source.src = videoSrc;
+        source.type = videoMime;
+        modalVideo.appendChild(source);
+        modalVideo.load();
+        var p = modalVideo.play();
+        if (p && p.catch) p.catch(function () {});
+      }
+
+      if (thumb) { modalThumb.src = thumb; modalThumb.style.display = ""; }
+      else { modalThumb.style.display = "none"; }
+      modalTitle.textContent = title || "";
+      modalPrice.textContent = price || "";
+      if (productUrl) { modalLink.setAttribute("href", productUrl); modalLink.style.pointerEvents = ""; }
+      else { modalLink.removeAttribute("href"); modalLink.style.pointerEvents = "none"; }
+      modalAtc.dataset.variantId = variantId || "";
+      modalAtc.disabled = !variantId;
+      modalAtc.textContent = "ADD TO CART";
+
+      modalPrev.disabled = index <= 0;
+      modalNext.disabled = index >= slides.length - 1;
+    }
+
+    function openModal(index) {
+      overlay.classList.add("wb-active");
+      modal.classList.add("wb-active");
+      overlay.setAttribute("aria-hidden", "false");
+      modal.setAttribute("aria-hidden", "false");
+      document.body.style.overflow = "hidden";
+      renderModal(index);
+    }
+
+    function closeModal() {
+      modalVideo.pause();
+      overlay.classList.remove("wb-active");
+      modal.classList.remove("wb-active");
+      overlay.setAttribute("aria-hidden", "true");
+      modal.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      activeIndex = -1;
+    }
+
+    slides.forEach(function (slide, idx) {
+      var card = slide.querySelector(".wb-card");
+      if (!card) return;
+      card.addEventListener("click", function () { openModal(idx); });
+      card.addEventListener("keydown", function (e) {
+        if (e.key === "Enter" || e.key === " ") { e.preventDefault(); openModal(idx); }
+      });
+    });
+
+    modalClose.addEventListener("click", closeModal);
+    overlay.addEventListener("click", closeModal);
+    modalPrev.addEventListener("click", function () {
+      if (activeIndex > 0) renderModal(activeIndex - 1);
+    });
+    modalNext.addEventListener("click", function () {
+      if (activeIndex < slides.length - 1) renderModal(activeIndex + 1);
+    });
+
+    document.addEventListener("keydown", function (e) {
+      if (!modal.classList.contains("wb-active")) return;
+      if (e.key === "Escape") closeModal();
+      else if (e.key === "ArrowLeft" && activeIndex > 0) renderModal(activeIndex - 1);
+      else if (e.key === "ArrowRight" && activeIndex < slides.length - 1) renderModal(activeIndex + 1);
+    });
+
+    modalAtc.addEventListener("click", function () {
+      var vid = modalAtc.dataset.variantId;
+      if (!vid) return;
+      modalAtc.disabled = true;
+      modalAtc.textContent = "Adding...";
+      fetch("/cart/add.js", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: parseInt(vid, 10), quantity: 1 })
+      })
+      .then(function (res) { return res.json(); })
+      .then(function (data) {
+        if (data.status && data.status >= 400) {
+          modalAtc.textContent = data.description || "Error";
+          setTimeout(function () { modalAtc.textContent = "ADD TO CART"; modalAtc.disabled = false; }, 1800);
+        } else {
+          modalAtc.textContent = "ADDED!";
+          fetch("/cart.js").then(function (r) { return r.json(); }).then(function (cart) {
+            document.querySelectorAll("[data-cart-count], .cart-count-bubble span, .cart-count").forEach(function (el) {
+              el.textContent = cart.item_count;
+            });
+          }).catch(function () {});
+          setTimeout(function () { modalAtc.textContent = "ADD TO CART"; modalAtc.disabled = false; }, 1500);
+        }
+      })
+      .catch(function () {
+        modalAtc.textContent = "ERROR - TRY AGAIN";
+        setTimeout(function () { modalAtc.textContent = "ADD TO CART"; modalAtc.disabled = false; }, 1800);
+      });
+    });
   }
 
   if (document.readyState === "loading") {
