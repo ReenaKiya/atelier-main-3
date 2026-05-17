@@ -1,0 +1,110 @@
+{%- liquid
+  assign bg_color = section.settings.bg_color | default: '#ffffff'
+  assign padding_top = section.settings.padding_top | default: 40
+  assign padding_bottom = section.settings.padding_bottom | default: 40
+-%}
+
+<section
+  class="cpr-section"
+  data-section-id="{{ section.id }}"
+  style="
+    --cpr-bg: {{ bg_color }};
+    --cpr-padding-top: {{ padding_top }}px;
+    --cpr-padding-bottom: {{ padding_bottom }}px;
+  "
+>
+  <div class="cpr-container">
+    {% if section.blocks.size > 0 %}
+      {% for block in section.blocks %}
+        {% case block.type %}
+          {% when '@app' %}
+            {% render block %}
+        {% endcase %}
+      {% endfor %}
+    {% else %}
+      <div class="cpr-empty">
+        <p><strong>Add the Judge.me Reviews Carousel here.</strong></p>
+        <p>In the Theme Editor: click this section &rarr; <em>Add block</em> &rarr; pick <em>Judge.me Reviews Carousel</em> (under <em>Apps</em>).</p>
+      </div>
+    {% endif %}
+  </div>
+</section>
+
+<style>
+  .cpr-section {
+    background-color: var(--cpr-bg);
+    padding-top: var(--cpr-padding-top);
+    padding-bottom: var(--cpr-padding-bottom);
+  }
+
+  .cpr-container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 20px;
+  }
+
+  .cpr-empty {
+    text-align: center;
+    color: #666;
+    padding: 40px 20px;
+    border: 2px dashed #ddd;
+    border-radius: 8px;
+    background: #fafafa;
+  }
+
+  .cpr-empty p { margin: 0 0 6px; font-size: 14px; }
+  .cpr-empty p:last-child { margin-bottom: 0; }
+</style>
+
+{% schema %}
+{
+  "name": "Customer Photo Reviews",
+  "tag": "section",
+  "class": "cpr-section-wrapper",
+  "settings": [
+    {
+      "type": "paragraph",
+      "content": "Add the Judge.me Reviews Carousel app block inside this section. Reviews populate dynamically from your Judge.me dashboard."
+    },
+    {
+      "type": "color",
+      "id": "bg_color",
+      "label": "Background color",
+      "default": "#ffffff"
+    },
+    {
+      "type": "header",
+      "content": "Spacing"
+    },
+    {
+      "type": "range",
+      "id": "padding_top",
+      "label": "Padding top (px)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    },
+    {
+      "type": "range",
+      "id": "padding_bottom",
+      "label": "Padding bottom (px)",
+      "min": 0,
+      "max": 100,
+      "step": 5,
+      "default": 40
+    }
+  ],
+  "blocks": [
+    {
+      "type": "@app"
+    }
+  ],
+  "presets": [
+    {
+      "name": "Customer Photo Reviews",
+      "category": "Testimonials"
+    }
+  ]
+}
+{% endschema %}

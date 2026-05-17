@@ -772,6 +772,18 @@
         "padding_top": 40,
         "padding_bottom": 40
       }
+    },
+    "customer_photo_reviews_main": {
+      "type": "customer-photo-reviews",
+      "name": "Customer Photo Reviews",
+      "settings": {
+        "heading": "How do customers rate us?",
+        "show_verified": true,
+        "bg_color": "#ffffff",
+        "star_color": "#000000",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
     }
   },
   "order": [
@@ -786,6 +798,7 @@
     "signature_collections_abc123",
     "1774263311a512530e",
     "find_your_style_RUDfzG",
+    "customer_photo_reviews_main",
     "gift_banner_hJhHdM"
   ]
 }
