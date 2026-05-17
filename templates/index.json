@@ -773,7 +773,6 @@
         "padding_bottom": 40
       }
     },
-<<<<<<< HEAD
     "customer_photo_reviews_main": {
       "type": "customer-photo-reviews",
       "name": "Customer Photo Reviews",
@@ -784,7 +783,8 @@
         "star_color": "#000000",
         "padding_top": 40,
         "padding_bottom": 40
-=======
+      }
+    },
     "1778989654a2f703c4": {
       "type": "_blocks",
       "blocks": {
@@ -851,7 +851,6 @@
         "gradient_direction": "to top",
         "padding-block-start": 0,
         "padding-block-end": 0
->>>>>>> 01a8155038f1e65b00e1133cc42f7fcd06197dcb
       }
     }
   },
@@ -867,12 +866,8 @@
     "signature_collections_abc123",
     "1774263311a512530e",
     "find_your_style_RUDfzG",
-<<<<<<< HEAD
     "customer_photo_reviews_main",
-    "gift_banner_hJhHdM"
-=======
     "gift_banner_hJhHdM",
     "1778989654a2f703c4"
->>>>>>> 01a8155038f1e65b00e1133cc42f7fcd06197dcb
   ]
 }
