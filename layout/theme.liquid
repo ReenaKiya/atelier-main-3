@@ -61,6 +61,8 @@
     <script src="{{ 'critical.js' | asset_url }}"></script>
     {% # theme-check-enable ParserBlockingScript %}
 
+    <script src="{{ 'judgeme-text-card-image.js' | asset_url }}" defer></script>
+
     {% render 'search-modal' %}
 
     {% if settings.quick_add or settings.mobile_quick_add %}
