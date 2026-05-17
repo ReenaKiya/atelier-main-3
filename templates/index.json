@@ -767,7 +767,9 @@
           "settings": {
             "show_sample_reviews": true,
             "reviews_selection": "all",
-            "products": [],
+            "products": [
+              "14k-gold-classic-bead-segment-clicker-ring"
+            ],
             "star_rating": "all",
             "show_review_media": true,
             "display_order": "media_first",
