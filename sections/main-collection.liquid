@@ -61,12 +61,16 @@
 
   {% paginate collection.products by 24 %}
     <div class="collection-wrapper grid gap-style">
-      {% content_for 'block',
-        type: 'filters',
-        id: 'filters',
-        results: collection,
-        results_size: collection.products_count
-      %}
+      {%- if section.settings.use_tag_filters -%}
+        {% render 'tag-filter-sidebar' %}
+      {%- else -%}
+        {% content_for 'block',
+          type: 'filters',
+          id: 'filters',
+          results: collection,
+          results_size: collection.products_count
+        %}
+      {%- endif -%}
 
       {%- liquid
         assign material_label = ''
@@ -1614,6 +1618,13 @@
     "templates": ["collection"]
   },
   "settings": [
+    {
+      "type": "checkbox",
+      "id": "use_tag_filters",
+      "label": "Use tag-based filters (Group-Value tags)",
+      "info": "Replaces Shopify's storefront filter block with a custom tag-based sidebar. Products must be tagged with 'Group-Value' patterns like 'Material-14K', 'Stone-Amethyst'.",
+      "default": true
+    },
     {
       "type": "select",
       "id": "layout_type",

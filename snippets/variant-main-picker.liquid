@@ -49,6 +49,8 @@
             endif
           elsif is_color_option and block.settings.show_swatches and swatch_count == 0
             assign variant_style = 'color_fallback'
+          elsif is_color_option == false
+            assign variant_style = 'dropdowns'
           endif
 
           if variant_style == 'buttons' and settings.variant_button_width == 'equal-width-buttons'
@@ -81,7 +83,7 @@
               {%- endfor -%}
             </div>
           </fieldset>
-        {%- elsif variant_style == 'swatch' or block.settings.variant_style == 'buttons' -%}
+        {%- elsif variant_style == 'swatch' or variant_style == 'buttons' -%}
           <fieldset
             class="variant-option variant-option--buttons{% if variant_style == 'swatch' %} variant-option--swatches{% else %} variant-option--{{ settings.variant_button_width }}{% endif %}"
             {{ option_id_attribute }}
@@ -235,7 +237,7 @@
               {% endstyle %}
             {% endif %}
           </fieldset>
-        {%- elsif block.settings.variant_style == 'dropdowns' -%}
+        {%- elsif variant_style == 'dropdowns' -%}
           {%
             # There is an opportunity to build a custom select component that will allow us to style the select element further (animation for dropdown, swatches shown in the dropdown options, etc)
             # It's too bad as it mean rebuilding baked in behaviours but I think we've already done that for the locale selectors

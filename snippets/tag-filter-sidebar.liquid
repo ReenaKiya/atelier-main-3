@@ -1,0 +1,413 @@
+{%- comment -%}
+  Tag-based filter sidebar — groups product tags by "Group-Value" pattern.
+
+  Example tags on products:
+    Type-Flat Back Studs
+    Material-14K, Material-14K/Bioflex, Material-9K
+    Thread Type-Internally Threaded, Thread Type-Push Fit
+    Stone-Amethyst, Stone-Cubic Zirconia, Stone-Lab Grown Diamond
+
+  URLs use Shopify's native tag filter: /collections/{handle}/{tag1}+{tag2}
+  Clicking a tag adds it to the URL; clicking an active tag removes it.
+
+  Renders alongside (or instead of) the modern storefront filters block.
+{%- endcomment -%}
+
+{%- liquid
+  assign group_order = 'Type,Material,Thread Type,Stone,Color,Colour,Size,Length,Thickness,Gauge'
+  assign group_order_arr = group_order | split: ','
+
+  comment
+    Pass 1: collect all tags, parse "Group-Value" format.
+    Use remove_first to strip the prefix (no `shift` filter exists in Liquid).
+  endcomment
+  assign all_tag_pairs = ''
+  for tag in collection.all_tags
+    if tag contains '-'
+      assign group_name = tag | split: '-' | first
+      assign value_name = tag | remove_first: group_name | remove_first: '-'
+      assign all_tag_pairs = all_tag_pairs | append: group_name | append: '|||' | append: value_name | append: '|||' | append: tag | append: '~~~'
+    endif
+  endfor
+  assign all_pairs_arr = all_tag_pairs | split: '~~~'
+
+  comment
+    Build a unique list of group names.
+    Bookend with ~~~ so the `contains` check matches whole names only —
+    otherwise "Thread Type" contains "Type" as a substring and the
+    "Type" group would be silently dropped.
+  endcomment
+  assign unique_groups = '~~~'
+  for pair in all_pairs_arr
+    if pair == blank
+      continue
+    endif
+    assign pair_parts = pair | split: '|||'
+    assign g = pair_parts[0]
+    assign needle = '~~~' | append: g | append: '~~~'
+    unless unique_groups contains needle
+      assign unique_groups = unique_groups | append: g | append: '~~~'
+    endunless
+  endfor
+  assign unique_groups_arr = unique_groups | split: '~~~'
+
+  comment
+    Reorder: preferred groups first, then any remaining alphabetically.
+  endcomment
+  assign sorted_groups = '~~~'
+  for preferred in group_order_arr
+    assign preferred_trim = preferred | strip
+    for g in unique_groups_arr
+      if g == preferred_trim
+        assign sorted_groups = sorted_groups | append: g | append: '~~~'
+      endif
+    endfor
+  endfor
+  for g in unique_groups_arr
+    assign needle = '~~~' | append: g | append: '~~~'
+    unless sorted_groups contains needle
+      assign sorted_groups = sorted_groups | append: g | append: '~~~'
+    endunless
+  endfor
+  assign sorted_groups_arr = sorted_groups | split: '~~~'
+-%}
+
+<aside class="tagfilter" data-tagfilter>
+  <div class="tagfilter__header">
+    <h2 class="tagfilter__title">Filters</h2>
+    {% if current_tags.size > 0 %}
+      <a href="{{ collection.url }}" class="tagfilter__clear-all">Clear all</a>
+    {% endif %}
+  </div>
+
+  {%- if sorted_groups_arr.size <= 1 -%}
+    <div class="tagfilter__empty">
+      <p><strong>No filters available yet.</strong></p>
+      <p>Tag your products with the pattern <code>Group-Value</code> in Shopify Admin to populate filters.</p>
+      <p>Examples: <code>Material-14K</code>, <code>Stone-Amethyst</code>, <code>Thread Type-Push Fit</code>, <code>Type-Flat Back Studs</code></p>
+    </div>
+  {%- endif -%}
+
+  {%- for group in sorted_groups_arr -%}
+    {%- if group == blank -%}{% continue %}{%- endif -%}
+    {%- liquid
+      assign group_values = ''
+      for pair in all_pairs_arr
+        if pair == blank
+          continue
+        endif
+        assign pair_parts = pair | split: '|||'
+        if pair_parts[0] == group
+          unless group_values contains pair_parts[2]
+            assign group_values = group_values | append: pair_parts[1] | append: '|||' | append: pair_parts[2] | append: '~~~'
+          endunless
+        endif
+      endfor
+      assign group_values_arr = group_values | split: '~~~'
+      assign group_id = group | handle
+    -%}
+
+    <details class="tagfilter__group" open data-tagfilter-group>
+      <summary class="tagfilter__group-summary">
+        <h3 class="tagfilter__group-title">{{ group }}</h3>
+        <span class="tagfilter__chevron" aria-hidden="true">
+          <svg width="10" height="6" viewBox="0 0 10 6" fill="none"><path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        </span>
+      </summary>
+
+      <ul class="tagfilter__list">
+        {%- for entry in group_values_arr -%}
+          {%- if entry == blank -%}{% continue %}{%- endif -%}
+          {%- liquid
+            assign entry_parts = entry | split: '|||'
+            assign value_label = entry_parts[0]
+            assign full_tag = entry_parts[1]
+            assign tag_handle = full_tag | handle
+            assign is_active = false
+            if current_tags contains full_tag
+              assign is_active = true
+            endif
+
+            comment
+              Count products that carry this tag in the current collection
+            endcomment
+            assign tag_count = 0
+            for product in collection.products
+              if product.tags contains full_tag
+                assign tag_count = tag_count | plus: 1
+              endif
+            endfor
+
+            comment
+              Build URL for this tag: toggle it in/out of current_tags.
+              Handleize each tag separately (the `handle` filter strips `+`,
+              so concatenating first and handleizing after eats the separator).
+            endcomment
+            assign new_tags = ''
+            for t in current_tags
+              if t == full_tag
+                continue
+              endif
+              assign t_handle = t | handle
+              if new_tags == ''
+                assign new_tags = t_handle
+              else
+                assign new_tags = new_tags | append: '+' | append: t_handle
+              endif
+            endfor
+            unless is_active
+              if new_tags == ''
+                assign new_tags = tag_handle
+              else
+                assign new_tags = new_tags | append: '+' | append: tag_handle
+              endif
+            endunless
+
+            if new_tags == ''
+              assign tag_url = collection.url
+            else
+              assign tag_url = collection.url | append: '/' | append: new_tags
+            endif
+          -%}
+          <li class="tagfilter__item{% if is_active %} tagfilter__item--active{% endif %}">
+            <a href="{{ tag_url }}" class="tagfilter__link" data-tag="{{ full_tag | escape }}">
+              <span class="tagfilter__checkbox" aria-hidden="true">
+                {% if is_active %}
+                  <svg width="12" height="12" viewBox="0 0 14 14" fill="none"><path d="M2.5 7L5.5 10L11.5 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                {% endif %}
+              </span>
+              <span class="tagfilter__label">{{ value_label }}</span>
+              {% if tag_count > 0 %}
+                <span class="tagfilter__count">({{ tag_count }})</span>
+              {% endif %}
+            </a>
+          </li>
+        {%- endfor -%}
+      </ul>
+    </details>
+  {%- endfor -%}
+</aside>
+
+<style>
+  /* ===== Grid placement: dock sidebar flush to the left =====
+     Override the wrapper's default layout (which relies on Shopify's
+     storefront-filter block CSS variables that aren't set here). */
+  .collection-wrapper:has(> .tagfilter) {
+    display: grid !important;
+    grid-template-columns: 240px minmax(0, 1fr) !important;
+    column-gap: 24px;
+    row-gap: 0;
+    padding-inline: 16px;
+    max-width: none;
+    margin: 0;
+    align-items: start;
+  }
+
+  .collection-wrapper > .tagfilter {
+    grid-column: 1;
+    grid-row: 1;
+    padding-block-start: 8px;
+  }
+
+  .collection-wrapper:has(> .tagfilter) > .main-collection-column {
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    padding-inline: 0 !important;
+  }
+
+  /* Tighten the gap between the page title and the product grid */
+  .collection-wrapper:has(> .tagfilter) .collection--title {
+    margin-bottom: 16px;
+  }
+
+  /* Force the product grid to 5 columns on desktop when the tag sidebar is active.
+     The grid uses --product-grid-columns-desktop, so override that. */
+  .collection-wrapper:has(> .tagfilter) .product-grid {
+    --product-grid-columns-desktop: repeat(5, minmax(0, 1fr)) !important;
+    grid-template-columns: repeat(5, minmax(0, 1fr)) !important;
+  }
+
+  .collection-wrapper:has(> .tagfilter) .product-grid__item {
+    grid-column: auto !important;
+    width: auto !important;
+    max-width: none !important;
+  }
+
+  /* Tablet: 3 per row */
+  @media (max-width: 1199px) and (min-width: 750px) {
+    .collection-wrapper:has(> .tagfilter) .product-grid {
+      --product-grid-columns-desktop: repeat(3, minmax(0, 1fr)) !important;
+      grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    }
+  }
+
+  /* Mobile: stack vertically, 2 products per row */
+  @media (max-width: 749px) {
+    .collection-wrapper:has(> .tagfilter) {
+      grid-template-columns: 1fr !important;
+      column-gap: 0;
+      padding-inline: 12px;
+    }
+    .collection-wrapper > .tagfilter,
+    .collection-wrapper:has(> .tagfilter) > .main-collection-column {
+      grid-column: 1 !important;
+    }
+    .collection-wrapper:has(> .tagfilter) > .main-collection-column {
+      grid-row: 2 !important;
+    }
+    .collection-wrapper:has(> .tagfilter) .product-grid {
+      --product-grid-columns-desktop: repeat(2, minmax(0, 1fr)) !important;
+      grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    }
+  }
+
+  .tagfilter {
+    width: 100%;
+    font-family: inherit;
+    color: #222;
+  }
+
+  .tagfilter__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #e5e5e5;
+    margin-bottom: 8px;
+  }
+
+  .tagfilter__title {
+    margin: 0;
+    font-size: 18px;
+    font-weight: 500;
+  }
+
+  .tagfilter__clear-all {
+    font-size: 12px;
+    color: #da1e37;
+    text-decoration: none;
+    font-weight: 500;
+  }
+
+  .tagfilter__clear-all:hover {
+    text-decoration: underline;
+  }
+
+  .tagfilter__group {
+    border-bottom: 1px solid #f0f0f0;
+    padding: 14px 0;
+  }
+
+  .tagfilter__group-summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    cursor: pointer;
+    list-style: none;
+    user-select: none;
+  }
+
+  .tagfilter__group-summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .tagfilter__group-title {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 600;
+    color: #111;
+  }
+
+  .tagfilter__chevron {
+    display: inline-flex;
+    transition: transform 0.2s ease;
+    color: #555;
+  }
+
+  .tagfilter__group:not([open]) .tagfilter__chevron {
+    transform: rotate(-90deg);
+  }
+
+  .tagfilter__list {
+    list-style: none;
+    padding: 10px 0 0;
+    margin: 0;
+  }
+
+  .tagfilter__item {
+    padding: 6px 0;
+  }
+
+  .tagfilter__link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    text-decoration: none;
+    color: #333;
+    font-size: 13px;
+    transition: color 0.15s ease;
+  }
+
+  .tagfilter__link:hover {
+    color: #000;
+  }
+
+  .tagfilter__checkbox {
+    flex-shrink: 0;
+    width: 16px;
+    height: 16px;
+    border: 1.5px solid #888;
+    border-radius: 3px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    color: #fff;
+    background: #fff;
+    transition: background 0.15s ease, border-color 0.15s ease;
+  }
+
+  .tagfilter__item--active .tagfilter__checkbox {
+    background: #111;
+    border-color: #111;
+  }
+
+  .tagfilter__item--active .tagfilter__label {
+    font-weight: 500;
+  }
+
+  .tagfilter__label {
+    line-height: 1.3;
+    flex: 1;
+  }
+
+  .tagfilter__count {
+    color: #888;
+    font-size: 12px;
+    margin-left: 4px;
+  }
+
+  .tagfilter__empty {
+    padding: 16px;
+    background: #fff8e1;
+    border: 1px solid #f3d573;
+    border-radius: 6px;
+    font-size: 12px;
+    color: #5a4a00;
+    line-height: 1.5;
+  }
+  .tagfilter__empty p { margin: 0 0 6px; }
+  .tagfilter__empty p:last-child { margin-bottom: 0; }
+  .tagfilter__empty code {
+    background: #fff;
+    padding: 1px 5px;
+    border-radius: 3px;
+    font-size: 11px;
+    border: 1px solid #ddd;
+  }
+
+  @media (max-width: 749px) {
+    .tagfilter {
+      max-width: none;
+    }
+  }
+</style>

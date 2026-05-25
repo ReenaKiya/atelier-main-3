@@ -162,6 +162,22 @@
               },
               "blocks": {}
             },
+<<<<<<< Updated upstream
+=======
+            "variant_picker_R3rGDr": {
+              "type": "variant-picker",
+              "settings": {
+                "variant_style": "buttons",
+                "show_swatches": true,
+                "alignment": "left",
+                "padding-block-start": 12,
+                "padding-block-end": 24,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
+>>>>>>> Stashed changes
             "buy_buttons_9MVfWi": {
               "type": "buy-buttons",
               "name": "t:names.product_buy_buttons",
@@ -263,7 +279,11 @@
             "text_idAt7H",
             "review_hddTi3",
             "price_PHGQkM",
+<<<<<<< Updated upstream
             "variant_picker_ARPYYP",
+=======
+            "variant_picker_R3rGDr",
+>>>>>>> Stashed changes
             "rio_mobile_media_K8nQpV",
             "product_inventory_cf9Nct",
             "buy_buttons_9MVfWi",
