@@ -128,6 +128,20 @@
               },
               "blocks": {}
             },
+            "variant_picker_ARPYYP": {
+              "type": "variant-picker",
+              "name": "t:names.product_variant_picker",
+              "settings": {
+                "variant_style": "buttons",
+                "show_swatches": true,
+                "alignment": "left",
+                "padding-block-start": 0,
+                "padding-block-end": 8,
+                "padding-inline-start": 0,
+                "padding-inline-end": 0
+              },
+              "blocks": {}
+            },
             "rio_mobile_media_K8nQpV": {
               "type": "rio-mobile-media",
               "name": "Mobile media (Rio)",
@@ -143,19 +157,6 @@
                 "show_inventory_quantity": true,
                 "padding-block-start": 0,
                 "padding-block-end": 0,
-                "padding-inline-start": 0,
-                "padding-inline-end": 0
-              },
-              "blocks": {}
-            },
-            "variant_picker_R3rGDr": {
-              "type": "variant-picker",
-              "settings": {
-                "variant_style": "dropdowns",
-                "show_swatches": true,
-                "alignment": "left",
-                "padding-block-start": 12,
-                "padding-block-end": 24,
                 "padding-inline-start": 0,
                 "padding-inline-end": 0
               },
@@ -262,9 +263,9 @@
             "text_idAt7H",
             "review_hddTi3",
             "price_PHGQkM",
+            "variant_picker_ARPYYP",
             "rio_mobile_media_K8nQpV",
             "product_inventory_cf9Nct",
-            "variant_picker_R3rGDr",
             "buy_buttons_9MVfWi",
             "description_accordion_xY3kPq",
             "icon_features_3Q9wZf"
@@ -971,7 +972,7 @@
     "1778812615f3a5df96": {
       "type": "_blocks",
       "blocks": {
-        "judge_me_reviews_cards_carousel_XxQNMg": {
+        "judge_me_reviews_cards_carousel_NQXVNR": {
           "type": "shopify://apps/judge-me-reviews/blocks/cards_carousel/61ccd3b1-a9f2-4160-9fe9-4fec8413e5d8",
           "settings": {
             "show_sample_reviews": true,
@@ -979,7 +980,7 @@
             "products": [],
             "star_rating": "all",
             "show_review_media": true,
-            "display_order": "media_first",
+            "display_order": "most_recent",
             "no_image_fallback": "review_text_only",
             "max_reviews": 20,
             "review_length": "medium",
@@ -999,13 +1000,12 @@
             "arrows_color": "#000000",
             "transition_speed": 5,
             "header_text": "Customers are saying",
-            "show_average_rating": true,
-            "rating_display": "default"
+            "show_average_rating": true
           }
         }
       },
       "block_order": [
-        "judge_me_reviews_cards_carousel_XxQNMg"
+        "judge_me_reviews_cards_carousel_NQXVNR"
       ],
       "settings": {
         "content_direction": "column",

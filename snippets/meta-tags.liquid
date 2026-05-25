@@ -2,7 +2,7 @@
   if template == 'collection' and current_tags.size == 1
     assign tag_slug = current_tags.first | handleize
     assign lookup_handle = collection.handle | append: '--' | append: tag_slug
-    assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
+    assign tag_seo = shop.metaobjects.tag_collection_seo[flatback-studs--material-sterling-silver]
   endif
 -%}
 
@@ -130,6 +130,18 @@
   </title>
 {% endif %}
 
+{% if tag_seo and tag_seo.seo_description.value != blank %}
+  <meta
+    name="description"
+    content="{{ tag_seo.seo_description.value | escape }}"
+  >
+{% elsif page_description %}
+  <meta
+    name="description"
+    content="{{ page_description | escape }}"
+  >
+{% endif %}
+
 {% if tag_seo %}
   <link
     rel="canonical"
@@ -142,14 +154,4 @@
   >
 {% endif %}
 
-{% if tag_seo and tag_seo.seo_description.value != blank %}
-  <meta
-    name="description"
-    content="{{ tag_seo.seo_description.value | escape }}"
-  >
-{% elsif page_description %}
-  <meta
-    name="description"
-    content="{{ page_description | escape }}"
-  >
-{% endif %}
+
