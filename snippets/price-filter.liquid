@@ -11,8 +11,26 @@
 {%- enddoc -%}
 
 {% if filter_style == 'vertical' %}
-  <div class="facets__item facets__item--no-accordion">
-    <div class="facets__filter-title">{{ filter.label }}</div>
+  {%- if filter.min_value.value != null or filter.max_value.value != null -%}
+    {%- assign has_active_values = true -%}
+  {%- endif -%}
+  <div class="facets__item facets__item--no-accordion price-facet-vertical">
+    <div class="facets__filter-title-row">
+      <div class="facets__filter-title">{{ filter.label }}</div>
+      <facet-clear-component
+        class="clear-filter price-clear-inline"
+        tabindex="{% if has_active_values %}0{% else %}-1{% endif %}"
+        on:click="/clearFilter"
+        on:keydown="/clearFilter"
+      >
+        <div
+          class="facets__clear {% if has_active_values %}facets__clear--active{% endif %}"
+          ref="clearButton"
+        >
+          {{- 'actions.clear' | t -}}
+        </div>
+      </facet-clear-component>
+    </div>
     <div class="facets__panel-content-open">
 {% else %}
   <accordion-custom
@@ -119,6 +137,7 @@
 
         <div class="price-filter-inputs">
           <div class="price-facet__field">
+            <span class="price-facet__currency" aria-hidden="true">$</span>
             <input
               type="number"
               class="price-facet__input"
@@ -134,12 +153,10 @@
                 autofocus
               {% endif %}
             >
-            <span class="price-facet__field-caret" aria-hidden="true">
-              <svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
           </div>
           <span class="price-facet__to">to</span>
           <div class="price-facet__field">
+            <span class="price-facet__currency" aria-hidden="true">$</span>
             <input
               type="number"
               class="price-facet__input"
@@ -155,9 +172,6 @@
                 autofocus
               {% endif %}
             >
-            <span class="price-facet__field-caret" aria-hidden="true">
-              <svg viewBox="0 0 10 6" xmlns="http://www.w3.org/2000/svg"><path d="M1 1l4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
-            </span>
           </div>
         </div>
 
@@ -211,18 +225,11 @@
     top: 50%;
     left: 0;
     right: 0;
-    height: 4px;
-    background: #e5e5e5;
+    height: 3px;
+    background: #e81a48;
     border-radius: 2px;
     transform: translateY(-50%);
     pointer-events: none;
-    background-image: repeating-linear-gradient(
-      to right,
-      transparent 0,
-      transparent calc(100% / 24 - 1px),
-      #bdbdbd calc(100% / 24 - 1px),
-      #bdbdbd calc(100% / 24)
-    );
   }
 
   .price-facet__fill {
@@ -230,7 +237,7 @@
     top: 50%;
     left: 0;
     right: 0;
-    height: 4px;
+    height: 3px;
     background: #e81a48;
     border-radius: 2px;
     transform: translateY(-50%);
@@ -280,42 +287,26 @@
   .price-facet__range-input::-webkit-slider-thumb {
     -webkit-appearance: none;
     appearance: none;
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1.5px solid #c5c5c5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    background: #000000;
+    border: none;
+    box-shadow: none;
     cursor: pointer;
     pointer-events: auto;
     margin-top: 0;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
   }
 
   .price-facet__range-input::-moz-range-thumb {
-    width: 18px;
-    height: 18px;
+    width: 16px;
+    height: 16px;
     border-radius: 50%;
-    background: #ffffff;
-    border: 1.5px solid #c5c5c5;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.18);
+    background: #000000;
+    border: none;
+    box-shadow: none;
     cursor: pointer;
     pointer-events: auto;
-    transition: border-color 0.15s ease, box-shadow 0.15s ease;
-  }
-
-  .price-facet__slider-wrap:hover .price-facet__range-input::-webkit-slider-thumb,
-  .price-facet__range-input:focus::-webkit-slider-thumb,
-  .price-facet__range-input:active::-webkit-slider-thumb {
-    border-color: #e81a48;
-    box-shadow: 0 2px 6px rgba(232, 26, 72, 0.35);
-  }
-
-  .price-facet__slider-wrap:hover .price-facet__range-input::-moz-range-thumb,
-  .price-facet__range-input:focus::-moz-range-thumb,
-  .price-facet__range-input:active::-moz-range-thumb {
-    border-color: #e81a48;
-    box-shadow: 0 2px 6px rgba(232, 26, 72, 0.35);
   }
 
   .price-facet__range-input:focus {
@@ -344,7 +335,7 @@
   .price-facet__input {
     width: 100%;
     box-sizing: border-box;
-    padding: 8px 28px 8px 10px;
+    padding: 8px 22px 8px 24px;
     font-size: 13px;
     color: #1f1f1f;
     background: #ffffff;
@@ -355,42 +346,26 @@
   }
 
   .price-facet__input:focus {
-    border-color: #1a73e8;
-    box-shadow: 0 0 0 2px rgba(26, 115, 232, 0.18);
+    border-color: #9a9a9a;
+    box-shadow: none;
   }
 
-  .price-facet__field-caret {
+  .price-facet__currency {
     position: absolute;
-    right: 10px;
+    left: 10px;
     top: 50%;
     transform: translateY(-50%);
-    width: 10px;
-    height: 6px;
-    color: #5f5f5f;
+    font-size: 13px;
+    color: #1f1f1f;
     pointer-events: none;
-  }
-
-  .price-facet__field-caret svg {
-    width: 100%;
-    height: 100%;
-    display: block;
-  }
-
-  .price-facet__input::-webkit-inner-spin-button,
-  .price-facet__input::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
-
-  .price-facet__input[type=number] {
-    -moz-appearance: textfield;
+    line-height: 1;
   }
 
   .facets--horizontal .facets__panel-content:has(.price-facet) {
     min-width: 360px;
   }
 
-  /* Scoped CLEAR button for price facet (blue + uppercase, top-right) */
+  /* Scoped CLEAR button for price facet (red + uppercase, top-right) */
   .price-facet .clear-filter {
     position: absolute;
     top: 0;
@@ -398,24 +373,58 @@
     margin: 0;
   }
 
-  .price-facet .clear-filter .facets__clear {
+  .price-facet .clear-filter .facets__clear,
+  .price-clear-inline .facets__clear {
     font-size: 12px;
-    font-weight: 600;
-    letter-spacing: 0.06em;
+    font-weight: 700;
+    letter-spacing: 0.08em;
     text-transform: uppercase;
-    color: #1a73e8;
+    color: #e3173e;
     background: transparent;
     border: none;
     padding: 0;
     cursor: pointer;
   }
 
-  .price-facet .clear-filter .facets__clear:hover {
-    color: #1557b0;
+  .price-facet .clear-filter .facets__clear:hover,
+  .price-clear-inline .facets__clear:hover {
+    color: #b8122f;
   }
 
   .price-facet {
     position: relative;
     padding-top: 4px;
+  }
+
+  /* Vertical layout: PRICE title and CLEAR on the same row */
+  .price-facet-vertical .facets__filter-title-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 12px 0 10px;
+    border-bottom: none;
+  }
+
+  .facets--vertical .price-facet-vertical .facets__filter-title,
+  .facets--drawer .price-facet-vertical .facets__filter-title,
+  .price-facet-vertical .facets__filter-title-row .facets__filter-title {
+    font-weight: 700;
+    font-size: 13px;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 0;
+    border-bottom: none;
+    margin: 0;
+    color: #111;
+  }
+
+  .price-clear-inline {
+    position: static !important;
+    display: inline-flex;
+    align-items: center;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
   }
 {% endstylesheet %}
