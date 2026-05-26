@@ -186,7 +186,252 @@
       </ul>
     </details>
   {%- endfor -%}
+
+  {%- comment -%} Price filter — uses Shopify storefront price filter if enabled, else falls back to defaults. {%- endcomment -%}
+  {%- liquid
+    assign price_filter = nil
+    for f in collection.filters
+      if f.type == 'price_range'
+        assign price_filter = f
+        break
+      endif
+    endfor
+
+    assign price_floor = 4
+    if price_filter
+      assign price_ceiling = price_filter.range_max | divided_by: 100
+      if price_filter.min_value.value != null
+        assign price_current_min = price_filter.min_value.value | divided_by: 100
+      else
+        assign price_current_min = price_floor
+      endif
+      if price_filter.max_value.value != null
+        assign price_current_max = price_filter.max_value.value | divided_by: 100
+      else
+        assign price_current_max = price_ceiling
+      endif
+      assign min_param = price_filter.min_value.param_name
+      assign max_param = price_filter.max_value.param_name
+    else
+      assign price_ceiling = 790
+      assign price_current_min = price_floor
+      assign price_current_max = price_ceiling
+      assign min_param = 'filter.v.price.gte'
+      assign max_param = 'filter.v.price.lte'
+    endif
+
+    if price_current_min < price_floor
+      assign price_current_min = price_floor
+    endif
+    if price_current_max > price_ceiling
+      assign price_current_max = price_ceiling
+    endif
+
+    assign price_span = price_ceiling | minus: price_floor
+    if price_span <= 0
+      assign price_span = 1
+    endif
+    assign min_offset = price_current_min | minus: price_floor
+    assign max_offset = price_current_max | minus: price_floor
+    assign fill_left_pct = min_offset | times: 100 | divided_by: price_span
+    assign fill_right_pct_raw = max_offset | times: 100 | divided_by: price_span
+    assign fill_right_pct = 100 | minus: fill_right_pct_raw
+
+    assign price_is_active = false
+    if price_current_min > price_floor or price_current_max < price_ceiling
+      assign price_is_active = true
+    endif
+  -%}
+
+  <div class="tagfilter__price">
+    <div class="tagfilter__price-header">
+      <span class="tagfilter__price-title">Price</span>
+      <button
+        type="button"
+        class="tagfilter__price-clear{% if price_is_active %} is-active{% endif %}"
+        data-price-clear
+      >
+        Clear
+      </button>
+    </div>
+
+    <form
+      method="get"
+      action="{{ request.path }}"
+      class="tagfilter__price-form"
+      data-price-form
+      data-price-floor="{{ price_floor }}"
+      data-price-ceiling="{{ price_ceiling }}"
+    >
+      <div class="tagfilter__price-slider" data-price-slider>
+        <div class="tagfilter__price-track"></div>
+        <div
+          class="tagfilter__price-fill"
+          data-price-fill
+          style="left: {{ fill_left_pct }}%; right: {{ fill_right_pct }}%;"
+        ></div>
+        <input
+          type="range"
+          class="tagfilter__price-range tagfilter__price-range--min"
+          min="{{ price_floor }}"
+          max="{{ price_ceiling }}"
+          value="{{ price_current_min }}"
+          step="1"
+          aria-label="Minimum price"
+          data-price-range-min
+        >
+        <input
+          type="range"
+          class="tagfilter__price-range tagfilter__price-range--max"
+          min="{{ price_floor }}"
+          max="{{ price_ceiling }}"
+          value="{{ price_current_max }}"
+          step="1"
+          aria-label="Maximum price"
+          data-price-range-max
+        >
+      </div>
+
+      <div class="tagfilter__price-inputs">
+        <div class="tagfilter__price-field">
+          <span class="tagfilter__price-currency" aria-hidden="true">$</span>
+          <input
+            type="number"
+            class="tagfilter__price-input"
+            name="{{ min_param }}"
+            value="{{ price_current_min }}"
+            min="{{ price_floor }}"
+            max="{{ price_ceiling }}"
+            aria-label="Minimum price"
+            data-price-input-min
+            autocomplete="off"
+          >
+        </div>
+        <span class="tagfilter__price-to">to</span>
+        <div class="tagfilter__price-field">
+          <span class="tagfilter__price-currency" aria-hidden="true">$</span>
+          <input
+            type="number"
+            class="tagfilter__price-input"
+            name="{{ max_param }}"
+            value="{{ price_current_max }}"
+            min="{{ price_floor }}"
+            max="{{ price_ceiling }}"
+            aria-label="Maximum price"
+            data-price-input-max
+            autocomplete="off"
+          >
+        </div>
+      </div>
+
+      <noscript>
+        <button type="submit" class="tagfilter__price-apply">Apply</button>
+      </noscript>
+    </form>
+  </div>
 </aside>
+
+<script>
+  (function () {
+    var form = document.querySelector('[data-price-form]');
+    if (!form) return;
+
+    var floor = parseInt(form.dataset.priceFloor, 10);
+    var ceiling = parseInt(form.dataset.priceCeiling, 10);
+    var span = ceiling - floor || 1;
+
+    var rangeMin = form.querySelector('[data-price-range-min]');
+    var rangeMax = form.querySelector('[data-price-range-max]');
+    var inputMin = form.querySelector('[data-price-input-min]');
+    var inputMax = form.querySelector('[data-price-input-max]');
+    var fill = form.querySelector('[data-price-fill]');
+    var clearBtn = document.querySelector('[data-price-clear]');
+
+    function clamp(value, min, max) {
+      value = isNaN(value) ? min : value;
+      return Math.min(Math.max(value, min), max);
+    }
+
+    function updateFill() {
+      var minVal = clamp(parseInt(rangeMin.value, 10), floor, ceiling);
+      var maxVal = clamp(parseInt(rangeMax.value, 10), floor, ceiling);
+      if (minVal > maxVal) {
+        var tmp = minVal; minVal = maxVal; maxVal = tmp;
+      }
+      var leftPct = ((minVal - floor) / span) * 100;
+      var rightPct = 100 - ((maxVal - floor) / span) * 100;
+      fill.style.left = leftPct + '%';
+      fill.style.right = rightPct + '%';
+    }
+
+    function pruneDefaults() {
+      inputMin.disabled = parseInt(inputMin.value, 10) <= floor;
+      inputMax.disabled = parseInt(inputMax.value, 10) >= ceiling;
+    }
+
+    var submitTimer;
+    function scheduleSubmit() {
+      clearTimeout(submitTimer);
+      submitTimer = setTimeout(function () {
+        pruneDefaults();
+        form.submit();
+      }, 600);
+    }
+
+    form.addEventListener('submit', pruneDefaults);
+
+    function syncFromRange(which) {
+      var minVal = clamp(parseInt(rangeMin.value, 10), floor, ceiling);
+      var maxVal = clamp(parseInt(rangeMax.value, 10), floor, ceiling);
+      if (which === 'min' && minVal > maxVal) {
+        rangeMin.value = maxVal;
+        minVal = maxVal;
+      }
+      if (which === 'max' && maxVal < minVal) {
+        rangeMax.value = minVal;
+        maxVal = minVal;
+      }
+      inputMin.value = minVal;
+      inputMax.value = maxVal;
+      updateFill();
+    }
+
+    function syncFromInput(which) {
+      var minVal = clamp(parseInt(inputMin.value, 10), floor, ceiling);
+      var maxVal = clamp(parseInt(inputMax.value, 10), floor, ceiling);
+      if (which === 'min' && minVal > maxVal) minVal = maxVal;
+      if (which === 'max' && maxVal < minVal) maxVal = minVal;
+      rangeMin.value = minVal;
+      rangeMax.value = maxVal;
+      updateFill();
+    }
+
+    rangeMin.addEventListener('input', function () { syncFromRange('min'); });
+    rangeMax.addEventListener('input', function () { syncFromRange('max'); });
+    rangeMin.addEventListener('change', scheduleSubmit);
+    rangeMax.addEventListener('change', scheduleSubmit);
+
+    inputMin.addEventListener('input', function () { syncFromInput('min'); });
+    inputMax.addEventListener('input', function () { syncFromInput('max'); });
+    inputMin.addEventListener('change', function () {
+      inputMin.value = clamp(parseInt(inputMin.value, 10), floor, ceiling);
+      scheduleSubmit();
+    });
+    inputMax.addEventListener('change', function () {
+      inputMax.value = clamp(parseInt(inputMax.value, 10), floor, ceiling);
+      scheduleSubmit();
+    });
+
+    if (clearBtn) {
+      clearBtn.addEventListener('click', function () {
+        var url = new URL(window.location.href);
+        url.searchParams.delete(inputMin.name);
+        url.searchParams.delete(inputMax.name);
+        window.location.href = url.pathname + (url.search ? url.search : '');
+      });
+    }
+  })();
+</script>
 
 <style>
   /* ===== Grid placement: dock sidebar flush to the left =====
@@ -409,5 +654,192 @@
     .tagfilter {
       max-width: none;
     }
+  }
+
+  /* ===== Price filter ===== */
+  .tagfilter__price {
+    padding: 18px 0 14px;
+    border-bottom: 1px solid #f0f0f0;
+  }
+
+  .tagfilter__price-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin-bottom: 14px;
+  }
+
+  .tagfilter__price-title {
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #111;
+  }
+
+  .tagfilter__price-clear {
+    background: transparent;
+    border: none;
+    padding: 0;
+    cursor: pointer;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: #e3173e;
+    opacity: 0.55;
+  }
+
+  .tagfilter__price-clear.is-active {
+    opacity: 1;
+  }
+
+  .tagfilter__price-clear:hover {
+    color: #b8122f;
+  }
+
+  .tagfilter__price-form {
+    margin: 0;
+  }
+
+  .tagfilter__price-slider {
+    position: relative;
+    width: 100%;
+    height: 18px;
+    margin: 0 0 14px;
+  }
+
+  .tagfilter__price-track {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #e81a48;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .tagfilter__price-fill {
+    position: absolute;
+    top: 50%;
+    left: 0;
+    right: 0;
+    height: 3px;
+    background: #e81a48;
+    border-radius: 2px;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  .tagfilter__price-range {
+    -webkit-appearance: none;
+    appearance: none;
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 18px;
+    background: transparent;
+    margin: 0;
+    padding: 0;
+    outline: none;
+    pointer-events: none;
+  }
+
+  .tagfilter__price-range--min { z-index: 3; }
+  .tagfilter__price-range--max { z-index: 4; }
+
+  .tagfilter__price-range::-webkit-slider-runnable-track {
+    height: 18px;
+    background: transparent;
+    border: none;
+  }
+
+  .tagfilter__price-range::-moz-range-track {
+    height: 18px;
+    background: transparent;
+    border: none;
+  }
+
+  .tagfilter__price-range::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #000;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+    margin-top: 0;
+  }
+
+  .tagfilter__price-range::-moz-range-thumb {
+    width: 16px;
+    height: 16px;
+    border-radius: 50%;
+    background: #000;
+    border: none;
+    cursor: pointer;
+    pointer-events: auto;
+  }
+
+  .tagfilter__price-inputs {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .tagfilter__price-field {
+    position: relative;
+    flex: 1 1 0;
+    min-width: 0;
+  }
+
+  .tagfilter__price-to {
+    font-size: 13px;
+    color: #555;
+    flex: 0 0 auto;
+  }
+
+  .tagfilter__price-currency {
+    position: absolute;
+    left: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    font-size: 13px;
+    color: #1f1f1f;
+    pointer-events: none;
+    line-height: 1;
+  }
+
+  .tagfilter__price-input {
+    width: 100%;
+    box-sizing: border-box;
+    padding: 8px 22px 8px 24px;
+    font-size: 13px;
+    color: #1f1f1f;
+    background: #fff;
+    border: 1px solid #d0d0d0;
+    border-radius: 4px;
+    outline: none;
+  }
+
+  .tagfilter__price-input:focus {
+    border-color: #9a9a9a;
+  }
+
+  .tagfilter__price-apply {
+    margin-top: 10px;
+    padding: 6px 12px;
+    background: #111;
+    color: #fff;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
   }
 </style>
