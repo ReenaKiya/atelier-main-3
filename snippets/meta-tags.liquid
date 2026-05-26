@@ -6,6 +6,9 @@
   endif
 -%}
 
+
+
+
 <meta charset="utf-8">
 <meta
   http-equiv="X-UA-Compatible"
@@ -119,6 +122,14 @@
   content="{{ og_description | escape }}"
 >
 
+
+
+
+
+
+
+  
+
 {% if tag_seo and tag_seo.seo_title.value != blank %}
   <title>{{ tag_seo.seo_title.value }}</title>
 {% else %}
@@ -153,5 +164,8 @@
     href="{{ canonical_url }}"
   >
 {% endif %}
+
+
+
 
 
