@@ -12,9 +12,14 @@
 %}
 
 {%- liquid
-  if current_tags.size == 1
-    assign tag_slug = current_tags.first | handleize
-    assign lookup_handle = collection.handle | append: '--' | append: tag_slug
+  if current_tags.size > 0
+    assign sorted_tags = current_tags | sort
+    assign tag_slugs = ''
+    for t in sorted_tags
+      assign t_slug = t | handleize
+      assign tag_slugs = tag_slugs | append: '--' | append: t_slug
+    endfor
+    assign lookup_handle = collection.handle | append: tag_slugs
     assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
   endif
 -%}
@@ -103,6 +108,10 @@
         {% if tag_seo and tag_seo.intro_content.value != blank %}
           <div class="collection-intro-content">
             {{ tag_seo.intro_content.value }}
+          </div>
+        {% elsif collection.description != blank %}
+          <div class="collection-description rte">
+            {{ collection.description }}
           </div>
         {% endif %}
 
