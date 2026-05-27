@@ -334,6 +334,7 @@
         "text_XeG4TN",
         "accordion_zLkxVk"
       ],
+      "disabled": true,
       "name": "t:names.faq_section",
       "settings": {
         "content_direction": "column",
