@@ -133,7 +133,26 @@
           </div>
         {% endif %}
 
-        {% if tag_seo and tag_seo.faq_json.value != blank %}
+
+
+{% assign faq_entry = shop.metaobjects.tag_collection_seo.values
+  | where: 'collection_handle', collection.handle
+  | where: 'tag', current_tags.first
+  | first %}
+
+{% assign faqs = faq_entry.faq_json.value %}
+
+
+{% for faq in faqs %}
+  <details>
+    <summary>{{ faq.question }}</summary>
+    <p>{{ faq.answer }}</p>
+  </details>
+{% endfor %}
+
+
+
+        {% comment %} {% if tag_seo and tag_seo.faq_json.value != blank %}
           {% assign faqs = tag_seo.faq_json.value %}
           <div class="collection-faq">
             <h2>Frequently Asked Questions</h2>
@@ -163,7 +182,7 @@
             ]
           }
           </script>
-        {% endif %}
+        {% endif %} {% endcomment %}
       </div>
     </div>
 
