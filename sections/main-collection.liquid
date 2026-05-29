@@ -105,9 +105,9 @@
           {% endif %}
         </h1>
 
-        {% if tag_seo and tag_seo.intro_content.value != blank %}
-          <div class="collection-intro-content">
-            {{ tag_seo.intro_content.value }}
+        {% if tag_seo and tag_seo.intro_content != blank %}
+          <div class="collection-intro-content rte">
+            {{ tag_seo.intro_content | metafield_tag }}
           </div>
         {% elsif collection.description != blank %}
           <div class="collection-description rte">
@@ -136,9 +136,9 @@
         paginate: paginate
       %}
 
-        {% if tag_seo and tag_seo.bottom_content.value != blank %}
-          <div class="collection-bottom-content">
-            {{ tag_seo.bottom_content.value }}
+        {% if tag_seo and tag_seo.bottom_content != blank %}
+          <div class="collection-bottom-content rte">
+            {{ tag_seo.bottom_content | metafield_tag }}
           </div>
         {% endif %}
 
