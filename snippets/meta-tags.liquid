@@ -2,23 +2,14 @@
   assign tag_seo = nil
 
   if template == 'collection' and current_tags.size > 0
-
-    assign current_tags_handle = current_tags | join: '+' | handleize
-
-    assign seo_entries = shop.metaobjects.tag_collection_seo.values
-
-    for entry in seo_entries
-
-      assign entry_collection = entry.collection_handle.value | handleize
-      assign entry_tag = entry.tag.value | handleize
-
-      if entry_collection == collection.handle and entry_tag == current_tags_handle
-        assign tag_seo = entry
-        break
-      endif
-
+    assign sorted_tags = current_tags | sort
+    assign tag_slugs = ''
+    for t in sorted_tags
+      assign t_slug = t | handleize
+      assign tag_slugs = tag_slugs | append: '--' | append: t_slug
     endfor
-
+    assign lookup_handle = collection.handle | append: tag_slugs
+    assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
   endif
 -%}
 
