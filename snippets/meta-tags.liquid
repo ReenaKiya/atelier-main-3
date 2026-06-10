@@ -1,35 +1,53 @@
 {%- liquid
-  assign tag_seo = nil
-  assign tag_url_path = ''
-
   if template == 'collection' and current_tags.size > 0
-    # Sort tags so the same combination always maps to one SEO entry,
-    # regardless of the order the tags appear in the URL.
-    assign sorted_tags = current_tags | sort
-    assign tag_slugs = ''
-
-    for t in sorted_tags
-      assign t_slug = t | handleize
-      assign tag_slugs = tag_slugs | append: '--' | append: t_slug
-
-      # Build the Shopify tag URL path (tags joined by '+') for canonical / og:url.
-      if forloop.first
-        assign tag_url_path = t_slug
+    # Sorted handles for a stable combined lookup
+    assign tag_handles_joined = ''
+    for t in current_tags
+      assign t_handle = t | handleize
+      if tag_handles_joined == ''
+        assign tag_handles_joined = t_handle
       else
-        assign tag_url_path = tag_url_path | append: '+' | append: t_slug
+        assign tag_handles_joined = tag_handles_joined | append: '|' | append: t_handle
       endif
     endfor
+    assign sorted_tag_handles = tag_handles_joined | split: '|' | sort
 
-    # 1. Exact multi-tag combination lookup.
-    assign lookup_handle = collection.handle | append: tag_slugs
-    assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
+    # 1) Try combined handle: collection-handle--tag1--tag2--...
+    assign combo_handle = collection.handle
+    for h in sorted_tag_handles
+      assign combo_handle = combo_handle | append: '--' | append: h
+    endfor
+    assign tag_seo = shop.metaobjects.tag_collection_seo[combo_handle]
 
-    # 2. Fallback: collection-level default SEO entry (handle = collection.handle).
-    if tag_seo == nil
-      assign tag_seo = shop.metaobjects.tag_collection_seo[collection.handle]
-    endif
+    # 2) Fall back to the first single-tag entry that exists
+    unless tag_seo
+      for t in current_tags
+        assign t_handle = t | handleize
+        assign single_handle = collection.handle | append: '--' | append: t_handle
+        assign found_single = shop.metaobjects.tag_collection_seo[single_handle]
+        if found_single
+          assign tag_seo = found_single
+          break
+        endif
+      endfor
+   endunless
+
+
+    # Build the multi-tag URL path (preserves URL order, joined with '+')
+    assign tag_url_path = ''
+    for t in current_tags
+      assign t_handle = t | handleize
+      if tag_url_path == ''
+        assign tag_url_path = t_handle
+      else
+        assign tag_url_path = tag_url_path | append: '+' | append: t_handle
+      endif
+    endfor
   endif
 -%}
+
+
+
 
 <meta charset="utf-8">
 <meta
