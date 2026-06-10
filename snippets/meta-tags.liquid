@@ -1,34 +1,35 @@
 {%- liquid
   assign tag_seo = nil
+  assign tag_url_path = ''
 
   if template == 'collection' and current_tags.size > 0
+    # Sort tags so the same combination always maps to one SEO entry,
+    # regardless of the order the tags appear in the URL.
     assign sorted_tags = current_tags | sort
     assign tag_slugs = ''
+
     for t in sorted_tags
       assign t_slug = t | handleize
       assign tag_slugs = tag_slugs | append: '--' | append: t_slug
+
+      # Build the Shopify tag URL path (tags joined by '+') for canonical / og:url.
+      if forloop.first
+        assign tag_url_path = t_slug
+      else
+        assign tag_url_path = tag_url_path | append: '+' | append: t_slug
+      endif
     endfor
+
+    # 1. Exact multi-tag combination lookup.
     assign lookup_handle = collection.handle | append: tag_slugs
     assign tag_seo = shop.metaobjects.tag_collection_seo[lookup_handle]
+
+    # 2. Fallback: collection-level default SEO entry (handle = collection.handle).
+    if tag_seo == nil
+      assign tag_seo = shop.metaobjects.tag_collection_seo[collection.handle]
+    endif
   endif
 -%}
-
-
-<title>
-  {%- if tag_seo and tag_seo.seo_title != blank -%}
-    {{ tag_seo.seo_title.value }}
-  {%- else -%}
-    {{ page_title }}
-  {%- endif -%}
-</title>
-
-<meta
-  name="description"
-  content="{% if tag_seo and tag_seo.seo_description != blank %}{{ tag_seo.seo_description.value | escape }}{% else %}{{ page_description | escape }}{% endif %}"
->
-
-
-
 
 <meta charset="utf-8">
 <meta
