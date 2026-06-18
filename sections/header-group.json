@@ -28,6 +28,14 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_dG4Djg": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Nose Studs",
+            "product": "g23-titanium-classic-hinged-segment-clicker-ring"
+          }
+        },
         "featured_product_mJETEP": {
           "type": "featured_product",
           "settings": {
@@ -246,6 +254,7 @@
         }
       },
       "block_order": [
+        "featured_product_dG4Djg",
         "featured_product_mJETEP",
         "featured_product_3BVJAK",
         "featured_product_yX4D8Y",
