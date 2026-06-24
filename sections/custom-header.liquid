@@ -429,9 +429,9 @@
                 {%- endif -%}
                 <div class="custom-cart-drawer__item-price">{{ item.final_price | money }}</div>
                 <div class="custom-cart-drawer__quantity">
-                  <button type="button" class="custom-cart-drawer__qty-btn" aria-label="Decrease quantity" onclick="updateCartQty(this, -1)">−</button>
+                  <button type="button" class="custom-cart-drawer__qty-btn" aria-label="Decrease quantity" data-qty-change="-1">−</button>
                   <span class="custom-cart-drawer__qty-value">{{ item.quantity }}</span>
-                  <button type="button" class="custom-cart-drawer__qty-btn" aria-label="Increase quantity" onclick="updateCartQty(this, 1)">+</button>
+                  <button type="button" class="custom-cart-drawer__qty-btn" aria-label="Increase quantity" data-qty-change="1">+</button>
                 </div>
               </div>
               <div class="custom-cart-drawer__item-line-price">
@@ -755,32 +755,52 @@
       .replace(/\{\{\s*amount\s*\}\}/g, amount);
   }
 
-  // Refresh cart drawer UI from cart JSON
+  // Refresh cart drawer UI from cart JSON. Defensive against missing fields.
   function refreshCartDrawer(cartData) {
-    // Update total price
-    var totalEl = document.querySelector('.custom-cart-drawer__total-price');
-    if (totalEl) totalEl.textContent = formatMoney(cartData.total_price);
+    if (!cartData || typeof cartData !== 'object') {
+      console.warn('[cart] refreshCartDrawer called with invalid data', cartData);
+      return;
+    }
+
+    // Update total price (only if we have a valid number)
+    if (typeof cartData.total_price === 'number' && !isNaN(cartData.total_price)) {
+      var totalEl = document.querySelector('.custom-cart-drawer__total-price');
+      if (totalEl) totalEl.textContent = formatMoney(cartData.total_price);
+    }
 
     // Update cart count badge
-    document.querySelectorAll('[data-cart-count]').forEach(function(el) {
-      el.textContent = cartData.item_count;
-    });
+    if (typeof cartData.item_count === 'number') {
+      document.querySelectorAll('[data-cart-count]').forEach(function(el) {
+        el.textContent = cartData.item_count;
+      });
+    }
 
-    // Update each line item by key
-    cartData.items.forEach(function(item, index) {
-      var lineIndex = index + 1;
-      var itemEl = document.querySelector('[data-line-index="' + lineIndex + '"]');
+    // Update each line item — match by data-line-key first (stable across reorders), index as fallback
+    var items = Array.isArray(cartData.items) ? cartData.items : [];
+    items.forEach(function(item, index) {
+      var itemEl = null;
+      if (item && item.key) {
+        itemEl = document.querySelector('[data-line-key="' + item.key + '"]');
+      }
+      if (!itemEl) {
+        itemEl = document.querySelector('[data-line-index="' + (index + 1) + '"]');
+      }
       if (!itemEl) return;
+
       var qtyEl = itemEl.querySelector('.custom-cart-drawer__qty-value');
       var linePriceEl = itemEl.querySelector('.custom-cart-drawer__item-line-price');
-      if (qtyEl) qtyEl.textContent = item.quantity;
-      if (linePriceEl) linePriceEl.textContent = formatMoney(item.final_line_price);
+      if (qtyEl && typeof item.quantity === 'number') {
+        qtyEl.textContent = item.quantity;
+      }
+      if (linePriceEl && typeof item.final_line_price === 'number') {
+        linePriceEl.textContent = formatMoney(item.final_line_price);
+      }
     });
 
     // Remove deleted items
     document.querySelectorAll('.custom-cart-drawer__item[data-line-key]').forEach(function(el) {
       var key = el.getAttribute('data-line-key');
-      var found = cartData.items.some(function(item) { return item.key === key; });
+      var found = items.some(function(item) { return item && item.key === key; });
       if (!found) el.remove();
     });
 
@@ -788,40 +808,124 @@
     if (cartData.item_count === 0) window.location.reload();
   }
 
+  // Recalculate the displayed cart total from current line prices in the DOM.
+  // Used for optimistic updates so the total reflects the new line prices
+  // immediately, before the server response.
+  function recalcCartTotalFromDOM() {
+    var totalCents = 0;
+    document.querySelectorAll('.custom-cart-drawer__item-line-price').forEach(function(el) {
+      totalCents += parsePriceToCents(el.textContent);
+    });
+    var totalEl = document.querySelector('.custom-cart-drawer__total-price');
+    if (totalEl) totalEl.textContent = formatMoney(totalCents);
+  }
+
   // Update cart quantity using line index (most reliable Shopify method)
+  // Parse a money string like "Rs. 40.24" or "$12.49" or "1.234,56 €" into integer cents.
+  function parsePriceToCents(text) {
+    if (!text) return 0;
+    var cleaned = String(text).replace(/[^0-9.,]/g, '');
+    if (!cleaned) return 0;
+    // Treat the LAST separator as the decimal mark (handles both "1,234.56" and "1.234,56")
+    var lastSep = Math.max(cleaned.lastIndexOf('.'), cleaned.lastIndexOf(','));
+    var whole, frac;
+    if (lastSep >= 0 && cleaned.length - lastSep <= 3) {
+      whole = cleaned.substring(0, lastSep).replace(/[.,]/g, '');
+      frac = (cleaned.substring(lastSep + 1) + '00').slice(0, 2);
+    } else {
+      whole = cleaned.replace(/[.,]/g, '');
+      frac = '00';
+    }
+    return (parseInt(whole, 10) || 0) * 100 + (parseInt(frac, 10) || 0);
+  }
+
   function updateCartQty(btn, change) {
+    if (!btn) return;
     var itemEl = btn.closest('.custom-cart-drawer__item');
-    if (!itemEl) return;
+    if (!itemEl) { console.warn('[cart] No .custom-cart-drawer__item ancestor'); return; }
 
-    var lineIndex = parseInt(itemEl.getAttribute('data-line-index'));
+    var lineIndex = parseInt(itemEl.getAttribute('data-line-index'), 10);
+    if (!lineIndex) { console.warn('[cart] Missing data-line-index'); return; }
+
     var qtyEl = itemEl.querySelector('.custom-cart-drawer__qty-value');
-    var currentQty = parseInt(qtyEl.textContent);
+    var linePriceEl = itemEl.querySelector('.custom-cart-drawer__item-line-price');
+    var unitPriceEl = itemEl.querySelector('.custom-cart-drawer__item-price');
+    if (!qtyEl) { console.warn('[cart] Missing .custom-cart-drawer__qty-value'); return; }
+
+    var currentQty = parseInt(qtyEl.textContent, 10) || 1;
     var newQty = Math.max(currentQty + change, 0);
+    var previousLinePriceText = linePriceEl ? linePriceEl.textContent : '';
 
-    // Immediately update displayed quantity
-    if (newQty > 0) qtyEl.textContent = newQty;
+    // Optimistic UI update — quantity, line price, AND total all change immediately
+    if (newQty > 0) {
+      qtyEl.textContent = newQty;
+      if (linePriceEl && unitPriceEl) {
+        var unitCents = parsePriceToCents(unitPriceEl.textContent);
+        linePriceEl.textContent = formatMoney(unitCents * newQty);
+      }
+      recalcCartTotalFromDOM();
+    }
 
-    // Disable buttons during request
     var btns = itemEl.querySelectorAll('.custom-cart-drawer__qty-btn');
     btns.forEach(function(b) { b.disabled = true; });
 
     fetch('/cart/change.js', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
+      headers: { 'Content-Type': 'application/json', 'Accept': 'application/json' },
       body: JSON.stringify({ line: lineIndex, quantity: newQty })
     })
-    .then(function(res) { return res.json(); })
-    .then(function(cartData) {
-      refreshCartDrawer(cartData);
-      // Re-enable buttons
+    .then(function(res) {
+      // Always parse JSON — Shopify returns useful error info on 422 too
+      return res.json().then(function(data) { return { ok: res.ok, status: res.status, data: data }; });
+    })
+    .then(function(result) {
+      if (!result.ok) {
+        // Shopify returned an error (e.g. 422 — stock limit, quantity rule, etc.)
+        var msg = (result.data && (result.data.description || result.data.message)) || 'Cart update failed';
+        console.warn('[cart] Shopify rejected the update:', msg, result.data);
+        throw new Error(msg);
+      }
+      refreshCartDrawer(result.data);
       btns.forEach(function(b) { b.disabled = false; });
     })
-    .catch(function() {
-      // Revert on error
+    .catch(function(err) {
+      console.error('[cart] Update failed —', err.message || err);
+      // Revert ALL optimistic changes
       qtyEl.textContent = currentQty;
+      if (linePriceEl) linePriceEl.textContent = previousLinePriceText;
+      recalcCartTotalFromDOM(); // Re-sum from reverted line prices so total is correct
       btns.forEach(function(b) { b.disabled = false; });
+
+      // Show error to user briefly (e.g. "All 1 are in your cart")
+      showCartError(itemEl, err.message || 'Could not update quantity');
     });
   }
+
+  // Show a short error toast inside the cart item
+  function showCartError(itemEl, message) {
+    if (!itemEl) return;
+    var existing = itemEl.querySelector('.custom-cart-drawer__error');
+    if (existing) existing.remove();
+    var toast = document.createElement('div');
+    toast.className = 'custom-cart-drawer__error';
+    toast.textContent = message;
+    toast.style.cssText = 'color:#c62828;font-size:12px;margin-top:6px;padding:4px 8px;background:#fdecea;border-radius:4px;';
+    itemEl.appendChild(toast);
+    setTimeout(function() { if (toast.parentNode) toast.remove(); }, 3000);
+  }
+
+  // Expose globally so other scripts can call it too
+  window.updateCartQty = updateCartQty;
+
+  // Event delegation — handles all qty button clicks (works for re-rendered cart items)
+  document.addEventListener('click', function(e) {
+    var qtyBtn = e.target.closest('.custom-cart-drawer__qty-btn');
+    if (!qtyBtn || qtyBtn.disabled) return;
+    var change = parseInt(qtyBtn.getAttribute('data-qty-change'), 10);
+    if (!change) change = qtyBtn.getAttribute('aria-label') === 'Increase quantity' ? 1 : -1;
+    e.preventDefault();
+    updateCartQty(qtyBtn, change);
+  });
 
   // Add recommended product to cart
   function addRecToCart(variantId, btn) {
