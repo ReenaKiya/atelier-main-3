@@ -28,6 +28,22 @@
     "header_nav": {
       "type": "header-navigation",
       "blocks": {
+        "featured_product_dG4Djg": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Nose Studs",
+            "product": "g23-titanium-classic-hinged-segment-clicker-ring"
+          }
+        },
+        "featured_product_mJETEP": {
+          "type": "featured_product",
+          "settings": {
+            "parent_menu_title": "By Jewellery Type",
+            "category_title": "Hoops & Rings",
+            "product": "14k-gold-classic-hinged-segment-clicker-ring"
+          }
+        },
         "featured_product_3BVJAK": {
           "type": "featured_product",
           "settings": {
@@ -120,8 +136,8 @@
           "type": "featured_product",
           "settings": {
             "parent_menu_title": "By Jewellery Type",
-            "category_title": "Plugs & Tunnels",
-            "product": "black-silicone-ear-tunnel"
+            "category_title": "Belly Rings",
+            "product": "g23-titanium-double-cz-jewelled-non-dangling-banana-belly-ring"
           }
         },
         "featured_product_d6AEAE": {
@@ -145,7 +161,7 @@
           "settings": {
             "parent_menu_title": "'By Jewellery Type'",
             "category_title": "Barbells",
-            "product": "g23-titanium-captive-bead-ring"
+            "product": "g23-titanium-circular-barbell-with-double-prong-set-cz-gems"
           }
         },
         "featured_product_TPNLBM": {
@@ -168,8 +184,8 @@
           "type": "featured_product",
           "settings": {
             "parent_menu_title": "By Jewellery Type",
-            "category_title": "Nose Studs",
-            "product": "g23-titanium-classic-hinged-segment-clicker-ring-2"
+            "category_title": "Barbells",
+            "product": "g23-titanium-captive-bead-ring"
           }
         },
         "featured_product_G8PMiD": {
@@ -177,7 +193,7 @@
           "settings": {
             "parent_menu_title": "By Jewellery Type",
             "category_title": "Nose Studs",
-            "product": "14k-gold"
+            "product": "14k-gold-classic-hinged-segment-clicker-ring"
           }
         },
         "featured_product_tpFdQ4": {
@@ -185,15 +201,15 @@
           "settings": {
             "parent_menu_title": "By Jewellery Type",
             "category_title": "Hoops & Rings",
-            "product": "14k-gold"
+            "product": "g23-titanium-classic-hinged-segment-clicker-ring"
           }
         },
         "featured_product_pGmakt": {
           "type": "featured_product",
           "settings": {
             "parent_menu_title": "By Jewellery Type",
-            "category_title": "Hoops & Rings",
-            "product": "g23-titanium-classic-hinged-segment-clicker-ring-2"
+            "category_title": "Labrets",
+            "product": "925-sterling-silver-round-cz-jewelled-threadless-flatback-stud"
           }
         },
         "featured_product_d7qKxT": {
@@ -238,6 +254,8 @@
         }
       },
       "block_order": [
+        "featured_product_dG4Djg",
+        "featured_product_mJETEP",
         "featured_product_3BVJAK",
         "featured_product_yX4D8Y",
         "featured_product_MTat7t",
