@@ -819,14 +819,54 @@
   font-weight: 600;
   color: #333;
   margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 12px;
 }
 
 .cf-quickshop__price .cf-price--compare {
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 400;
   color: #999;
   text-decoration: line-through;
-  margin-left: 8px;
+}
+
+.cf-quickshop__discount-badge {
+  display: inline-flex;
+  flex-direction: column;
+  padding: 8px 14px;
+  background: #f0fdf4;
+  border: 1px solid #86efac;
+  border-radius: 6px;
+  line-height: 1.2;
+}
+
+.cf-quickshop__discount-badge__top {
+  font-size: 11px;
+  font-weight: 600;
+  color: #15803d;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+}
+
+.cf-quickshop__discount-badge__top svg {
+  vertical-align: middle;
+  margin-right: 4px;
+}
+
+.cf-quickshop__discount-badge__sale {
+  font-size: 18px;
+  font-weight: 700;
+  color: #15803d;
+  margin-top: 2px;
+}
+
+.cf-quickshop__discount-badge__note {
+  font-size: 11px;
+  font-weight: 400;
+  color: #166534;
+  margin-top: 1px;
 }
 
 .cf-quickshop__option-group {
@@ -1470,10 +1510,20 @@
               if (!v) return;
               var priceDiv = modalContent.querySelector(".cf-quickshop__price");
               if (!priceDiv) return;
-              var formatted = formatMoney(v.price);
               var hasCompare = v.compare_at_price && v.compare_at_price > v.price;
-              var compareHtml = hasCompare ? ' <span class="cf-price--compare">' + formatMoney(v.compare_at_price) + '</span>' : '';
-              priceDiv.innerHTML = '<span class="price">' + formatted + '</span>' + compareHtml;
+              if (hasCompare) {
+                var percentOff = Math.round((v.compare_at_price - v.price) / v.compare_at_price * 100);
+                var checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+                priceDiv.innerHTML =
+                  '<span class="cf-price--compare">' + formatMoney(v.compare_at_price) + '</span>' +
+                  '<span class="cf-quickshop__discount-badge">' +
+                    '<span class="cf-quickshop__discount-badge__top">' + checkSvg + percentOff + '% DISCOUNT APPLIED</span>' +
+                    '<span class="cf-quickshop__discount-badge__sale">' + formatMoney(v.price) + '</span>' +
+                    '<span class="cf-quickshop__discount-badge__note">now you can buy at this price</span>' +
+                  '</span>';
+              } else {
+                priceDiv.innerHTML = '<span class="price">' + formatMoney(v.price) + '</span>';
+              }
             }
 
             /* Fetch variant → image map and stamp swatches with data-image */
