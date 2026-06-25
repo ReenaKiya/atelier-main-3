@@ -1505,20 +1505,26 @@
               } catch (e) {}
               return "$" + (Math.round(cents) / 100).toFixed(2);
             }
+            // Fixed discount percentage — applied uniformly across all variants.
+            // Change this single value if you want a different rate (e.g. 15, 25, 30).
+            var FIXED_DISCOUNT_PERCENT = 20;
+
             function updatePriceDisplay(variantId) {
               var v = variantById[variantId];
               if (!v) return;
               var priceDiv = modalContent.querySelector(".cf-quickshop__price");
               if (!priceDiv) return;
+              // Use compare_at_price if set, otherwise fall back to the variant's regular price
+              var basePrice = (v.compare_at_price && v.compare_at_price > v.price) ? v.compare_at_price : v.price;
+              var discountedPrice = Math.round(basePrice * (100 - FIXED_DISCOUNT_PERCENT) / 100);
               var hasCompare = v.compare_at_price && v.compare_at_price > v.price;
               if (hasCompare) {
-                var percentOff = Math.round((v.compare_at_price - v.price) / v.compare_at_price * 100);
                 var checkSvg = '<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
                 priceDiv.innerHTML =
                   '<span class="cf-price--compare">' + formatMoney(v.compare_at_price) + '</span>' +
                   '<span class="cf-quickshop__discount-badge">' +
-                    '<span class="cf-quickshop__discount-badge__top">' + checkSvg + percentOff + '% DISCOUNT APPLIED</span>' +
-                    '<span class="cf-quickshop__discount-badge__sale">' + formatMoney(v.price) + '</span>' +
+                    '<span class="cf-quickshop__discount-badge__top">' + checkSvg + FIXED_DISCOUNT_PERCENT + '% DISCOUNT APPLIED</span>' +
+                    '<span class="cf-quickshop__discount-badge__sale">' + formatMoney(discountedPrice) + '</span>' +
                     '<span class="cf-quickshop__discount-badge__note">now you can buy at this price</span>' +
                   '</span>';
               } else {
