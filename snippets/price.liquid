@@ -41,7 +41,7 @@
   endif
 -%}
 
-<div ref="priceContainer">
+{% comment %} <div ref="priceContainer">
   {% if show_sale_price_first == false and show_compare_price %}
     <span role="group">
       <span class="visually-hidden">{{ 'content.price_regular' | t }}&nbsp;</span>
@@ -76,4 +76,63 @@
     -%}
     {% render 'unit-price', price: unit_price, measurement: selected_variant.unit_price_measurement %}
   {%- endif -%}
+</div> {% endcomment %}
+
+
+<div ref="priceContainer">
+  {% if show_sale_price_first == false and show_compare_price %}
+    <span role="group">
+      <span class="visually-hidden">{{ 'content.price_regular' | t }}&nbsp;</span>
+      <span class="compare-at-price">{{- compare_at_price -}}</span>
+    </span>
+  {% endif %}
+
+  {% if show_compare_price %}
+    <span role="group">
+      <span class="visually-hidden">{{ 'content.price_sale' | t }}&nbsp;</span>
+      <span class="price">{{ price | default: '&nbsp;' }}</span>
+    </span>
+  {% else %}
+    <span class="price">{{ price | default: '&nbsp;' }}</span>
+  {% endif %}
+
+  {% if show_sale_price_first == true and show_compare_price %}
+    <span role="group">
+      <span class="visually-hidden">{{ 'content.price_regular' | t }}&nbsp;</span>
+      <span class="compare-at-price">{{- compare_at_price -}}</span>
+    </span>
+  {% endif %}
+
+  {%- if selected_variant.unit_price and show_unit_price %}
+    {%- liquid
+      if product.handle == closest.product.handle and settings.currency_code_enabled_product_pages
+        assign unit_price = selected_variant.unit_price | money_with_currency
+      elsif product.handle != closest.product.handle and settings.currency_code_enabled_product_cards
+        assign unit_price = selected_variant.unit_price | money_with_currency
+      else
+        assign unit_price = selected_variant.unit_price | money
+      endif
+    -%}
+    {% render 'unit-price', price: unit_price, measurement: selected_variant.unit_price_measurement %}
+  {%- endif -%}
+
+  {% if show_compare_price %}
+    <span class="cf-quickshop__discount-badge">
+      <span class="cf-quickshop__discount-badge__top">
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#15803d" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"></polyline>
+        </svg>
+        20% DISCOUNT APPLIED
+      </span>
+
+      <span class="cf-quickshop__discount-badge__sale">
+        {{ price }}
+      </span>
+
+      <span class="cf-quickshop__discount-badge__note">
+        now you can buy at this price
+      </span>
+    </span>
+  {% endif %}
+
 </div>
