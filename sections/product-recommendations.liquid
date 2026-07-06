@@ -1010,7 +1010,7 @@
   }
 
   .cf-star--filled {
-    fill: #DA1E37;
+    fill: #ffab41;
   }
 
   .cf-review-count {
@@ -1026,10 +1026,9 @@
     gap: 6px;
     margin-top: auto;
     padding-top: 8px;
-    opacity: 0;
-    transform: translateY(4px);
-    pointer-events: none;
-    transition: opacity 0.25s ease, transform 0.25s ease;
+    opacity: 1;
+    transform: none;
+    pointer-events: auto;
   }
 
   .cf-card__actions .cf-card__btn {
@@ -1045,21 +1044,6 @@
   .cf-card__actions:has(.cf-card__btn--options) .cf-card__btn {
     flex: initial;
     padding: 8px 12px;
-  }
-
-  .resource-list__item .cf-card:hover .cf-card__actions,
-  .resource-list__item .cf-card:focus-within .cf-card__actions {
-    opacity: 1;
-    transform: translateY(0);
-    pointer-events: auto;
-  }
-
-  @media (hover: none) {
-    .resource-list__item .cf-card__actions {
-      opacity: 1;
-      transform: none;
-      pointer-events: auto;
-    }
   }
 
   .cf-card__btn {
