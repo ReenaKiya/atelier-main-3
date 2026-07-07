@@ -465,6 +465,78 @@
         "padding_bottom": 40
       }
     },
+    "shop_by_collection_main": {
+      "type": "shop-by-collection",
+      "blocks": {
+        "cat_belly": {
+          "type": "category",
+          "settings": {
+            "collection": "belly-rings-piercing",
+            "label": "Belly Rings Piercing"
+          }
+        },
+        "cat_earring": {
+          "type": "category",
+          "settings": {
+            "collection": "earring-jewellery",
+            "label": "Earring Jewellery"
+          }
+        },
+        "cat_14kgold": {
+          "type": "category",
+          "settings": {
+            "collection": "14k-gold-jewellery",
+            "label": "14K Gold Jewellery"
+          }
+        },
+        "cat_14knose": {
+          "type": "category",
+          "settings": {
+            "collection": "14k-gold-nose-jewellery",
+            "label": "14K Gold Nose Jewellery"
+          }
+        },
+        "cat_flatback": {
+          "type": "category",
+          "settings": {
+            "collection": "flatback-studs",
+            "label": "Flatback Studs"
+          }
+        },
+        "cat_clicker": {
+          "type": "category",
+          "settings": {
+            "collection": "gold-hinged-clicker-ring",
+            "label": "Gold Hinged Clicker Ring"
+          }
+        }
+      },
+      "block_order": [
+        "cat_belly",
+        "cat_earring",
+        "cat_14kgold",
+        "cat_14knose",
+        "cat_flatback",
+        "cat_clicker"
+      ],
+      "name": "Shop by Category",
+      "settings": {
+        "subtitle": "Shop By",
+        "title": "Category",
+        "products_per_view": 4,
+        "products_limit": 12,
+        "show_swatches": true,
+        "swatch_option": "Color",
+        "bg_color": "#ffffff",
+        "heading_color": "#111111",
+        "subtitle_color": "#8a8a8a",
+        "title_color": "#333333",
+        "price_color": "#DA1E37",
+        "accent_color": "#DA1E37",
+        "padding_top": 40,
+        "padding_bottom": 40
+      }
+    },
     "watch_and_buy_main": {
       "type": "watch-and-buy",
       "blocks": {
@@ -858,6 +930,7 @@
     "shop_by_type_afLXVP",
     "featured_collection_wwdfbm",
     "featured_collection_bestsellers",
+    "shop_by_collection_main",
     "watch_and_buy_main",
     "trust_icons_yAwwpV",
     "signature_collections_abc123",
