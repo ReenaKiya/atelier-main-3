@@ -164,6 +164,13 @@
   {%- assign pdt_size_guide = section.settings.size_guide_content -%}
 {%- endif -%}
 
+{%- comment -%} Size guide image (metafield: custom.size_guide_image). Prepended to the size guide content so it shows in the product tab AND the quick-shop popup. {%- endcomment -%}
+{%- assign pdt_size_guide_image = product.metafields.custom.size_guide_image -%}
+{%- if pdt_size_guide_image != blank -%}
+  {%- capture pdt_size_guide_img_html -%}<img src="{{ pdt_size_guide_image.value | image_url: width: 900 }}" alt="{{ product.title | escape }} size guide" loading="lazy" class="pdt-size-guide-img" style="max-width:100%;height:auto;display:block;margin:0 auto;">{%- endcapture -%}
+  {%- assign pdt_size_guide = pdt_size_guide_img_html | append: pdt_size_guide -%}
+{%- endif -%}
+
 {%- assign pdt_faq = product.metafields.custom.pdt_faq.value | default: blank -%}
 {%- if pdt_faq != blank -%}
   {%- assign pdt_faq = pdt_faq | replace: '&lt;', '<' | replace: '&gt;', '>' | replace: '&amp;', '&' | replace: '&quot;', '"' | replace: '&#39;', "'" -%}
