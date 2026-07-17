@@ -472,7 +472,8 @@
           "type": "category",
           "settings": {
             "collection": "belly-rings-piercing",
-            "label": "Belly Rings Piercing"
+            "label": "Belly Rings Piercing",
+            "image": "shopify://shop_images/Gemini_Generated_Image_u8omqdu8omqdu8om-circle-image.avif"
           }
         },
         "cat_earring": {
@@ -531,8 +532,8 @@
         "heading_color": "#111111",
         "subtitle_color": "#8a8a8a",
         "title_color": "#333333",
-        "price_color": "#DA1E37",
-        "accent_color": "#DA1E37",
+        "price_color": "#da1e37",
+        "accent_color": "#da1e37",
         "padding_top": 40,
         "padding_bottom": 40
       }
@@ -859,12 +860,13 @@
             "corner_styling": "soft",
             "header_text_color": "#000000",
             "text_color": "#000000",
-            "card_color": "#F9F9F9",
+            "card_color": "#f9f9f9",
             "stars_color": "",
             "arrows_color": "#000000",
             "transition_speed": 5,
             "header_text": "Customers are saying",
-            "show_average_rating": true
+            "show_average_rating": true,
+            "rating_display": "default"
           }
         }
       },
