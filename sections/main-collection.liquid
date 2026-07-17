@@ -725,6 +725,102 @@
     margin-left: 8px;
   }
 
+  .cf-quickshop__size-guide-link {
+    display: inline-block;
+    background: none;
+    border: none;
+    padding: 0;
+    margin: 0 0 16px;
+    font-size: 14px;
+    font-weight: 500;
+    color: #333;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    cursor: pointer;
+  }
+
+  .cf-quickshop__size-guide-link:hover {
+    color: #000;
+  }
+
+  .cf-quickshop__size-guide-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 100000;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    background: rgba(0, 0, 0, 0.5);
+  }
+
+  .cf-quickshop__size-guide-overlay[hidden] {
+    display: none;
+  }
+
+  .cf-quickshop__size-guide-panel {
+    position: relative;
+    background: #fff;
+    border-radius: 8px;
+    max-width: 640px;
+    width: 100%;
+    max-height: 85vh;
+    overflow: auto;
+    padding: 28px 24px 24px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.25);
+  }
+
+  .cf-quickshop__size-guide-close {
+    position: absolute;
+    top: 10px;
+    right: 12px;
+    background: none;
+    border: none;
+    font-size: 26px;
+    line-height: 1;
+    color: #666;
+    cursor: pointer;
+  }
+
+  .cf-quickshop__size-guide-close:hover {
+    color: #000;
+  }
+
+  .cf-quickshop__size-guide-heading {
+    margin: 0 0 16px;
+    font-size: 20px;
+    font-weight: 600;
+    color: #222;
+  }
+
+  .cf-quickshop__size-guide-body {
+    font-size: 14px;
+    color: #444;
+  }
+
+  .cf-quickshop__size-guide-body table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-bottom: 16px;
+  }
+
+  .cf-quickshop__size-guide-body th,
+  .cf-quickshop__size-guide-body td {
+    border: 1px solid #e0e0e0;
+    padding: 8px 10px;
+    text-align: left;
+  }
+
+  .cf-quickshop__size-guide-body th {
+    background: #f7f7f7;
+    font-weight: 600;
+  }
+
+  .cf-quickshop__size-guide-body img {
+    max-width: 100%;
+    height: auto;
+  }
+
   .cf-quickshop__option-group {
     margin-bottom: 16px;
   }
@@ -1353,11 +1449,17 @@
               if (metaDesc) descriptionText = (metaDesc.getAttribute("content") || "").substring(0, 250);
             }
 
+            /* Extract size guide (gauge size chart) */
+            var sizeGuideHtml = "";
+            var sizeGuideEl = doc.querySelector('[data-pdt-panel="gauge-size-guide"]');
+            if (sizeGuideEl && sizeGuideEl.innerHTML.trim()) sizeGuideHtml = sizeGuideEl.innerHTML;
+
             var detailsHtml = '<div class="cf-quickshop__details">';
             if (vendor) detailsHtml += '<p class="cf-quickshop__vendor">by <a href="/collections/vendors?q=' + encodeURIComponent(vendor) + '">' + vendor + '</a></p>';
             detailsHtml += '<h2 class="cf-quickshop__title">' + title + '</h2>';
             detailsHtml += reviewsHtml;
             if (priceHtml) detailsHtml += '<div class="cf-quickshop__price">' + priceHtml + '</div>';
+            if (sizeGuideHtml) detailsHtml += '<button type="button" class="cf-quickshop__size-guide-link">Size Guide</button>';
             if (optionHtml) detailsHtml += optionHtml;
             if (variantSelectHtml) detailsHtml += variantSelectHtml;
             detailsHtml += '<div class="cf-quickshop__quantity-row">';
@@ -1371,6 +1473,7 @@
             if (descriptionText) detailsHtml += '<div class="cf-quickshop__description">' + descriptionText + '</div>';
             detailsHtml += '<a href="' + productUrl + '" class="cf-quickshop__view-full">View full details</a>';
             detailsHtml += '</div>';
+            if (sizeGuideHtml) detailsHtml += '<div class="cf-quickshop__size-guide-overlay" hidden><div class="cf-quickshop__size-guide-panel"><button type="button" class="cf-quickshop__size-guide-close" aria-label="Close">&times;</button><h3 class="cf-quickshop__size-guide-heading">Size Guide</h3><div class="cf-quickshop__size-guide-body">' + sizeGuideHtml + '</div></div></div>';
 
             if (modalContent) {
               modalContent.innerHTML = isOptionsOnly ? detailsHtml : (imagesHtml + detailsHtml);
@@ -1378,6 +1481,16 @@
               if (isOptionsOnly) modalContent.classList.add("cf-options-only");
             }
             if (modalLoading) modalLoading.classList.add("cf-hidden");
+
+            /* Size guide popup */
+            var sgLink = modalContent.querySelector(".cf-quickshop__size-guide-link");
+            var sgOverlay = modalContent.querySelector(".cf-quickshop__size-guide-overlay");
+            if (sgLink && sgOverlay) {
+              var sgClose = sgOverlay.querySelector(".cf-quickshop__size-guide-close");
+              sgLink.addEventListener("click", function () { sgOverlay.hidden = false; });
+              if (sgClose) sgClose.addEventListener("click", function () { sgOverlay.hidden = true; });
+              sgOverlay.addEventListener("click", function (e) { if (e.target === sgOverlay) sgOverlay.hidden = true; });
+            }
 
             /* Thumbnail click */
             modalContent.querySelectorAll(".cf-quickshop__thumb").forEach(function (thumb) {
